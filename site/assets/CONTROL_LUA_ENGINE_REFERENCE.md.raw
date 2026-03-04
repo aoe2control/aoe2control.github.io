@@ -1,0 +1,397 @@
+# CONTROL Lua Engine — AI Agent Reference
+
+**Purpose:** This document provides complete information about the CONTROL Lua scripting engine for Age of Empires II: Definitive Edition. Copy-paste this file into a coding agent (Cursor, Copilot, ChatGPT, etc.) to help users with limited Lua knowledge quickly build modules.
+
+**Target:** Coding agents assisting users to write CONTROL Lua modules. The agent should use this as the sole source of truth for engine behavior and API.
+
+---
+
+## 1. Overview
+
+CONTROL is a Lua scripting engine that communicates directly with Age of Empires II: Definitive Edition. It reads game state and sends commands without pixel scanning or mouse/keyboard simulation.
+
+- **Platform:** Windows, single-player only (multiplayer disabled)
+- **Config location:** `%appdata%\CONTROL\AoE2Control\`
+- **Module folder:** `%appdata%\CONTROL\AoE2Control\modules\`
+- **Entry point:** `{moduleName}.main.lua` or `{moduleName}.main.module` (encrypted)
+
+---
+
+## 2. Module Structure
+
+### Folder Convention
+
+```
+modules/
+└── {moduleName}/
+    ├── {moduleName}.main.lua   ← Entry point (required)
+    └── utils/
+        └── logger.lua          ← Optional submodules
+```
+
+The folder name must match the module name. The engine searches recursively for `*.main.lua` or `*.main.module` up to **depth 3**.
+
+### require Behavior
+
+- `require("utils.logger")` → loads `utils/logger.lua` (relative to project root)
+- Dot notation becomes path separators
+- **Depth limit: 3** — `require("a.b.c.d")` fails
+- **No `..`** — directory traversal forbidden
+- **Caching:** Modules are cached; second `require` returns cached result
+- **Sandbox:** `load`, `loadfile`, `dofile`, `module`, `collectgarbage` are removed
+
+### Example Submodule
+
+```lua
+-- utils/logger.lua
+local logger = {}
+
+function logger.info(message)
+    Log("[Bot] " .. message)
+end
+
+return logger
+```
+
+---
+
+## 3. Lifecycle Callbacks
+
+All callbacks are **optional**. Implement only what you need.
+
+| Callback | When | Use for |
+|----------|------|---------|
+| `Load` | Once when module is selected | `Settings.Add*` only. Do NOT call game API. |
+| `Init` | When game is ready, world changed, module reloaded, or AI enabled | One-time setup (e.g. `IPC.StartServer`, `ChatLocal`) |
+| `Update` | At configurable interval (default 1.0s) while game runs | Main game logic — commands, decisions |
+| `Render` | Every frame while game runs | Drawing overlays |
+| `End` | Once when game ends | Cleanup, receives `hasWon` (boolean) |
+
+**Order:** Load → Init → (Update ↔ Render loop) → End
+
+**Important:** Game API (commands, facts, render) must be called only from `Init`, `Update`, or `Render`. Calling before the game starts logs an error.
+
+---
+
+## 4. Commands (Game API — Actions)
+
+Call from `Init`, `Update`, or `Render` when the game is active.
+
+| Function | Parameters | Description | Complexity |
+|----------|------------|-------------|------------|
+| `Log` | `(message)` | Write to log window | Not complex |
+| `SetGameSpeedMultiplier` | `(multiplier)` | Set game speed (e.g. 1.5, 30) | Not complex |
+| `SetCameraPosition` | `(position)` | Move camera; position is Vector2 | Not complex |
+| `ChatLocal` | `(message)` | Send message to local chat | Not complex |
+| `TrainUnit` | `(trainSources, unitId, amount?)` | Train units. trainSources = table of UnitObjectType (buildings), unitId = unit type, amount defaults to 1 | Low |
+| `UnitsTargetObject` | `(units, target)` | Order units to attack/target object | Low |
+| `UnitsBuildStructure` | `(builders, structureId, position)` | Order builders to construct | Low |
+| `UnitsMove` | `(units, position)` | Move units to Vector3 position | Low |
+| `EnableScouting` | `()` | Enable auto-scouting; returns boolean | Low |
+| `ResearchTechnology` | `(researchSources, technology)` | Research tech at specified buildings | Low |
+| `DeleteUnit` | `(unit)` | Delete a unit | Low |
+| `DestroyBuilding` | `(building)` | Destroy a building | Low |
+| `SetGatherPoint` | `(buildings, targetPosition)` | Set gather point for buildings | Low |
+| `RingTownBell` | `(building, isCallingIn)` | Ring town bell | Low |
+| `SendBackToWork` | `(building)` | Send garrisoned units back to work | Low |
+| `SendAllBackToWork` | `(building)` | Send all garrisoned units back to work | Low |
+| `SetUnitStanceAutoScout` | `(units)` | Set units to auto-scout | Low |
+| `SetUnitStancePatrol` | `(units, targetPosition)` | Set units to patrol | Low |
+| `SetUnitStanceGuard` | `(units, targetObject)` | Set units to guard object | Low |
+| `SetUnitStanceFollow` | `(units, targetObject)` | Set units to follow object | Low |
+| `SetUnitStanceAttackMove` | `(units, targetPosition)` | Set units to attack-move | Low |
+| `SetUnitStanceGarrison` | `(units, targetObject)` | Garrison units in building | Low |
+| `SetUnitStanceUngarrison` | `(sourceObjects, unit)` | Ungarrison unit | Low |
+| `SetUnitStanceSeekShelter` | `(units)` | Set units to seek shelter | Low |
+| `SetUnitCombatStance` | `(units, stance)` | Set combat stance (UnitCombatStance enum) | Low |
+
+**TrainUnit example:**
+```lua
+TrainUnit({UnitObjectType.TOWN_CENTER_FEUDAL_AGE}, UnitObjectType.VILLAGER_MALE, 1)
+```
+
+---
+
+## 5. Facts (Game API — Read State)
+
+Call from `Init`, `Update`, or `Render` when the game is active.
+
+| Function | Parameters | Returns | Description |
+|----------|------------|---------|-------------|
+| `GetFact` | `(factId, parameter?)` | number | Fact value (population, resources, etc.). parameter often 0 |
+| `GetUnitTypeCount` | `(unitId)` | number | Count of unit type for local player |
+| `GetAttribute` | `(attribute)` | number | Player attribute (PlayerAttribute enum) |
+| `CanAfford` | `(unitId, isBuilding?)` | boolean | Can local player afford |
+| `CanResearch` | `(technology)` | boolean | Can research technology |
+| `IsTechnologyResearched` | `(technology)` | boolean | Is technology researched |
+| `GetObjectsByType` | `(unitType)` | Table of Object | Objects of specific type |
+| `GetObjectsByTypes` | `(unitTypes)` | Table of Object | Objects matching any type |
+| `GetObjectsByClass` | `(unitClass)` | Table of Object | Objects of class (e.g. UnitClass.VILLAGER) |
+| `GetGameTime` | `()` | number | Current game time (seconds) |
+| `GetLocalPlayer` | `()` | Player | Local player object |
+| `GetPlayerById` | `(id)` | Player | Player by ID |
+| `GetPlayerCount` | `()` | number | Number of players |
+| `IsEnemyPlayer` | `(player)` | boolean | Is player an enemy |
+| `GetObjectById` | `(id)` | Object | Object by ID |
+| `GetVictoryCondition` | `()` | VictoryCondition | Current victory condition |
+| `GetVictoryPlayer` | `()` | Player? | Winning player (if game ended) |
+
+**GetFact example:**
+```lua
+local pop = GetFact(FactId.POPULATION, 0)
+local food = GetFact(FactId.FOOD_AMOUNT, 0)
+```
+
+---
+
+## 6. Render API
+
+Use in `Render()`. Three coordinate spaces: **Screen** (HUD), **World** (map), **Minimap**.
+
+### Base (Screen Space)
+
+| Function | Parameters |
+|----------|------------|
+| `GetScreenSize` | `()` → Vector2 |
+| `IsOnScreen` | `(position)` |
+| `RenderText` | `(text, position, size, color, center, border?)` |
+| `RenderLine` | `(from, to, color, thickness)` |
+| `RenderCircle` | `(position, radius, color, thickness, segments?)` |
+| `RenderCircleFilled` | `(position, radius, color, segments?)` |
+| `RenderRect` | `(from, to, color, rounding, roundingCornersFlags, thickness)` |
+| `RenderRectFilled` | `(from, to, color, rounding, roundingCornersFlags)` |
+
+### World / Minimap
+
+| Function | Parameters |
+|----------|------------|
+| `IsWorldPosOnScreen` | `(worldPos)` |
+| `WorldToScreen` | `(worldPos)` → Vector2 |
+| `WorldToMinimap` | `(worldPos)` → Vector2 |
+| `GetZoom` | `()` |
+| `GetCameraPosition` | `()` → Vector2 |
+| `RenderWorldLine` | `(from, to, color, thickness?)` |
+| `RenderWorldRect` | `(worldPos, width, height, color, thickness?)` |
+| `RenderWorldRectFilled` | `(worldPos, width, height, color)` |
+| `RenderWorldCircle` | `(worldPos, radius, color, thickness?, segments?)` |
+| `RenderWorldCircleFilled` | `(worldPos, radius, color, segments?)` |
+| `RenderWorldText` | `(text, worldPos, size, color, center?, border?)` |
+| `RenderObjectBounds` | `(object, color, thickness?)` |
+| `RenderObjectBoundsFilled` | `(object, color)` — exactly 2 params |
+| `RenderMinimapDot` | `(worldPos, radius, color)` |
+| `RenderMinimapLine` | `(worldPosFrom, worldPosTo, thickness, color)` |
+| `RenderMinimapRect` | `(worldPos, width, height, color, thickness)` |
+| `RenderMinimapRectFilled` | `(worldPos, width, height, color)` |
+
+---
+
+## 7. Settings API
+
+**Add functions** — call **only from `Load()`:**
+
+| Function | Parameters |
+|----------|------------|
+| `Settings.AddBool` | `(key, default)` |
+| `Settings.AddInt` | `(key, default, min, max)` |
+| `Settings.AddFloat` | `(key, default, min, max)` |
+| `Settings.AddDropdown` | `(key, default, options)` — options = table of strings |
+| `Settings.AddKeybind` | `(key, defaultVkCode)` — use Key.Add, Key.F, Key.SPACE, etc. |
+| `Settings.AddColor` | `(key, defaultColor)` |
+| `Settings.AddTooltip` | `(key, tooltip)` |
+
+**Get functions** — call from anywhere:
+
+| Function | Returns |
+|----------|---------|
+| `Settings.GetBool` | `(key, default?)` → boolean |
+| `Settings.GetInt` | `(key, default?)` → number |
+| `Settings.GetFloat` | `(key, default?)` → number |
+| `Settings.GetString` | `(key, default?)` → string |
+| `Settings.GetKeybind` | `(key, defaultVkCode?)` → number |
+| `Settings.GetColor` | `(key, defaultColor)` → Color |
+
+**IsKeyPressed:** `IsKeyPressed(vkCode)` → boolean. Use with `Settings.GetKeybind` for hotkeys.
+
+---
+
+## 8. IPC API
+
+For external processes (e.g. Python ML agents) via named pipes and JSON.
+
+| Function | Parameters | Returns |
+|----------|------------|---------|
+| `IPC.StartServer` | `(pipeName)` | boolean |
+| `IPC.StopServer` | `()` | — |
+| `IPC.Send` | `(message)` | — |
+| `IPC.GetMessages` | `()` | Table of strings |
+| `ParseJSON` | `(str)` | table |
+| `ToJSON` | `(obj)` | string |
+
+**Protocol:** Newline-delimited JSON. Pipe name `"AoE_ML_Pipe"` → `\\.\pipe\AoE_ML_Pipe`.
+
+---
+
+## 9. Types
+
+### Vector2, Vector3, Vector4
+
+- **Constructors:** `Vector2(x, y)`, `Vector3(x, y, z)`, `Vector4(x, y, z, w)`
+- **Properties:** x, y, z, w
+- **Methods:** LengthSqr, Length, Normalize, Normalized, Dot, Cross, IsNearlyZero, Lerp, Distance
+- **Operators:** +, -, *, /, unary -
+
+### Color
+
+- `Color.new(r, g, b)` or `Color.new(r, g, b, a)` — 0–255
+- `Color(r, g, b)`, `Color(hexStr)`, `Color.Parse`, `Color.HSV`
+
+### Game Types
+
+| Type | Source | Description | Complexity |
+|------|--------|-------------|------------|
+| **Object** | GetObjectsByType, GetObjectsByClass, GetObjectById | Unit or building. Methods: GetId, GetPosition, GetHitpoints, IsAlive, GetUnitObjectType, GetClass, GetAttribute, etc. | Low |
+| **Player** | GetLocalPlayer, GetPlayerById | Player. Methods: GetId, GetAttribute, GetUnitTypeCount, GetFact, CanAfford, GetObjectsByClass, GetTownCenters, etc. | Low |
+
+### Strategic Component Types
+
+| Type | Constructor | Description | Complexity |
+|------|-------------|-------------|------------|
+| **ResourceTracker** | `ResourceTracker()` | Tracks trees, gold, stone, farms, etc. Methods: GetConvertibleLivestock, GetForage, GetFarms, GetTrees, GetGold, GetStone | High |
+| **VillagerOccupation** | `VillagerOccupation(resourceTracker)` | Manages villager assignments. Methods: Update, GetVillagerCount, RequestVillagers, AssignVillagers | High |
+| **ConstructionPlacement** | `ConstructionPlacement(villagerOccupation)` | Building placement. Methods: Update, TryBuildStructure, FindBestPosition, QueueBuildingRequest, ProcessBuildingRequests | High |
+
+---
+
+## 10. Enums
+
+Use as `EnumName.VALUE`.
+
+### Game Enums (common values)
+
+- **PlayerType:** NON_PLAYER, HUMAN, GAIA, BOT
+- **VictoryCondition:** STANDARD, CONQUEST, TIME_LIMIT, SCORE, CUSTOM
+- **ResearchState:** NOT_AVAILABLE, LOCKED, RESEARCHABLE, RESEARCHING, RESEARCHED
+- **PlayerAttribute:** FOOD, WOOD, STONE, GOLD, POP_SPACE_LEFT, POP_CURRENT, AGE
+- **Age:** DARK_AGE, FEUDAL_AGE, CASTLE_AGE, IMPERIAL_AGE
+- **UnitCombatStance:** AGGRESSIVE, DEFENSIVE, NO_ATTACK, STAND_GROUND
+- **FactId:** GAME_TIME, POPULATION_CAP, FOOD_AMOUNT, WOOD_AMOUNT, STONE_AMOUNT, GOLD_AMOUNT, POPULATION, etc.
+
+### UnitClass, UnitObjectType, Technology
+
+These enums have hundreds of values. Reference external tables:
+
+- **UnitObjectType:** https://airef.github.io/tables/objects.html
+- **UnitClass:** https://airef.github.io/parameters/parameters-details.html#ClassId
+- **Technology:** https://airef.github.io/tables/techs.html
+- **ObjectData:** https://airef.github.io/parameters/parameters-details.html#ObjectData
+
+### Key (for keybinds)
+
+- `Key.Add` (numpad +), `Key.F`, `Key.SPACE`, `Key.Escape`, `Key.Num0`–`Key.Num9`, `Key.F1`–`Key.F12`, etc.
+
+---
+
+## 11. Limits
+
+- **require depth:** Max 3 levels
+- **Multiplayer:** Disabled
+- **Sandbox:** No `load`, `loadfile`, `dofile`, `module`, `collectgarbage`
+- **Game API:** Only call from Init, Update, or Render
+- **Performance:** Avoid heavy work in Render (runs every frame)
+
+---
+
+## 12. Complete Examples
+
+### Minimal Module (Settings + Render)
+
+```lua
+-- my_module.main.lua
+local logger = require("utils.logger")
+
+function Load()
+    Settings.AddColor("Villager Color", Color.new(0, 255, 0))
+    Settings.AddKeybind("Increase Game Speed", Key.Add)
+    logger.info("Module loaded")
+end
+
+function Init()
+    ChatLocal("Hello from my module!")
+end
+
+function Update()
+end
+
+function Render()
+    local key = Settings.GetKeybind("Increase Game Speed", Key.Add)
+    if IsKeyPressed(key) then
+        SetGameSpeedMultiplier(30)
+    else
+        SetGameSpeedMultiplier(1.5)
+    end
+
+    local color = Settings.GetColor("Villager Color", Color.new(0, 255, 0))
+    local villagers = GetObjectsByClass(UnitClass.VILLAGER)
+    for i = 1, #villagers do
+        RenderObjectBoundsFilled(villagers[i], color)
+    end
+end
+
+function End(hasWon)
+    logger.info("Game ended: " .. (hasWon and "Victory!" or "Defeat!"))
+end
+```
+
+### IPC Module (External Agent)
+
+```lua
+-- ipc_module.main.lua
+local pipeName = "AoE_ML_Pipe"
+
+function Init()
+    IPC.StartServer(pipeName)
+end
+
+function Update()
+    local messages = IPC.GetMessages()
+    for _, msgStr in ipairs(messages) do
+        local cmd = ParseJSON(msgStr)
+        if cmd and cmd.action == "Scout" and cmd.target then
+            -- UnitsMove(cmd.unitIds, Vector3(cmd.target.x, cmd.target.y, 0))
+        end
+    end
+
+    local state = { time = GetGameTime(), playerCount = GetPlayerCount(), isAlive = true }
+    IPC.Send(ToJSON(state))
+end
+
+function End()
+    IPC.StopServer()
+end
+```
+
+### Logger Submodule
+
+```lua
+-- utils/logger.lua
+local logger = {}
+function logger.info(message)
+    Log("[Bot] " .. message)
+end
+return logger
+```
+
+---
+
+## 13. Agent Instructions
+
+When assisting users to build CONTROL modules:
+
+1. **Always** create the entry file as `{moduleName}.main.lua` inside `modules/{moduleName}/`.
+2. **Use** the exact function names and signatures from this document.
+3. **Call** game API only from Init, Update, or Render.
+4. **Call** Settings.Add* only from Load.
+5. **Respect** the require depth limit of 3.
+6. **Reference** https://airef.github.io for UnitObjectType, UnitClass, Technology IDs when the user needs specific unit/tech IDs.
+7. **Suggest** the full module structure including submodules when the user's request is complex.
+8. **Remind** users that multiplayer is disabled and the engine is single-player only.

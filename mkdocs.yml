@@ -11,6 +11,7 @@ theme:
     - search.suggest
     - search.highlight
     - toc.integrate
+    - content.code.copy
   logo: assets/logo.png
   favicon: assets/logo.png
 
