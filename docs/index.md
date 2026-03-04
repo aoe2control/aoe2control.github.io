@@ -26,7 +26,7 @@ The engine talks directly to the game, allowing scripters to:
 | **Multi-file Projects** | Use `require()` for modular Lua code (depth limit: 3) |
 | **IPC for ML** | Named pipes + JSON for external agents (e.g. Python) |
 | **Encrypted Modules** | Precompiled `.module` files for code protection |
-| **VS Code Plugin** | Planned — autocomplete and suggestions for endpoints |
+| **VS Code Plugin** | [Available on Marketplace](https://marketplace.visualstudio.com/items?itemName=BigJohn.aoe2-control-lua) — IntelliSense, snippets, and API definitions |
 
 ## Target Audience
 

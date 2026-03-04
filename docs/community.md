@@ -14,4 +14,4 @@ The community is in early stages. Contributions, feedback, and shared modules ar
 
 ## VS Code Plugin
 
-A Visual Studio Code plugin is planned to provide autocomplete and suggestions for CONTROL endpoints, making development easier.
+The [aoe2-control-lua](https://marketplace.visualstudio.com/items?itemName=BigJohn.aoe2-control-lua) extension is available on the Visual Studio Code Marketplace. It provides IntelliSense, code snippets, and full API definitions for the CONTROL Lua engine.
