@@ -36,9 +36,9 @@ The engine talks directly to the game, allowing scripters to:
 
 ## Prerequisites
 
-- **Age of Empires II: Definitive Edition** (Steam)
+- **Age of Empires II: Definitive Edition** (Xbox version not tested)
 - Basic Lua familiarity is helpful but not required
-- Windows
+- Windows (64-bit)
 
 ## Quick Links
 

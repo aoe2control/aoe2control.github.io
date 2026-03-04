@@ -61,13 +61,14 @@ All callbacks are **optional**. Implement only what you need.
 
 | Callback | When | Use for |
 |----------|------|---------|
-| `Load` | Once when module is selected | `Settings.Add*` only. Do NOT call game API. |
+| `Load` | When module is selected or AI is enabled | `Settings.Add*` only. Module settings only show when AI enabled. Do NOT call game API. |
 | `Init` | When game is ready, world changed, module reloaded, or AI enabled | One-time setup (e.g. `IPC.StartServer`, `ChatLocal`) |
 | `Update` | At configurable interval (default 1.0s) while game runs | Main game logic — commands, decisions |
 | `Render` | Every frame while game runs | Drawing overlays |
 | `End` | Once when game ends | Cleanup, receives `hasWon` (boolean) |
+| `Unload` | When module is unloaded, AI is disabled, or engine is ejected | IPC cleanup (e.g. `IPC.StopServer()`), releasing resources |
 
-**Order:** Load → Init → (Update ↔ Render loop) → End
+**Order:** Load → Init → (Update ↔ Render loop) → End. **Unload** runs independently when the module is unloaded, AI is disabled, or the engine is ejected (e.g. user detaches).
 
 **Important:** Game API (commands, facts, render) must be called only from `Init`, `Update`, or `Render`. Calling before the game starts logs an error.
 

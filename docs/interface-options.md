@@ -28,6 +28,8 @@ Example: `modules/my_first_module/my_first_module.main.lua` appears as `my_first
 
 The Update Interval is clamped to a minimum of 0.1 seconds in the ui and 0.01 seconds when manually editing the settings file.
 
+**Module settings** (checkboxes, sliders, etc. that a module adds via `Load`) are only shown in the menu while AI is enabled.
+
 ## Log Window
 
 An option exists to show **only script logs** (default) — filtering out engine-internal messages. Use `Log("message")` in your scripts to write to this window.

@@ -60,7 +60,16 @@ function End()
     Log("Shutting down IPC Server...")
     IPC.StopServer()
 end
+
+-- Unload runs when module is unloaded, AI is disabled, or engine is ejected.
+-- Use it for IPC cleanup when the game may not have ended (e.g. user switches module or detaches).
+function Unload()
+    Log("Unloading — stopping IPC Server...")
+    IPC.StopServer()
+end
 ```
+
+**Note:** Use `Unload` for IPC cleanup when the module is switched, AI is disabled, or the engine is ejected. Use `End` for cleanup when the game ends normally. Implementing both ensures proper cleanup in all cases.
 
 ## Python Client Example
 
