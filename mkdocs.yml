@@ -1,0 +1,65 @@
+site_name: AoE 2 Control - Lua Scripting Engine Documentation
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: black
+    accent: deep blue
+  features:
+    - navigation.tabs
+    - navigation.expand
+    - search.suggest
+    - search.highlight
+    - toc.integrate
+  logo: assets/logo.png
+  favicon: assets/logo.png
+
+docs_dir: docs
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed
+  - tables
+  - admonition
+  - pymdownx.details
+
+extra:
+  discord: "https://discord.gg/5PNcyrgC"
+  version: "1.0"
+
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - getting-started.md
+    - quick-example.md
+  - Interface & Configuration:
+    - interface-options.md
+    - config-location.md
+  - Scripting Fundamentals:
+    - lifecycle.md
+    - module-system.md
+  - Game API:
+    - commands.md
+    - facts.md
+  - Render API: render-api.md
+  - Types & Enums:
+    - types.md
+    - enums.md
+  - Advanced APIs:
+    - settings-api.md
+    - render-api-impl.md
+    - ipc-api.md
+  - Reference:
+    - ai-agent-reference.md
+    - limits.md
+    - distribution.md
+    - community.md
+  - Discord: https://discord.gg/5PNcyrgC
