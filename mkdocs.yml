@@ -1,4 +1,5 @@
 site_name: AoE 2 Control - Lua Scripting Engine Documentation
+site_url: https://aoe2control.github.io/
 theme:
   name: material
   palette:
