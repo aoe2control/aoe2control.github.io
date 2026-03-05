@@ -18,4 +18,4 @@ The engine may be **flagged by antivirus** due to techniques (process injection,
 
 ## Updates
 
-The engine may need updates after major AoE2DE patches. Check for new releases when the game updates. Join the [Discord server](https://discord.gg/5PNcyrgC) for announcements and support.
+The engine may need updates after major AoE2DE patches. Check for new releases when the game updates. Join the [Discord server](https://discord.gg/DENDVuWq5t) for announcements and support.

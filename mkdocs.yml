@@ -31,7 +31,7 @@ markdown_extensions:
   - pymdownx.details
 
 extra:
-  discord: "https://discord.gg/5PNcyrgC"
+  discord: "https://discord.gg/DENDVuWq5t"
   version: "1.0"
 
 extra_css:
@@ -64,4 +64,4 @@ nav:
     - limits.md
     - distribution.md
     - community.md
-  - Discord: https://discord.gg/5PNcyrgC
+  - Discord: https://discord.gg/DENDVuWq5t

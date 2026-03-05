@@ -2,7 +2,7 @@
 
 ## Discord
 
-[Join the Discord server](https://discord.gg/5PNcyrgC) for:
+[Join the Discord server](https://discord.gg/DENDVuWq5t) for:
 
 - **Support** — Ask questions about scripting and the engine
 - **Sharing** — Share your modules and scripts

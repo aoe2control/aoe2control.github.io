@@ -4,7 +4,7 @@
 
 **CONTROL** is a Lua scripting engine that communicates directly with Age of Empires II: Definitive Edition. It reads game state and sends commands without pixel scanning or mouse/keyboard simulation.
 
-[![Join Discord](https://img.shields.io/badge/Discord-Join%20Community-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/5PNcyrgC)
+[![Join Discord](https://img.shields.io/badge/Discord-Join%20Community-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/DENDVuWq5t)
 
 ## What is it?
 
