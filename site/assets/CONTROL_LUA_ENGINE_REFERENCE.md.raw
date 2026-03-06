@@ -207,6 +207,7 @@ Behavior:
 - `IPC.Send` wraps payloads in an envelope with source metadata
 - `IPC.GetMessages` returns strings; use `ParseJSON` when expecting JSON
 - `IPC.Send` and `IPC.GetMessages` no longer block waiting for the pipe to close
+- Explicit `IPC.StopServer()` in `Unload()` is optional in practice because CONTROL also stops the server automatically after module unload
 
 ---
 

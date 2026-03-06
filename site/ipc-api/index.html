@@ -1646,11 +1646,10 @@
 <span class="w">    </span><span class="kr">end</span>
 <span class="kr">end</span>
 
-<span class="kr">function</span><span class="w"> </span><span class="nf">End</span><span class="p">()</span>
-<span class="w">    </span><span class="nv">IPC</span><span class="p">.</span><span class="nf">StopServer</span><span class="p">()</span>
-<span class="kr">end</span>
-
 <span class="kr">function</span><span class="w"> </span><span class="nf">Unload</span><span class="p">()</span>
+<span class="w">    </span><span class="c1">-- Not required in theory: CONTROL stops the server automatically</span>
+<span class="w">    </span><span class="c1">-- after the module is unloaded. Keeping this is still fine as</span>
+<span class="w">    </span><span class="c1">-- explicit cleanup.</span>
 <span class="w">    </span><span class="nv">IPC</span><span class="p">.</span><span class="nf">StopServer</span><span class="p">()</span>
 <span class="kr">end</span>
 </code></pre></div>
@@ -1702,7 +1701,7 @@
 <li><code>IPC.Send</code> returns <code>false</code> if no client is connected.</li>
 <li><code>IPC.GetMessages()</code> still returns strings. Use <code>ParseJSON()</code> when you expect JSON payloads.</li>
 <li><code>IPC.Send()</code> and <code>IPC.GetMessages()</code> are safe to poll continuously; they no longer wait for the pipe to close before returning data.</li>
-<li>Use both <code>End</code> and <code>Unload</code> for cleanup so pipe servers stop on normal game end and on module disable/reload.</li>
+<li>Explicit <code>IPC.StopServer()</code> in <code>Unload()</code> is optional in practice because CONTROL also stops the server automatically after module unload.</li>
 </ul>
 
 

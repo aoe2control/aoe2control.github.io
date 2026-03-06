@@ -81,11 +81,10 @@ function Update()
     end
 end
 
-function End()
-    IPC.StopServer()
-end
-
 function Unload()
+    -- Not required in theory: CONTROL stops the server automatically
+    -- after the module is unloaded. Keeping this is still fine as
+    -- explicit cleanup.
     IPC.StopServer()
 end
 ```
@@ -141,4 +140,4 @@ print(data.decode("utf-8"))
 - `IPC.Send` returns `false` if no client is connected.
 - `IPC.GetMessages()` still returns strings. Use `ParseJSON()` when you expect JSON payloads.
 - `IPC.Send()` and `IPC.GetMessages()` are safe to poll continuously; they no longer wait for the pipe to close before returning data.
-- Use both `End` and `Unload` for cleanup so pipe servers stop on normal game end and on module disable/reload.
+- Explicit `IPC.StopServer()` in `Unload()` is optional in practice because CONTROL also stops the server automatically after module unload.
