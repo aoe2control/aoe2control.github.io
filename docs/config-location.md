@@ -1,28 +1,22 @@
 # Config Location
 
-All CONTROL configuration and module data lives in a single folder.
+All CONTROL configuration and module data lives here:
 
-## Path
-
-```
+```text
 %appdata%\CONTROL\AoE2Control\
 ```
-
-On Windows, `%appdata%` typically resolves to `C:\Users\<username>\AppData\Roaming`.
 
 ## Contents
 
 | Item | Description |
 |------|-------------|
-| `settings.ini` | Engine and module settings (AI enabled, module choice, update interval, per-module settings) |
-| `imgui.ini` | ImGui layout (window positions, etc.) |
-| `modules/` | Folder for your Lua module projects |
+| `settings.ini` | Global AI settings, module instance configs, profiles, misc options, and module settings. |
+| `imgui.ini` | Saved ImGui layout. |
+| `modules/` | Lua and encrypted module projects. |
 
-## Module Projects
+## Module Folder Example
 
-Place your module projects inside `modules/`:
-
-```
+```text
 modules/
 ├── my_first_module/
 │   ├── my_first_module.main.lua
@@ -32,4 +26,7 @@ modules/
     └── ipc_test.main.lua
 ```
 
-**Depth limit:** Subfolders are supported up to 3 levels for module discovery and `require()`.
+## Limits
+
+- Module discovery depth: 3
+- `require()` depth: 3

@@ -8,6 +8,8 @@
       
       
       
+        <link rel="canonical" href="https://aoe2control.github.io/types/">
+      
       
         <link rel="prev" href="../render-api/">
       
@@ -1157,6 +1159,67 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Strategic Component Types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#resourcetracker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ResourceTracker
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#villageroccupation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VillagerOccupation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#constructionplacement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ConstructionPlacement
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#binding-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Binding Notes
+      
+    </span>
+  </a>
+  
 </li>
       
     </ul>
@@ -1562,413 +1625,715 @@
 
 
 <h1 id="types">Types</h1>
-<p>CONTROL exposes several types for use in Lua scripts.</p>
+<p>CONTROL exposes math helpers, game objects, and strategic helper classes to Lua.</p>
+<div class="admonition note">
+<p class="admonition-title">Lua signatures are strict</p>
+<p>If a method parameter is listed here, pass it explicitly unless a separate overload is shown.</p>
+</div>
 <h2 id="math-types">Math Types</h2>
 <h3 id="vector2">Vector2</h3>
+<p><strong>Constructors:</strong> <code>Vector2()</code>, <code>Vector2(x, y)</code>, <code>Vector2(scalar)</code></p>
 <table>
 <thead>
 <tr>
-<th>Property</th>
-<th>Type</th>
+<th>Member</th>
+<th>Returns</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>x</code>, <code>y</code></td>
-<td>number</td>
-<td>Components</td>
+<td><code>number</code></td>
+<td>Vector components.</td>
+</tr>
+<tr>
+<td><code>LengthSqr()</code></td>
+<td><code>number</code></td>
+<td>Squared vector length.</td>
+</tr>
+<tr>
+<td><code>Length()</code></td>
+<td><code>number</code></td>
+<td>Vector length.</td>
+</tr>
+<tr>
+<td><code>Normalize()</code></td>
+<td><code>nil</code></td>
+<td>Normalizes the vector in place.</td>
+</tr>
+<tr>
+<td><code>Normalized()</code></td>
+<td><code>Vector2</code></td>
+<td>Returns a normalized copy.</td>
+</tr>
+<tr>
+<td><code>Dot(other)</code></td>
+<td><code>number</code></td>
+<td>Instance dot product.</td>
+</tr>
+<tr>
+<td><code>Dot(a, b)</code></td>
+<td><code>number</code></td>
+<td>Static-style dot product overload.</td>
+</tr>
+<tr>
+<td><code>Cross(other)</code></td>
+<td><code>number</code></td>
+<td>Instance 2D cross product.</td>
+</tr>
+<tr>
+<td><code>Cross(a, b)</code></td>
+<td><code>number</code></td>
+<td>Static-style 2D cross product overload.</td>
+</tr>
+<tr>
+<td><code>IsNearlyZero()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether the vector is near zero.</td>
+</tr>
+<tr>
+<td><code>Lerp(target, alpha)</code></td>
+<td><code>Vector2</code></td>
+<td>Linearly interpolates toward <code>target</code>.</td>
+</tr>
+<tr>
+<td><code>Distance(other)</code></td>
+<td><code>number</code></td>
+<td>Distance to another <code>Vector2</code>.</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Constructors:</strong> <code>Vector2()</code>, <code>Vector2(x, y)</code>, <code>Vector2(scalar)</code></p>
-<p><strong>Methods:</strong> LengthSqr, Length, Normalize, Normalized, Dot, Cross, IsNearlyZero, Lerp, Distance</p>
-<p><strong>Operators:</strong> +, -, *, /, unary -</p>
+<p><strong>Operators:</strong> <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, unary <code>-</code>, <code>==</code></p>
 <h3 id="vector3">Vector3</h3>
+<p><strong>Constructors:</strong> <code>Vector3()</code>, <code>Vector3(x, y, z)</code>, <code>Vector3(scalar)</code></p>
 <table>
 <thead>
 <tr>
-<th>Property</th>
-<th>Type</th>
+<th>Member</th>
+<th>Returns</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>x</code>, <code>y</code>, <code>z</code></td>
-<td>number</td>
-<td>Components</td>
+<td><code>number</code></td>
+<td>Vector components.</td>
+</tr>
+<tr>
+<td><code>LengthSqr()</code></td>
+<td><code>number</code></td>
+<td>Squared vector length.</td>
+</tr>
+<tr>
+<td><code>Length()</code></td>
+<td><code>number</code></td>
+<td>Vector length.</td>
+</tr>
+<tr>
+<td><code>Normalize()</code></td>
+<td><code>nil</code></td>
+<td>Normalizes the vector in place.</td>
+</tr>
+<tr>
+<td><code>Normalized()</code></td>
+<td><code>Vector3</code></td>
+<td>Returns a normalized copy.</td>
+</tr>
+<tr>
+<td><code>Dot(other)</code></td>
+<td><code>number</code></td>
+<td>Instance dot product.</td>
+</tr>
+<tr>
+<td><code>Dot(a, b)</code></td>
+<td><code>number</code></td>
+<td>Static-style dot product overload.</td>
+</tr>
+<tr>
+<td><code>Cross(other)</code></td>
+<td><code>Vector3</code></td>
+<td>Instance cross product.</td>
+</tr>
+<tr>
+<td><code>Cross(a, b)</code></td>
+<td><code>Vector3</code></td>
+<td>Static-style cross product overload.</td>
+</tr>
+<tr>
+<td><code>IsNearlyZero()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether the vector is near zero.</td>
+</tr>
+<tr>
+<td><code>Lerp(target, alpha)</code></td>
+<td><code>Vector3</code></td>
+<td>Linearly interpolates toward <code>target</code>.</td>
+</tr>
+<tr>
+<td><code>Distance(other)</code></td>
+<td><code>number</code></td>
+<td>Distance to another <code>Vector3</code>.</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Constructors:</strong> <code>Vector3()</code>, <code>Vector3(x, y, z)</code>, <code>Vector3(scalar)</code></p>
-<p><strong>Methods:</strong> LengthSqr, Length, Normalize, Normalized, Dot, Cross, IsNearlyZero, Lerp, Distance</p>
-<p><strong>Operators:</strong> +, -, *, /, unary -</p>
-<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">pos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">Vector3</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
-<span class="c1">-- or Vector3.new(x, y, z) if available</span>
-</code></pre></div>
+<p><strong>Operators:</strong> <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, unary <code>-</code>, <code>==</code></p>
 <h3 id="vector4">Vector4</h3>
+<p><strong>Constructors:</strong> <code>Vector4()</code>, <code>Vector4(x, y, z, w)</code>, <code>Vector4(scalar)</code></p>
 <table>
 <thead>
 <tr>
-<th>Property</th>
-<th>Type</th>
+<th>Member</th>
+<th>Returns</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>x</code>, <code>y</code>, <code>z</code>, <code>w</code></td>
-<td>number</td>
-<td>Components</td>
+<td><code>number</code></td>
+<td>Vector components.</td>
+</tr>
+<tr>
+<td><code>LengthSqr()</code></td>
+<td><code>number</code></td>
+<td>Squared vector length.</td>
+</tr>
+<tr>
+<td><code>Length()</code></td>
+<td><code>number</code></td>
+<td>Vector length.</td>
+</tr>
+<tr>
+<td><code>Normalize()</code></td>
+<td><code>nil</code></td>
+<td>Normalizes the vector in place.</td>
+</tr>
+<tr>
+<td><code>Normalized()</code></td>
+<td><code>Vector4</code></td>
+<td>Returns a normalized copy.</td>
+</tr>
+<tr>
+<td><code>Dot(other)</code></td>
+<td><code>number</code></td>
+<td>Instance dot product.</td>
+</tr>
+<tr>
+<td><code>Dot(a, b)</code></td>
+<td><code>number</code></td>
+<td>Static-style dot product overload.</td>
+</tr>
+<tr>
+<td><code>IsNearlyZero()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether the vector is near zero.</td>
+</tr>
+<tr>
+<td><code>Lerp(target, alpha)</code></td>
+<td><code>Vector4</code></td>
+<td>Linearly interpolates toward <code>target</code>.</td>
+</tr>
+<tr>
+<td><code>Distance(other)</code></td>
+<td><code>number</code></td>
+<td>Distance to another <code>Vector4</code>.</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Constructors:</strong> <code>Vector4()</code>, <code>Vector4(x, y, z, w)</code>, <code>Vector4(scalar)</code></p>
-<p><strong>Methods:</strong> LengthSqr, Length, Normalize, Normalized, Dot, IsNearlyZero, Lerp, Distance</p>
-<p><strong>Operators:</strong> +, -, *, /, unary -</p>
+<p><strong>Operators:</strong> <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, unary <code>-</code>, <code>==</code></p>
 <h2 id="color">Color</h2>
-<p><strong>Constructors:</strong></p>
+<p><strong>Constructors</strong></p>
 <ul>
-<li><code>Color(r, g, b)</code> — RGB, 0–255</li>
-<li><code>Color(r, g, b, a)</code> — RGBA, 0–255</li>
-<li><code>Color(r, g, b, a)</code> — float 0–1</li>
-<li><code>Color(hexStr)</code> — hex string</li>
+<li><code>Color()</code></li>
+<li><code>Color(r, g, b)</code></li>
+<li><code>Color(r, g, b, a)</code></li>
+<li><code>Color(floatR, floatG, floatB)</code></li>
+<li><code>Color(floatR, floatG, floatB, floatA)</code></li>
+<li><code>Color(hexString)</code></li>
 </ul>
-<p><strong>Static methods:</strong> <code>Color.Parse</code>, <code>Color.HSV</code></p>
-<div class="highlight"><pre><span></span><code><span class="nv">Color</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w">      </span><span class="c1">-- green (used in my_first_module)</span>
-<span class="nv">Color</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">128</span><span class="p">)</span><span class="w"> </span><span class="c1">-- green with alpha</span>
-</code></pre></div>
-<h2 id="game-types">Game Types</h2>
-<h3 id="object">Object</h3>
-<p>Returned by <code>GetObjectsByType</code>, <code>GetObjectsByTypes</code>, <code>GetObjectsByClass</code>, <code>GetObjectById</code>.</p>
+<p><strong>Static methods</strong></p>
 <table>
 <thead>
 <tr>
 <th>Method</th>
 <th>Returns</th>
 <th>Description</th>
-<th>Complexity</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>GetId</td>
-<td>number</td>
-<td>Object ID</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>Color.Parse(value)</code></td>
+<td><code>Color</code></td>
+<td>Parses a string color value.</td>
 </tr>
 <tr>
-<td>GetObjectType</td>
-<td>ObjectType</td>
-<td>Type</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>Color.HSV(h, s, v)</code></td>
+<td><code>Color</code></td>
+<td>Creates a color from HSV components.</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">green</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">translucent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">128</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="game-types">Game Types</h2>
+<h3 id="object">Object</h3>
+<p>Returned by <code>GetObjectsByType</code>, <code>GetObjectsByTypes</code>, <code>GetObjectsByClass</code>, and <code>GetObjectById</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GetId()</code></td>
+<td><code>number</code></td>
+<td>Returns the object's id.</td>
 </tr>
 <tr>
-<td>GetOwningPlayer</td>
-<td>Player</td>
-<td>Owner</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetObjectType()</code></td>
+<td><code>ObjectType</code></td>
+<td>Returns the high-level object type.</td>
 </tr>
 <tr>
-<td>GetGarrisonObject</td>
-<td>Object?</td>
-<td>Garrison container</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetOwningPlayer()</code></td>
+<td><code>Player</code></td>
+<td>Returns the owning player.</td>
 </tr>
 <tr>
-<td>GetTargetPosition</td>
-<td>Vector3</td>
-<td>Target position</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetGarrisonObject()</code></td>
+<td><code>Object</code></td>
+<td>Returns the current garrison container.</td>
 </tr>
 <tr>
-<td>GetTargetObject</td>
-<td>Object?</td>
-<td>Target object</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetTargetPosition()</code></td>
+<td><code>Vector3</code></td>
+<td>Returns the AI target position.</td>
 </tr>
 <tr>
-<td>GetDirection</td>
-<td>number</td>
-<td>Facing direction</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetTargetObject()</code></td>
+<td><code>Object</code></td>
+<td>Returns the current AI target object.</td>
 </tr>
 <tr>
-<td>IsVisible</td>
-<td>boolean</td>
-<td>Visible to local player</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetDirection()</code></td>
+<td><code>Vector3</code></td>
+<td>Returns the current facing vector.</td>
 </tr>
 <tr>
-<td>IsAlive</td>
-<td>boolean</td>
-<td>Alive</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>IsVisible()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether the object is visible in the current perspective.</td>
 </tr>
 <tr>
-<td>GetUnitObjectType</td>
-<td>UnitObjectType</td>
-<td>Unit type</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>IsAlive()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether the object is alive.</td>
 </tr>
 <tr>
-<td>GetClass</td>
-<td>UnitClass</td>
-<td>Unit class</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetUnitObjectType()</code></td>
+<td><code>UnitObjectType</code></td>
+<td>Returns the unit or building type id.</td>
 </tr>
 <tr>
-<td>GetAttribute</td>
-<td>number</td>
-<td>Attribute value</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetClass()</code></td>
+<td><code>UnitClass</code></td>
+<td>Returns the unit class id.</td>
 </tr>
 <tr>
-<td>GetObjectData</td>
-<td>number</td>
-<td>Object data field</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetAttribute(attribute, damageType)</code></td>
+<td><code>number</code></td>
+<td>Returns a unit attribute value.</td>
 </tr>
 <tr>
-<td>IsIdle</td>
-<td>boolean</td>
-<td>Idle</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetObjectData(objectData)</code></td>
+<td><code>number</code></td>
+<td>Returns an object data field.</td>
 </tr>
 <tr>
-<td>IsMoving</td>
-<td>boolean</td>
-<td>Moving</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>IsIdle()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether the object is idle.</td>
 </tr>
 <tr>
-<td>IsScouting</td>
-<td>boolean</td>
-<td>Scouting</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>IsMoving()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether the object is moving.</td>
 </tr>
 <tr>
-<td>GetHitpoints</td>
-<td>number</td>
-<td>Current HP</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>IsScouting()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether the object is auto-scouting.</td>
 </tr>
 <tr>
-<td>GetMaxHitpoints</td>
-<td>number</td>
-<td>Max HP</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetHitpoints()</code></td>
+<td><code>number</code></td>
+<td>Returns current hitpoints.</td>
 </tr>
 <tr>
-<td>GetPosition</td>
-<td>Vector3</td>
-<td>World position</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetMaxHitpoints()</code></td>
+<td><code>number</code></td>
+<td>Returns max hitpoints.</td>
+</tr>
+<tr>
+<td><code>GetPosition()</code></td>
+<td><code>Vector3</code></td>
+<td>Returns the world position.</td>
 </tr>
 </tbody>
 </table>
 <h3 id="player">Player</h3>
-<p>Returned by <code>GetLocalPlayer</code>, <code>GetPlayerById</code>, <code>GetVictoryPlayer</code>.</p>
+<p>Returned by <code>GetAssignedPlayer</code>, <code>GetPlayerById</code>, and <code>GetVictoryPlayer</code>.</p>
 <table>
 <thead>
 <tr>
 <th>Method</th>
 <th>Returns</th>
 <th>Description</th>
-<th>Complexity</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>GetId</td>
-<td>number</td>
-<td>Player ID</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetId()</code></td>
+<td><code>number</code></td>
+<td>Returns the player id.</td>
 </tr>
 <tr>
-<td>GetPlayerType</td>
-<td>PlayerType</td>
-<td>Type (human, bot, etc.)</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetPlayerType()</code></td>
+<td><code>PlayerType</code></td>
+<td>Returns the player type.</td>
 </tr>
 <tr>
-<td>GetPlayerObjects</td>
-<td>Table</td>
-<td>Objects owned</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>GetPlayerObjects()</code></td>
+<td><code>Object[]</code></td>
+<td>Returns owned objects.</td>
 </tr>
 <tr>
-<td>GetCameraPosition</td>
-<td>Vector2</td>
-<td>Camera position</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetCameraPosition()</code></td>
+<td><code>Vector2</code></td>
+<td>Returns the player's camera position.</td>
 </tr>
 <tr>
-<td>GetMouseHoveredObject</td>
-<td>Object?</td>
-<td>Hovered object</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetMouseHoveredObject()</code></td>
+<td><code>Object</code></td>
+<td>Returns the currently hovered object.</td>
 </tr>
 <tr>
-<td>GetSelectedObject</td>
-<td>Object?</td>
-<td>Selected object</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetSelectedObject()</code></td>
+<td><code>Object</code></td>
+<td>Returns the last selected object.</td>
 </tr>
 <tr>
-<td>GetSelectedObjectCount</td>
-<td>number</td>
-<td>Selection count</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetSelectedObjectCount()</code></td>
+<td><code>number</code></td>
+<td>Returns the selection count.</td>
 </tr>
 <tr>
-<td>GetPlayerName</td>
-<td>string</td>
-<td>Name</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetPlayerName()</code></td>
+<td><code>string</code></td>
+<td>Returns the player name.</td>
 </tr>
 <tr>
-<td>GetCivilizationId</td>
-<td>number</td>
-<td>Civ ID</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetCivilizationId()</code></td>
+<td><code>number</code></td>
+<td>Returns the civilization id.</td>
 </tr>
 <tr>
-<td>GetCivilizationName</td>
-<td>string</td>
-<td>Civ name</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetCivilizationName()</code></td>
+<td><code>string</code></td>
+<td>Returns the civilization name.</td>
 </tr>
 <tr>
-<td>HasWon</td>
-<td>boolean</td>
-<td>Won the game</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>HasWon()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether this player won the finished game.</td>
 </tr>
 <tr>
-<td>IsAlliedWith</td>
-<td>boolean</td>
-<td>Allied with player</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>IsAlliedWith(player)</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether this player is allied with another player.</td>
 </tr>
 <tr>
-<td>IsEnemyTo</td>
-<td>boolean</td>
-<td>Enemy to player</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>IsEnemyTo(player)</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether this player is an enemy of another player.</td>
 </tr>
 <tr>
-<td>GetColor</td>
-<td>Color</td>
-<td>Player color</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetColor()</code></td>
+<td><code>Color</code></td>
+<td>Returns the player's UI color.</td>
 </tr>
 <tr>
-<td>GetAttribute</td>
-<td>number</td>
-<td>Attribute</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetAttribute(attribute)</code></td>
+<td><code>number</code></td>
+<td>Returns a <code>PlayerAttribute</code> value.</td>
 </tr>
 <tr>
-<td>GetUnitTypeCount</td>
-<td>number</td>
-<td>Unit type count</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetUnitTypeCount(id)</code></td>
+<td><code>number</code></td>
+<td>Returns the count for a unit type id.</td>
 </tr>
 <tr>
-<td>GetFact</td>
-<td>number</td>
-<td>Fact value</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetFact(factId, parameter)</code></td>
+<td><code>number</code></td>
+<td>Returns a fact value for this player.</td>
 </tr>
 <tr>
-<td>CanAfford</td>
-<td>boolean</td>
-<td>Can afford</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>CanAfford(id, isBuilding)</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether this player can afford an item.</td>
 </tr>
 <tr>
-<td>GetResearchState</td>
-<td>ResearchState</td>
-<td>Tech state</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>GetResearchState(technology)</code></td>
+<td><code>ResearchState</code></td>
+<td>Returns the research state of a technology.</td>
 </tr>
 <tr>
-<td>CanAffordResearch</td>
-<td>boolean</td>
-<td>Can afford research</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>CanAffordResearch(technology)</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether this player can pay for a technology.</td>
 </tr>
 <tr>
-<td>CanResearch</td>
-<td>boolean</td>
-<td>Can research</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>CanResearch(technology)</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether this player can currently research a technology.</td>
 </tr>
 <tr>
-<td>IsTechnologyResearched</td>
-<td>boolean</td>
-<td>Tech researched</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>IsTechnologyResearched(technology)</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether this player has researched a technology.</td>
 </tr>
 <tr>
-<td>GetObjectsByTypes</td>
-<td>Table</td>
-<td>Objects by types</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>GetObjectsByTypes(unitTypes)</code></td>
+<td><code>Object[]</code></td>
+<td>Returns owned objects matching any listed type.</td>
 </tr>
 <tr>
-<td>GetObjectsByMostCommonType</td>
-<td>Table</td>
-<td>By most common type</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>GetObjectsByMostCommonType(unitTypes)</code></td>
+<td><code>Object[]</code></td>
+<td>Returns owned objects for the most common matching type.</td>
 </tr>
 <tr>
-<td>GetObjectsByClass</td>
-<td>Table</td>
-<td>Objects by class</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>GetObjectsByClass(unitClass)</code></td>
+<td><code>Object[]</code></td>
+<td>Returns owned objects in a class.</td>
 </tr>
 <tr>
-<td>GetTownCenters</td>
-<td>Table</td>
-<td>Town centers</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>GetObjectsByClassDeadInclusive(unitClass)</code></td>
+<td><code>Object[]</code></td>
+<td>Returns owned objects in a class, including dead objects.</td>
+</tr>
+<tr>
+<td><code>GetTownCenters()</code></td>
+<td><code>Object[]</code></td>
+<td>Returns owned town centers.</td>
 </tr>
 </tbody>
 </table>
 <h2 id="strategic-component-types">Strategic Component Types</h2>
+<h3 id="resourcetracker">ResourceTracker</h3>
+<p><strong>Constructor:</strong> <code>ResourceTracker()</code></p>
 <table>
 <thead>
 <tr>
-<th>Type</th>
-<th>Constructor</th>
+<th>Method</th>
+<th>Returns</th>
 <th>Description</th>
-<th>Complexity</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>ResourceTracker</strong></td>
-<td><code>ResourceTracker()</code></td>
-<td>Tracks trees, gold, stone, farms, etc. Methods: GetConvertibleLivestock, GetOwnedLivestock, GetDeadLivestock, GetForage, GetFarms, GetTrees, GetGold, GetStone</td>
-<td><span class="badge badge--high">High</span></td>
+<td><code>GetConvertibleLivestock(position, radius)</code></td>
+<td><code>Object[]</code></td>
+<td>Returns convertible livestock near a position.</td>
 </tr>
 <tr>
-<td><strong>VillagerOccupation</strong></td>
-<td><code>VillagerOccupation(resourceTracker)</code></td>
-<td>Manages villager assignments. Methods: Update, GetVillagerCount, RequestVillagers, AssignVillagers, SetPriorities, ResetPriorities</td>
-<td><span class="badge badge--high">High</span></td>
+<td><code>GetOwnedLivestock()</code></td>
+<td><code>Object[]</code></td>
+<td>Returns currently owned livestock.</td>
 </tr>
 <tr>
-<td><strong>ConstructionPlacement</strong></td>
-<td><code>ConstructionPlacement(villagerOccupation)</code></td>
-<td>Building placement. Methods: Update, TryBuildStructure, FindBestPosition, QueueBuildingRequest, ProcessBuildingRequests</td>
-<td><span class="badge badge--high">High</span></td>
+<td><code>GetDeadLivestock(position, radius)</code></td>
+<td><code>Object[]</code></td>
+<td>Returns dead livestock near a position.</td>
+</tr>
+<tr>
+<td><code>GetForage()</code></td>
+<td><code>Object[]</code></td>
+<td>Returns forage bushes.</td>
+</tr>
+<tr>
+<td><code>GetFarms()</code></td>
+<td><code>Object[]</code></td>
+<td>Returns farm objects.</td>
+</tr>
+<tr>
+<td><code>GetTrees()</code></td>
+<td><code>Object[]</code></td>
+<td>Returns tree objects.</td>
+</tr>
+<tr>
+<td><code>GetGold()</code></td>
+<td><code>Object[]</code></td>
+<td>Returns gold mine objects.</td>
+</tr>
+<tr>
+<td><code>GetStone()</code></td>
+<td><code>Object[]</code></td>
+<td>Returns stone mine objects.</td>
 </tr>
 </tbody>
 </table>
+<h3 id="villageroccupation">VillagerOccupation</h3>
+<p><strong>Constructor:</strong> <code>VillagerOccupation(resourceTracker)</code></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Update()</code></td>
+<td><code>nil</code></td>
+<td>Refreshes villager tracking and assignments.</td>
+</tr>
+<tr>
+<td><code>GetVillagerCount()</code></td>
+<td><code>number</code></td>
+<td>Returns the total tracked villager count.</td>
+</tr>
+<tr>
+<td><code>GetVillagerCount(profession)</code></td>
+<td><code>number</code></td>
+<td>Returns the count for a <code>VillagerProfession</code>.</td>
+</tr>
+<tr>
+<td><code>GetAllVillagers()</code></td>
+<td><code>Object[]</code></td>
+<td>Returns all tracked villagers.</td>
+</tr>
+<tr>
+<td><code>RequestVillagers(amount, position, urgency)</code></td>
+<td><code>Object[]</code></td>
+<td>Requests villagers near a position using an <code>UrgencyLevel</code>.</td>
+</tr>
+<tr>
+<td><code>SetPriorities(wood, food, gold, stone)</code></td>
+<td><code>nil</code></td>
+<td>Sets raw villager priority weights.</td>
+</tr>
+<tr>
+<td><code>ResetPriorities()</code></td>
+<td><code>nil</code></td>
+<td>Resets villager priorities to defaults.</td>
+</tr>
+<tr>
+<td><code>SetPriorityPercentage(profession, percentage)</code></td>
+<td><code>nil</code></td>
+<td>Sets a percentage target for one profession.</td>
+</tr>
+<tr>
+<td><code>AssignVillagers(objectIds)</code></td>
+<td><code>nil</code></td>
+<td>Overload: assigns villagers by object id list.</td>
+</tr>
+<tr>
+<td><code>AssignVillagers(objects)</code></td>
+<td><code>nil</code></td>
+<td>Overload: assigns villagers by object list.</td>
+</tr>
+<tr>
+<td><code>AssignVillager(villager)</code></td>
+<td><code>nil</code></td>
+<td>Assigns one villager immediately.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="constructionplacement">ConstructionPlacement</h3>
+<p><strong>Constructor:</strong> <code>ConstructionPlacement(villagerOccupation)</code></p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Update()</code></td>
+<td><code>nil</code></td>
+<td>Rebuilds placement data for the current frame.</td>
+</tr>
+<tr>
+<td><code>TryBuildStructure(structureId, builderUnitId, buildingSize, targetPos, direction, padding, bypassTownCenterPadding)</code></td>
+<td><code>boolean</code></td>
+<td>Overload: tries to build relative to a <code>PlacementDirection</code>.</td>
+</tr>
+<tr>
+<td><code>TryBuildStructure(structureId, builderUnitId, buildingSize, targetPos, directionPos, padding, bypassTownCenterPadding)</code></td>
+<td><code>boolean</code></td>
+<td>Overload: tries to build using a directional world position.</td>
+</tr>
+<tr>
+<td><code>FindBestPosition(buildingSize, targetPos, direction, padding, bypassTownCenterPadding)</code></td>
+<td><code>Vector3</code></td>
+<td>Finds a placement candidate.</td>
+</tr>
+<tr>
+<td><code>QueueBuildingRequest(structureId, buildingSize, targetPosition, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)</code></td>
+<td><code>nil</code></td>
+<td>Queues a building request at a target position.</td>
+</tr>
+<tr>
+<td><code>QueueBuildingRequestAtTown(structureId, buildingSize, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)</code></td>
+<td><code>nil</code></td>
+<td>Queues a town-centered building request.</td>
+</tr>
+<tr>
+<td><code>ProcessBuildingRequests()</code></td>
+<td><code>nil</code></td>
+<td>Processes queued requests.</td>
+</tr>
+<tr>
+<td><code>IsStructureTypeQueued(structureId)</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether a structure type is already queued.</td>
+</tr>
+<tr>
+<td><code>IsUnitAssignedToBuilding(unitId)</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether a builder is already reserved for a request.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="example">Example</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">resources</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">ResourceTracker</span><span class="p">()</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">villagers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">VillagerOccupation</span><span class="p">(</span><span class="nv">resources</span><span class="p">)</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">planner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">ConstructionPlacement</span><span class="p">(</span><span class="nv">villagers</span><span class="p">)</span>
+
+<span class="kr">function</span><span class="w"> </span><span class="nf">Update</span><span class="p">()</span>
+<span class="w">    </span><span class="nv">villagers</span><span class="p">:</span><span class="nf">Update</span><span class="p">()</span>
+<span class="w">    </span><span class="nv">planner</span><span class="p">:</span><span class="nf">Update</span><span class="p">()</span>
+
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nv">villagers</span><span class="p">:</span><span class="nf">GetVillagerCount</span><span class="p">(</span><span class="nv">VillagerProfession</span><span class="p">.</span><span class="py">WOOD</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="nv">villagers</span><span class="p">:</span><span class="nf">SetPriorityPercentage</span><span class="p">(</span><span class="nv">VillagerProfession</span><span class="p">.</span><span class="py">WOOD</span><span class="p">,</span><span class="w"> </span><span class="mf">0.40</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+</code></pre></div>
+<h2 id="binding-notes">Binding Notes</h2>
+<ul>
+<li><code>ResourceTracker:Update()</code> exists in C++ but is not exposed to Lua.</li>
+<li><code>ConstructionPlacement:TryBuildStructureAtTown()</code> and <code>ConstructionPlacement:RenderDebug()</code> exist in C++ but are not exposed to Lua.</li>
+</ul>
 
 
 

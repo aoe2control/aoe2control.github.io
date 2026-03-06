@@ -1,44 +1,69 @@
 # Game API — Facts
 
-Facts read game state. Call them from `Init`, `Update`, or `Render` when the game is active.
+Facts read game state. Call them from `Init`, `Update`, or `Render` while a match is running.
 
 !!! warning "Game must be running"
-    Calling game API before the game starts logs an error. Move logic to `Init`, `Update`, or `Render`.
+    Calling game API before the game starts logs an error.
 
-## Reference Table
+!!! note "Lua signatures are strict"
+    Pass every argument shown below. A C++ default value does not make the parameter optional in Lua unless a separate overload is bound.
 
-| Function | Parameters | Returns | Description | Complexity |
-|----------|------------|---------|-------------|------------|
-| `GetFact` | `(factId, parameter?)` | number | Get fact value (population, resources, etc.) | <span class="badge badge--low">Low</span> |
-| `GetUnitTypeCount` | `(unitId)` | number | Count of unit type for local player | <span class="badge badge--low">Low</span> |
-| `GetAttribute` | `(attribute)` | number | Get player attribute (food, wood, etc.) | <span class="badge badge--low">Low</span> |
-| `CanAfford` | `(unitId, isBuilding?)` | boolean | Can local player afford unit/structure | <span class="badge badge--low">Low</span> |
-| `CanResearch` | `(technology)` | boolean | Can research technology | <span class="badge badge--low">Low</span> |
-| `IsTechnologyResearched` | `(technology)` | boolean | Is technology already researched | <span class="badge badge--low">Low</span> |
-| `GetObjectsByType` | `(unitType)` | Table of Object | Objects of specific type | <span class="badge badge--low">Low</span> |
-| `GetObjectsByTypes` | `(unitTypes)` | Table of Object | Objects matching any of the types | <span class="badge badge--low">Low</span> |
-| `GetObjectsByClass` | `(unitClass)` | Table of Object | Objects of class (e.g. VILLAGER) | <span class="badge badge--low">Low</span> |
-| `GetGameTime` | `()` | number | Current game time (seconds) | <span class="badge badge--gray">Not complex</span> |
-| `GetLocalPlayer` | `()` | Player | Local player object | <span class="badge badge--gray">Not complex</span> |
-| `GetPlayerById` | `(id)` | Player | Player by ID | <span class="badge badge--low">Low</span> |
-| `GetPlayerCount` | `()` | number | Number of players | <span class="badge badge--gray">Not complex</span> |
-| `IsEnemyPlayer` | `(player)` | boolean | Is player an enemy | <span class="badge badge--low">Low</span> |
-| `GetObjectById` | `(id)` | Object | Object by ID | <span class="badge badge--low">Low</span> |
-| `GetVictoryCondition` | `()` | VictoryCondition | Current victory condition | <span class="badge badge--low">Low</span> |
-| `GetVictoryPlayer` | `()` | Player? | Winning player (if game ended) | <span class="badge badge--low">Low</span> |
+## Reference
 
-## Notable Signatures
+| Function | Signature | Returns | Description |
+|----------|-----------|---------|-------------|
+| `GetFact` | `(factId, parameter)` | `number` | Returns a fact value for the assigned player. |
+| `GetUnitTypeCount` | `(unitId)` | `number` | Returns the assigned player's count for a unit type. |
+| `GetAttribute` | `(attribute)` | `number` | Returns a `PlayerAttribute` value for the assigned player. |
+| `CanAfford` | `(unitId, isBuilding)` | `boolean` | Returns whether the assigned player can afford an item. |
+| `CanResearch` | `(technology)` | `boolean` | Returns whether the assigned player can currently research a technology. |
+| `IsTechnologyResearched` | `(technology)` | `boolean` | Returns whether the assigned player has researched a technology. |
+| `GetObjectsByType` | `(unitType)` | `Object[]` | Returns matching alive world objects, not just owned objects. |
+| `GetObjectsByTypes` | `(unitTypes)` | `Object[]` | Returns alive world objects matching any type in the list. |
+| `GetObjectsByClass` | `(unitClass)` | `Object[]` | Returns alive world objects of a class, not just owned objects. |
+| `GetGameTime` | `()` | `number` | Returns the current match time in seconds. |
+| `GetAssignedPlayer` | `()` | `Player` | Returns the player currently assigned to this module instance. |
+| `GetAssignedPlayerId` | `()` | `number` | Returns the player id currently assigned to this module instance. |
+| `GetPlayerById` | `(id)` | `Player` | Returns a player by index. Gaia is typically `0`, regular players are typically `1` to `8`. |
+| `GetPlayerCount` | `()` | `number` | Returns the size of the world player list. |
+| `IsEnemyPlayer` | `(player)` | `boolean` | Returns whether the given player is an enemy of the assigned player. |
+| `GetObjectById` | `(id)` | `Object` | Returns a world object by id. |
+| `GetVictoryCondition` | `()` | `VictoryCondition` | Returns the current victory condition. |
+| `GetVictoryPlayer` | `()` | `Player` | Returns the winner when the game has ended, otherwise `nil`. |
 
-### GetFact
-
-```lua
-GetFact(factId, parameter?)
-```
-
-- **factId:** `FactId` enum (e.g. `FactId.POPULATION`, `FactId.FOOD_AMOUNT`)
-- **parameter:** Optional, often 0 for local player
+## Examples
 
 ```lua
-local pop = GetFact(FactId.POPULATION, 0)
-local food = GetFact(FactId.FOOD_AMOUNT, 0)
+function Update()
+    local assigned = GetAssignedPlayer()
+    if not assigned then
+        return
+    end
+
+    local population = GetFact(FactId.POPULATION, 0)
+    local wood = GetAttribute(PlayerAttribute.WOOD)
+
+    if population < 60 and CanAfford(UnitObjectType.HOUSE, true) then
+        Log("Player " .. tostring(GetAssignedPlayerId()) .. " has " .. tostring(wood) .. " wood.")
+    end
+end
 ```
+
+```lua
+function Render()
+    for i = 0, GetPlayerCount() - 1 do
+        local player = GetPlayerById(i)
+        if player and IsEnemyPlayer(player) then
+            for _, tc in ipairs(player:GetTownCenters()) do
+                RenderObjectBounds(tc, Color(255, 64, 64, 255), 2.0)
+            end
+        end
+    end
+end
+```
+
+## Notes
+
+- `GetLocalPlayer` was renamed to `GetAssignedPlayer`.
+- `GetObjectsByType`, `GetObjectsByTypes`, and `GetObjectsByClass` now scan world objects instead of only the assigned player's objects.
+- `CanAfford(unitId, isBuilding)` accepts both parameters in Lua, but the current binding does not distinguish the second flag internally yet.

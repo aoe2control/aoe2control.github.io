@@ -8,6 +8,8 @@
       
       
       
+        <link rel="canonical" href="https://aoe2control.github.io/render-api/">
+      
       
         <link rel="prev" href="../facts/">
       
@@ -978,10 +980,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#base-screen-space" class="md-nav__link">
+  <a href="#screen-space" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Base (Screen Space)
+        Screen Space
       
     </span>
   </a>
@@ -989,10 +991,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#game-world-minimap" class="md-nav__link">
+  <a href="#world-and-minimap-space" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Game (World / Minimap)
+        World and Minimap Space
       
     </span>
   </a>
@@ -1492,221 +1494,197 @@
 
 
 <h1 id="render-api">Render API</h1>
-<p>The Render API draws overlays on top of the game. Use it in <code>Render()</code>.</p>
+<p>Use the Render API from <code>Render()</code> to draw overlays in screen, world, or minimap space.</p>
+<div class="admonition note">
+<p class="admonition-title">Lua signatures are strict</p>
+<p>The C++ render functions use default arguments internally, but Lua does not receive those defaults unless an overload is bound. Pass every parameter shown below.</p>
+</div>
 <h2 id="coordinate-spaces">Coordinate Spaces</h2>
 <table>
 <thead>
 <tr>
 <th>Space</th>
 <th>Use for</th>
-<th>Functions</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><strong>Screen</strong></td>
-<td>HUD, fixed UI</td>
-<td>GetScreenSize, IsOnScreen, RenderText, RenderLine, RenderCircle, RenderRect</td>
+<td>HUD, labels, fixed UI.</td>
 </tr>
 <tr>
 <td><strong>World</strong></td>
-<td>Map markers, unit highlights</td>
-<td>WorldToScreen, IsWorldPosOnScreen, RenderWorld<em>, RenderObjectBounds</em></td>
+<td>Unit highlights, placement markers, tactical overlays.</td>
 </tr>
 <tr>
 <td><strong>Minimap</strong></td>
-<td>Minimap indicators</td>
-<td>WorldToMinimap, RenderMinimap*</td>
+<td>Strategic indicators on the minimap.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="base-screen-space">Base (Screen Space)</h2>
+<h2 id="screen-space">Screen Space</h2>
 <table>
 <thead>
 <tr>
 <th>Function</th>
-<th>Parameters</th>
+<th>Signature</th>
 <th>Description</th>
-<th>Complexity</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>GetScreenSize</code></td>
 <td><code>()</code></td>
-<td>Returns Vector2 (width, height)</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td>Returns the current screen size as <code>Vector2</code>.</td>
 </tr>
 <tr>
 <td><code>IsOnScreen</code></td>
 <td><code>(position)</code></td>
-<td>Is Vector2 position on screen</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td>Returns whether a <code>Vector2</code> screen position is visible.</td>
 </tr>
 <tr>
 <td><code>RenderText</code></td>
-<td><code>(text, position, size, color, center, border?)</code></td>
-<td>Draw text at screen position</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>(text, position, size, color, center, border)</code></td>
+<td>Draws screen-space text.</td>
 </tr>
 <tr>
 <td><code>RenderLine</code></td>
 <td><code>(from, to, color, thickness)</code></td>
-<td>Draw line between two Vector2 points</td>
-<td><span class="badge badge--low">Low</span></td>
+<td>Draws a screen-space line.</td>
 </tr>
 <tr>
 <td><code>RenderCircle</code></td>
-<td><code>(position, radius, color, thickness, segments?)</code></td>
-<td>Draw circle outline</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>(position, radius, color, thickness, segments)</code></td>
+<td>Draws a circle outline.</td>
 </tr>
 <tr>
 <td><code>RenderCircleFilled</code></td>
-<td><code>(position, radius, color, segments?)</code></td>
-<td>Draw filled circle</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>(position, radius, color, segments)</code></td>
+<td>Draws a filled circle.</td>
 </tr>
 <tr>
 <td><code>RenderRect</code></td>
 <td><code>(from, to, color, rounding, roundingCornersFlags, thickness)</code></td>
-<td>Draw rectangle outline</td>
-<td><span class="badge badge--low">Low</span></td>
+<td>Draws a rectangle outline.</td>
 </tr>
 <tr>
 <td><code>RenderRectFilled</code></td>
 <td><code>(from, to, color, rounding, roundingCornersFlags)</code></td>
-<td>Draw filled rectangle</td>
-<td><span class="badge badge--low">Low</span></td>
+<td>Draws a filled rectangle.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="game-world-minimap">Game (World / Minimap)</h2>
+<h2 id="world-and-minimap-space">World and Minimap Space</h2>
 <table>
 <thead>
 <tr>
 <th>Function</th>
-<th>Parameters</th>
+<th>Signature</th>
 <th>Description</th>
-<th>Complexity</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>IsWorldPosOnScreen</code></td>
 <td><code>(worldPos)</code></td>
-<td>Is Vector3 world position visible</td>
-<td><span class="badge badge--low">Low</span></td>
+<td>Returns whether a <code>Vector3</code> world position is visible.</td>
 </tr>
 <tr>
 <td><code>WorldToScreen</code></td>
 <td><code>(worldPos)</code></td>
-<td>Convert Vector3 world position to Vector2 screen</td>
-<td><span class="badge badge--medium">Medium</span></td>
+<td>Converts a <code>Vector3</code> world position to a <code>Vector2</code> screen position.</td>
 </tr>
 <tr>
 <td><code>WorldToMinimap</code></td>
 <td><code>(worldPos)</code></td>
-<td>Convert Vector3 world position to Vector2 minimap</td>
-<td><span class="badge badge--medium">Medium</span></td>
+<td>Converts a <code>Vector3</code> world position to a <code>Vector2</code> minimap position.</td>
 </tr>
 <tr>
 <td><code>GetZoom</code></td>
 <td><code>()</code></td>
-<td>Current camera zoom</td>
-<td><span class="badge badge--low">Low</span></td>
+<td>Returns the current camera zoom.</td>
 </tr>
 <tr>
 <td><code>GetCameraPosition</code></td>
 <td><code>()</code></td>
-<td>Camera position as Vector2</td>
-<td><span class="badge badge--low">Low</span></td>
+<td>Returns the camera position as <code>Vector2</code>.</td>
 </tr>
 <tr>
 <td><code>RenderWorldLine</code></td>
-<td><code>(from, to, color, thickness?)</code></td>
-<td>Line in world space</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>(from, to, color, thickness)</code></td>
+<td>Draws a world-space line.</td>
 </tr>
 <tr>
 <td><code>RenderWorldRect</code></td>
-<td><code>(worldPos, width, height, color, thickness?)</code></td>
-<td>Rectangle in world space</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>(worldPos, width, height, color, thickness)</code></td>
+<td>Draws a world-space rectangle outline.</td>
 </tr>
 <tr>
 <td><code>RenderWorldRectFilled</code></td>
 <td><code>(worldPos, width, height, color)</code></td>
-<td>Filled rectangle in world space</td>
-<td><span class="badge badge--low">Low</span></td>
+<td>Draws a filled world-space rectangle.</td>
 </tr>
 <tr>
 <td><code>RenderWorldCircle</code></td>
-<td><code>(worldPos, radius, color, thickness?, segments?)</code></td>
-<td>Circle in world space</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>(worldPos, radius, color, thickness, segments)</code></td>
+<td>Draws a world-space circle outline.</td>
 </tr>
 <tr>
 <td><code>RenderWorldCircleFilled</code></td>
-<td><code>(worldPos, radius, color, segments?)</code></td>
-<td>Filled circle in world space</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>(worldPos, radius, color, segments)</code></td>
+<td>Draws a filled world-space circle.</td>
 </tr>
 <tr>
 <td><code>RenderWorldText</code></td>
-<td><code>(text, worldPos, size, color, center?, border?)</code></td>
-<td>Text at world position</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>(text, worldPos, size, color, center, border)</code></td>
+<td>Draws text anchored in world space.</td>
 </tr>
 <tr>
 <td><code>RenderObjectBounds</code></td>
-<td><code>(object, color, thickness?)</code></td>
-<td>Outline around object bounds</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>(object, color, thickness)</code></td>
+<td>Draws an outline around an object's bounds.</td>
 </tr>
 <tr>
 <td><code>RenderObjectBoundsFilled</code></td>
 <td><code>(object, color)</code></td>
-<td>Filled overlay on object bounds</td>
-<td><span class="badge badge--low">Low</span></td>
+<td>Draws a filled overlay over an object's bounds.</td>
 </tr>
 <tr>
 <td><code>RenderMinimapDot</code></td>
 <td><code>(worldPos, radius, color)</code></td>
-<td>Dot on minimap</td>
-<td><span class="badge badge--low">Low</span></td>
+<td>Draws a dot on the minimap.</td>
 </tr>
 <tr>
 <td><code>RenderMinimapLine</code></td>
 <td><code>(worldPosFrom, worldPosTo, thickness, color)</code></td>
-<td>Line on minimap</td>
-<td><span class="badge badge--low">Low</span></td>
+<td>Draws a line on the minimap.</td>
 </tr>
 <tr>
 <td><code>RenderMinimapRect</code></td>
 <td><code>(worldPos, width, height, color, thickness)</code></td>
-<td>Rectangle on minimap</td>
-<td><span class="badge badge--low">Low</span></td>
+<td>Draws a rectangle on the minimap.</td>
 </tr>
 <tr>
 <td><code>RenderMinimapRectFilled</code></td>
 <td><code>(worldPos, width, height, color)</code></td>
-<td>Filled rectangle on minimap</td>
-<td><span class="badge badge--low">Low</span></td>
+<td>Draws a filled rectangle on the minimap.</td>
 </tr>
 </tbody>
 </table>
 <h2 id="example">Example</h2>
-<div class="highlight"><pre><span></span><code><span class="c1">-- Villager overlay (from my_first_module)</span>
-<span class="kd">local</span><span class="w"> </span><span class="nv">objects</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetObjectsByClass</span><span class="p">(</span><span class="nv">UnitClass</span><span class="p">.</span><span class="py">VILLAGER</span><span class="p">)</span>
-<span class="kr">for</span><span class="w"> </span><span class="nv">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">#</span><span class="nv">objects</span><span class="w"> </span><span class="kr">do</span>
-<span class="w">    </span><span class="nf">RenderObjectBoundsFilled</span><span class="p">(</span><span class="nv">objects</span><span class="p">[</span><span class="nv">i</span><span class="p">],</span><span class="w"> </span><span class="nv">villagerColor</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Render</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">player</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetAssignedPlayer</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">player</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">120</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">tc</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nv">player</span><span class="p">:</span><span class="nf">GetTownCenters</span><span class="p">())</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">        </span><span class="nf">RenderObjectBounds</span><span class="p">(</span><span class="nv">tc</span><span class="p">,</span><span class="w"> </span><span class="nv">color</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">)</span>
+<span class="w">        </span><span class="nf">RenderWorldText</span><span class="p">(</span><span class="s2">&quot;TC&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">tc</span><span class="p">:</span><span class="nf">GetPosition</span><span class="p">(),</span><span class="w"> </span><span class="mf">14.0</span><span class="p">,</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">),</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span>
 <span class="kr">end</span>
 </code></pre></div>
-<div class="admonition note">
-<p class="admonition-title">RenderObjectBoundsFilled</p>
-<p>Takes exactly two parameters: <code>(object, color)</code>. Extra arguments are ignored.</p>
-</div>
 
 
 

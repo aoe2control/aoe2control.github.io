@@ -1,59 +1,70 @@
 # Settings API
 
-The Settings API lets modules add UI controls (checkboxes, sliders, dropdowns, keybinds, colors) to the engine interface. Settings are per-module.
+The Settings API adds module-specific controls to CONTROL's UI.
 
-## Add Functions (Load only)
+!!! note "Lua signatures are strict"
+    Getter functions require the fallback/default argument in Lua. They are not optional overloads.
 
-Call these **only from `Load()`**:
+## Add Functions
 
-| Function | Parameters | Description |
-|----------|------------|-------------|
-| `Settings.AddBool` | `(key, default)` | Checkbox |
-| `Settings.AddInt` | `(key, default, min, max)` | Integer slider |
-| `Settings.AddFloat` | `(key, default, min, max)` | Float slider |
-| `Settings.AddDropdown` | `(key, default, options)` | Dropdown (options = table of strings) |
-| `Settings.AddKeybind` | `(key, defaultVkCode)` | Keybind (use `Key.Add`, `Key.F`, etc.) |
-| `Settings.AddColor` | `(key, defaultColor)` | Color picker |
-| `Settings.AddTooltip` | `(key, tooltip)` | Tooltip for a setting |
+Call these only from `Load()`.
 
-## Get Functions (anywhere)
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `Settings.AddBool` | `(key, defaultValue)` | Adds a checkbox. |
+| `Settings.AddInt` | `(key, defaultValue, minValue, maxValue)` | Adds an integer slider. |
+| `Settings.AddFloat` | `(key, defaultValue, minValue, maxValue)` | Adds a float slider. |
+| `Settings.AddDropdown` | `(key, defaultValue, options)` | Adds a dropdown from a string array. |
+| `Settings.AddKeybind` | `(key, defaultVkCode)` | Adds a keybind picker. |
+| `Settings.AddTooltip` | `(key, tooltip)` | Adds a tooltip to an existing setting. |
+| `Settings.AddColor` | `(key, defaultColor)` | Adds a color picker. |
 
-Call these from `Load`, `Init`, `Update`, or `Render`:
+## Get Functions
 
-| Function | Parameters | Returns | Description |
-|----------|------------|---------|-------------|
-| `Settings.GetBool` | `(key, default?)` | boolean | Get checkbox value |
-| `Settings.GetInt` | `(key, default?)` | number | Get int value |
-| `Settings.GetFloat` | `(key, default?)` | number | Get float value |
-| `Settings.GetString` | `(key, default?)` | string | Get string/dropdown value |
-| `Settings.GetKeybind` | `(key, defaultVkCode?)` | number | Get keybind VK code |
-| `Settings.GetColor` | `(key, defaultColor)` | Color | Get color value |
+Call these from `Load`, `Init`, `Update`, or `Render`.
 
-## IsKeyPressed
+| Function | Signature | Returns | Description |
+|----------|-----------|---------|-------------|
+| `Settings.GetBool` | `(key, defaultValue)` | `boolean` | Reads a checkbox value. |
+| `Settings.GetInt` | `(key, defaultValue)` | `number` | Reads an integer value. |
+| `Settings.GetFloat` | `(key, defaultValue)` | `number` | Reads a float value. |
+| `Settings.GetString` | `(key, defaultValue)` | `string` | Reads a string or dropdown value. |
+| `Settings.GetKeybind` | `(key, defaultVkCode)` | `number` | Reads a keybind virtual key code. |
+| `Settings.GetColor` | `(key, defaultColor)` | `Color` | Reads a color value. |
 
-```lua
-IsKeyPressed(vkCode)  -- returns boolean
-```
+## Input Helper
 
-Check if a key is currently pressed. Use with `Settings.GetKeybind` for hotkeys.
+| Function | Signature | Returns | Description |
+|----------|-----------|---------|-------------|
+| `IsKeyPressed` | `(vkCode)` | `boolean` | Returns whether a key is currently pressed. |
 
-## Example (my_first_module)
+## Example
 
 ```lua
 function Load()
-    Settings.AddColor("Villager Color", Color.new(0, 255, 0))
-    Settings.AddKeybind("Increase Game Speed", Key.Add)
+    Settings.AddBool("Show Overlay", true)
+    Settings.AddDropdown("Mode", "Eco", { "Eco", "Rush", "Boom" })
+    Settings.AddColor("Overlay Color", Color(0, 255, 0, 90))
+    Settings.AddKeybind("Toggle Speed", Key.Add)
 end
 
 function Render()
-    local toggleColorKey = Settings.GetKeybind("Increase Game Speed", Key.Add)
-    if IsKeyPressed(toggleColorKey) then
-        SetGameSpeedMultiplier(30)
-    else
-        SetGameSpeedMultiplier(1.5)
+    if not Settings.GetBool("Show Overlay", true) then
+        return
     end
 
-    local villagerColor = Settings.GetColor("Villager Color", Color.new(0, 255, 0))
-    -- use villagerColor for rendering
+    local mode = Settings.GetString("Mode", "Eco")
+    local key = Settings.GetKeybind("Toggle Speed", Key.Add)
+    local color = Settings.GetColor("Overlay Color", Color(0, 255, 0, 90))
+
+    if IsKeyPressed(key) then
+        SetGameSpeedMultiplier(2.0)
+    end
+
+    RenderText("Mode: " .. mode, Vector2(120, 40), 16.0, color, true, true)
 end
 ```
+
+## Multi-Module Note
+
+When **Sync Settings** is enabled for a module instance, the UI stores values under a shared profile-specific settings group instead of a per-player group.

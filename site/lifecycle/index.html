@@ -8,6 +8,8 @@
       
       
       
+        <link rel="canonical" href="https://aoe2control.github.io/lifecycle/">
+      
       
         <link rel="prev" href="../config-location/">
       
@@ -792,17 +794,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#all-callbacks-optional" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        All Callbacks Optional
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#callbacks" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -869,16 +860,38 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#unload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unload
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#timing-diagram" class="md-nav__link">
+  <a href="#order" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Timing Diagram
+        Order
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
       
     </span>
   </a>
@@ -1545,39 +1558,41 @@
 
 
 <h1 id="lifecycle">Lifecycle</h1>
-<p>The engine invokes your module through five optional callbacks. Implement only the ones you need.</p>
-<h2 id="all-callbacks-optional">All Callbacks Optional</h2>
-<p>Modules can omit any callback. For example, <code>ipc_test</code> has no <code>Load</code> because it uses no Settings.</p>
+<p>Each configured module instance can implement up to six callbacks. All of them are optional.</p>
 <h2 id="callbacks">Callbacks</h2>
 <h3 id="load">Load</h3>
-<p><strong>When:</strong> Once when the module is selected/loaded.</p>
-<p><strong>Use for:</strong> <code>Settings.Add*</code> only. Register checkboxes, sliders, dropdowns, keybinds, colors, etc. The engine calls <code>settings::Load()</code> after <code>Load()</code> returns.</p>
-<p><strong>Do not:</strong> Call game API (game may not be running yet).</p>
+<p><strong>When:</strong> When the module instance is loaded or when AI becomes active for that instance.</p>
+<p><strong>Use for:</strong> <code>Settings.Add*</code> only.</p>
+<p><strong>Do not:</strong> Call game API here.</p>
 <h3 id="init">Init</h3>
-<p><strong>When:</strong> When the game is ready, world changed, module reloaded, or AI enabled.</p>
-<p><strong>Use for:</strong> One-time setup (e.g. <code>IPC.StartServer</code>, <code>ChatLocal</code>).</p>
+<p><strong>When:</strong> When the game becomes ready, the world changes, the module is reloaded, or the instance becomes active again.</p>
+<p><strong>Use for:</strong> One-time per-match setup such as <code>IPC.StartServer()</code> or <code>ChatMessage()</code>.</p>
 <h3 id="update">Update</h3>
-<p><strong>When:</strong> At a configurable interval (default 1.0s) while the game is running.</p>
-<p><strong>Use for:</strong> Main game logic — commands, decisions, state updates.</p>
+<p><strong>When:</strong> At the configured update interval while the match is running.</p>
+<p><strong>Use for:</strong> Decision-making, commands, and state updates.</p>
 <h3 id="render">Render</h3>
-<p><strong>When:</strong> Every frame while the game is running.</p>
-<p><strong>Use for:</strong> Drawing overlays — shapes, text, minimap markers.</p>
+<p><strong>When:</strong> Every rendered frame while the match is running.</p>
+<p><strong>Use for:</strong> Overlays and debug drawing.</p>
 <h3 id="end">End</h3>
-<p><strong>When:</strong> Once when the game ends.</p>
-<p><strong>Parameters:</strong> <code>hasWon</code> (boolean) — whether the local player won.</p>
-<p><strong>Use for:</strong> Cleanup, logging, IPC shutdown (e.g. <code>IPC.StopServer()</code>).</p>
-<h2 id="timing-diagram">Timing Diagram</h2>
+<p><strong>When:</strong> Once after the match ends.</p>
+<p><strong>Parameters:</strong> <code>hasWon</code> tells you whether the assigned player won.</p>
+<h3 id="unload">Unload</h3>
+<p><strong>When:</strong> When the module instance is unloaded, disabled, replaced, or the engine is detached.</p>
+<p><strong>Use for:</strong> Cleanup that must also run outside normal match end, such as <code>IPC.StopServer()</code>.</p>
+<h2 id="order">Order</h2>
 <pre class="mermaid"><code>flowchart LR
-    L[Load] --&gt; I[Init]
-    I --&gt; U[Update]
-    U --&gt; R[Render]
+    L["Load"] --&gt; I["Init"]
+    I --&gt; U["Update"]
+    U --&gt; R["Render"]
     R --&gt; U
-    U --&gt; E[End]</code></pre>
+    U --&gt; E["End"]
+    L -.-&gt; Un["Unload"]
+    U -.-&gt; Un</code></pre>
+<h2 id="notes">Notes</h2>
 <ul>
-<li><strong>Load</strong> runs once when the module is selected.</li>
-<li><strong>Init</strong> runs when entering a game.</li>
-<li><strong>Update</strong> and <strong>Render</strong> run in a loop until the game ends.</li>
-<li><strong>End</strong> runs once when the game ends.</li>
+<li><code>Load</code> may run again when an instance is reloaded.</li>
+<li><code>Init</code> runs per module instance, not globally.</li>
+<li><code>Unload</code> can run without <code>End</code> if the user disables AI, removes the instance, switches modules, or ejects CONTROL.</li>
 </ul>
 
 

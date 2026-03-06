@@ -8,6 +8,8 @@
       
       
       
+        <link rel="canonical" href="https://aoe2control.github.io/enums/">
+      
       
         <link rel="prev" href="../types/">
       
@@ -1938,18 +1940,151 @@
 <p>See the <a href="https://airef.github.io/parameters/parameters-details.html#ObjectData">community Parameter Details (ObjectData)</a> for the full list of object data field IDs.</p>
 <h2 id="strategic-enums">Strategic Enums</h2>
 <h3 id="urgencylevel">UrgencyLevel</h3>
-<p>LOW, MEDIUM, HIGH</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LOW</td>
+<td>Low urgency request.</td>
+</tr>
+<tr>
+<td>MEDIUM</td>
+<td>Normal urgency request.</td>
+</tr>
+<tr>
+<td>HIGH</td>
+<td>High urgency request.</td>
+</tr>
+</tbody>
+</table>
 <h3 id="buildingposition">BuildingPosition</h3>
-<p>TOWN_CENTER, AGGRESSIVE</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TOWN_CENTER</td>
+<td>Prefer town-center-oriented building placement.</td>
+</tr>
+<tr>
+<td>AGGRESSIVE</td>
+<td>Prefer forward or aggressive building placement.</td>
+</tr>
+</tbody>
+</table>
 <h3 id="villagerprofession">VillagerProfession</h3>
-<p>WOOD, FOOD, STONE, GOLD</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WOOD</td>
+<td>Lumberjacks.</td>
+</tr>
+<tr>
+<td>FOOD</td>
+<td>Farmers, forage, or food gatherers.</td>
+</tr>
+<tr>
+<td>STONE</td>
+<td>Stone miners.</td>
+</tr>
+<tr>
+<td>GOLD</td>
+<td>Gold miners.</td>
+</tr>
+</tbody>
+</table>
 <h3 id="placementdirection">PlacementDirection</h3>
-<p>Used by ConstructionPlacement.</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Center</td>
+<td>Centered placement.</td>
+</tr>
+<tr>
+<td>North</td>
+<td>Offset north.</td>
+</tr>
+<tr>
+<td>NorthEast</td>
+<td>Offset north-east.</td>
+</tr>
+<tr>
+<td>East</td>
+<td>Offset east.</td>
+</tr>
+<tr>
+<td>SouthEast</td>
+<td>Offset south-east.</td>
+</tr>
+<tr>
+<td>South</td>
+<td>Offset south.</td>
+</tr>
+<tr>
+<td>SouthWest</td>
+<td>Offset south-west.</td>
+</tr>
+<tr>
+<td>West</td>
+<td>Offset west.</td>
+</tr>
+<tr>
+<td>NorthWest</td>
+<td>Offset north-west.</td>
+</tr>
+</tbody>
+</table>
 <h3 id="buildingrequestpriority">BuildingRequestPriority</h3>
-<p>Used by ConstructionPlacement.</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LOW</td>
+<td>Lowest build queue priority.</td>
+</tr>
+<tr>
+<td>MEDIUM</td>
+<td>Default build queue priority.</td>
+</tr>
+<tr>
+<td>HIGH</td>
+<td>High build queue priority.</td>
+</tr>
+<tr>
+<td>CRITICAL</td>
+<td>Highest build queue priority.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="engine-enum">Engine Enum</h2>
 <h3 id="key">Key</h3>
-<p>Virtual key codes for keybinds (e.g. <code>Key.Add</code> for +, <code>Key.F</code>, <code>Key.SPACE</code>). Used with <code>Settings.AddKeybind</code> and <code>IsKeyPressed</code>.</p>
+<p>Virtual key codes for keybinds (for example <code>Key.Add</code>, <code>Key.F</code>, <code>Key.SPACE</code>).</p>
 <div class="highlight"><pre><span></span><code><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddKeybind</span><span class="p">(</span><span class="s2">&quot;Hotkey&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">Key</span><span class="p">.</span><span class="py">Add</span><span class="p">)</span>
 <span class="kr">if</span><span class="w"> </span><span class="nf">IsKeyPressed</span><span class="p">(</span><span class="nv">Key</span><span class="p">.</span><span class="py">Add</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
 <span class="w">    </span><span class="c1">-- ...</span>

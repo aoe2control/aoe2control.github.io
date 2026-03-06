@@ -13,7 +13,7 @@ The engine talks directly to the game, allowing scripters to:
 - **Read** game state (units, resources, players, map data)
 - **Send** commands (train units, move armies, research technologies)
 - **Render** custom overlays (HUD elements, minimap markers, world-space indicators)
-- **Configure** modules via a built-in settings interface
+- **Configure** one or more module instances via a built-in settings interface
 
 ## Key Features
 
@@ -21,10 +21,11 @@ The engine talks directly to the game, allowing scripters to:
 |---------|-------------|
 | **CONTROL Launcher** | Attaches the engine to the game |
 | **Extensive API** | Commands, facts, render functions, and strategic components |
+| **Per-Player Modules** | Run different modules for different player slots in the same session |
 | **Custom Rendering** | Draw shapes and text in screen, world, or minimap space |
 | **Menu Settings** | Add checkboxes, sliders, dropdowns, keybinds, and color pickers |
 | **Multi-file Projects** | Use `require()` for modular Lua code (depth limit: 3) |
-| **IPC for ML** | Named pipes + JSON for external agents (e.g. Python) |
+| **IPC for ML** | Named pipes + JSON with module routing for external agents |
 | **Encrypted Modules** | Precompiled `.module` files for code protection |
 | **VS Code Plugin** | [Available on Marketplace](https://marketplace.visualstudio.com/items?itemName=BigJohn.aoe2-control-lua) — IntelliSense, snippets, and API definitions |
 

@@ -1,56 +1,71 @@
 # Game API — Commands
 
-Commands perform actions in the game. Call them from `Init`, `Update`, or `Render` when the game is active.
+Commands perform actions in the game. Call them from `Init`, `Update`, or `Render` while a match is running.
 
 !!! warning "Game must be running"
-    Calling game API before the game starts logs an error. Move logic to `Init`, `Update`, or `Render`.
+    Calling game API before the game starts logs an error.
 
-## Reference Table
+!!! note "Lua signatures are strict"
+    Lua only gets overloads that are explicitly bound. If a parameter is shown here, pass it explicitly even if the C++ function has a default value.
 
-| Function | Parameters | Description | Complexity |
-|----------|------------|-------------|------------|
-| `Log` | `(message)` | Write to the log window | <span class="badge badge--gray">Not complex</span> |
-| `SetGameSpeedMultiplier` | `(multiplier)` | Set game speed (e.g. 1.5, 30) | <span class="badge badge--gray">Not complex</span> |
-| `SetCameraPosition` | `(position)` | Move camera to Vector2 position | <span class="badge badge--gray">Not complex</span> |
-| `ChatLocal` | `(message)` | Send message to local chat | <span class="badge badge--gray">Not complex</span> |
-| `TrainUnit` | `(trainSources, unitId, amount?)` | Train units from specified buildings | <span class="badge badge--low">Low</span> |
-| `UnitsTargetObject` | `(units, target)` | Order units to attack/target an object | <span class="badge badge--low">Low</span> |
-| `UnitsBuildStructure` | `(builders, structureId, position)` | Order builders to construct | <span class="badge badge--low">Low</span> |
-| `UnitsMove` | `(units, position)` | Move units to world position | <span class="badge badge--low">Low</span> |
-| `EnableScouting` | `()` | Enable auto-scouting; returns success | <span class="badge badge--low">Low</span> |
-| `ResearchTechnology` | `(researchSources, technology)` | Research tech at specified buildings | <span class="badge badge--low">Low</span> |
-| `DeleteUnit` | `(unit)` | Delete a unit | <span class="badge badge--low">Low</span> |
-| `DestroyBuilding` | `(building)` | Destroy a building | <span class="badge badge--low">Low</span> |
-| `SetGatherPoint` | `(buildings, targetPosition)` | Set gather point for buildings | <span class="badge badge--low">Low</span> |
-| `RingTownBell` | `(building, isCallingIn)` | Ring town bell (call in / send out) | <span class="badge badge--low">Low</span> |
-| `SendBackToWork` | `(building)` | Send garrisoned units back to work | <span class="badge badge--low">Low</span> |
-| `SendAllBackToWork` | `(building)` | Send all garrisoned units back to work | <span class="badge badge--low">Low</span> |
-| `SetUnitStanceAutoScout` | `(units)` | Set units to auto-scout stance | <span class="badge badge--low">Low</span> |
-| `SetUnitStancePatrol` | `(units, targetPosition)` | Set units to patrol | <span class="badge badge--low">Low</span> |
-| `SetUnitStanceGuard` | `(units, targetObject)` | Set units to guard object | <span class="badge badge--low">Low</span> |
-| `SetUnitStanceFollow` | `(units, targetObject)` | Set units to follow object | <span class="badge badge--low">Low</span> |
-| `SetUnitStanceAttackMove` | `(units, targetPosition)` | Set units to attack-move | <span class="badge badge--low">Low</span> |
-| `SetUnitStanceGarrison` | `(units, targetObject)` | Garrison units in building | <span class="badge badge--low">Low</span> |
-| `SetUnitStanceUngarrison` | `(sourceObjects, unit)` | Ungarrison unit from building | <span class="badge badge--low">Low</span> |
-| `SetUnitStanceSeekShelter` | `(units)` | Set units to seek shelter | <span class="badge badge--low">Low</span> |
-| `SetUnitCombatStance` | `(units, stance)` | Set combat stance (aggressive, defensive, etc.) | <span class="badge badge--low">Low</span> |
+## Command Rules
 
-## Notable Signatures
+- Most unit and building commands silently filter the input list down to objects owned by the assigned player.
+- Global commands such as `Log`, `SetGameSpeedMultiplier`, `SetCameraPosition`, and `ChatMessage` are not ownership-filtered.
+- `ChatLocal` was renamed to `ChatMessage`.
 
-### TrainUnit
+## Reference
+
+| Function | Signature | Returns | Description |
+|----------|-----------|---------|-------------|
+| `Log` | `(message)` | `nil` | Writes a message to CONTROL's log window. |
+| `SetGameSpeedMultiplier` | `(multiplier)` | `nil` | Sets the game speed multiplier. |
+| `SetCameraPosition` | `(position)` | `nil` | Moves the camera to a `Vector2` world position. |
+| `ChatMessage` | `(message)` | `nil` | Sends chat text as the assigned player. |
+| `TrainUnit` | `(trainSources, unitId, amount)` | `boolean` | Trains `amount` units by selecting the assigned player's most common matching production source. |
+| `UnitsTargetObject` | `(units, target)` | `boolean` | Orders owned units to attack, interact with, or target an object. |
+| `UnitsBuildStructure` | `(builders, structureId, position)` | `boolean` | Orders owned builders to place a structure at a `Vector3` world position. |
+| `UnitsMove` | `(units, position)` | `boolean` | Orders owned units to move to a `Vector3` world position. |
+| `EnableScouting` | `()` | `boolean` | Enables auto-scouting on an idle assigned scout if one is available. |
+| `ResearchTechnology` | `(researchSources, technology)` | `boolean` | Researches a technology using the assigned player's most common matching research source. |
+| `DeleteUnit` | `(unit)` | `nil` | Deletes an owned unit. |
+| `DestroyBuilding` | `(building)` | `nil` | Destroys an owned building. |
+| `SetGatherPoint` | `(buildings, targetPosition)` | `nil` | Sets the gather point of owned buildings. |
+| `RingTownBell` | `(building, isCallingIn)` | `nil` | Calls villagers into shelter or sends them back out. |
+| `SendBackToWork` | `(building)` | `nil` | Sends workers from the selected building back to their previous jobs. |
+| `SendAllBackToWork` | `(building)` | `nil` | Sends all workers from the selected building back to work. |
+| `SetUnitStanceAutoScout` | `(units)` | `nil` | Sets owned units to auto-scout. |
+| `SetUnitStancePatrol` | `(units, targetPosition)` | `nil` | Sets owned units to patrol toward a `Vector3` target. |
+| `SetUnitStanceGuard` | `(units, targetObject)` | `nil` | Sets owned units to guard an object. |
+| `SetUnitStanceFollow` | `(units, targetObject)` | `nil` | Sets owned units to follow an object. |
+| `SetUnitStanceAttackMove` | `(units, targetPosition)` | `nil` | Sets owned units to attack-move toward a `Vector3` target. |
+| `SetUnitStanceGarrison` | `(units, targetObject)` | `nil` | Garrisons owned units into a target object. |
+| `SetUnitStanceUngarrison` | `(sourceObjects, unit)` | `nil` | Ungarrisons an owned unit from owned source buildings. |
+| `SetUnitStanceSeekShelter` | `(units)` | `nil` | Orders owned units to seek shelter. |
+| `SetUnitCombatStance` | `(units, stance)` | `nil` | Sets the combat stance of owned units using `UnitCombatStance`. |
+
+## Example
 
 ```lua
-TrainUnit(trainSources, unitId, amount?)
+function Update()
+    local player = GetAssignedPlayer()
+    if not player then
+        return
+    end
+
+    local townCenters = player:GetTownCenters()
+    if #townCenters == 0 then
+        return
+    end
+
+    if CanAfford(UnitObjectType.VILLAGER_MALE, false) then
+        TrainUnit({ UnitObjectType.TOWN_CENTER_FEUDAL_AGE }, UnitObjectType.VILLAGER_MALE, 1)
+    end
+end
 ```
 
-- **trainSources:** Table of `UnitObjectType` (building types that can train, e.g. Town Centers)
-- **unitId:** `UnitObjectType` of the unit to train
-- **amount:** Optional, defaults to 1
+## Notes
 
-```lua
-TrainUnit({UnitObjectType.TOWN_CENTER_FEUDAL_AGE}, UnitObjectType.VILLAGER_MALE, 1)
-```
-
-### EnableScouting
-
-Returns `boolean` — whether scouting was successfully enabled.
+- `TrainUnit` and `ResearchTechnology` require all arguments in Lua. Pass `amount` explicitly.
+- `DeleteUnit`, `DestroyBuilding`, and stance commands do not return success flags.
+- If `Sequential Actions` is enabled, only the first command that executes in a tick succeeds.

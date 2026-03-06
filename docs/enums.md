@@ -112,29 +112,56 @@ See the [community Parameter Details (ObjectData)](https://airef.github.io/param
 
 ### UrgencyLevel
 
-LOW, MEDIUM, HIGH
+| Value | Description |
+|-------|-------------|
+| LOW | Low urgency request. |
+| MEDIUM | Normal urgency request. |
+| HIGH | High urgency request. |
 
 ### BuildingPosition
 
-TOWN_CENTER, AGGRESSIVE
+| Value | Description |
+|-------|-------------|
+| TOWN_CENTER | Prefer town-center-oriented building placement. |
+| AGGRESSIVE | Prefer forward or aggressive building placement. |
 
 ### VillagerProfession
 
-WOOD, FOOD, STONE, GOLD
+| Value | Description |
+|-------|-------------|
+| WOOD | Lumberjacks. |
+| FOOD | Farmers, forage, or food gatherers. |
+| STONE | Stone miners. |
+| GOLD | Gold miners. |
 
 ### PlacementDirection
 
-Used by ConstructionPlacement.
+| Value | Description |
+|-------|-------------|
+| Center | Centered placement. |
+| North | Offset north. |
+| NorthEast | Offset north-east. |
+| East | Offset east. |
+| SouthEast | Offset south-east. |
+| South | Offset south. |
+| SouthWest | Offset south-west. |
+| West | Offset west. |
+| NorthWest | Offset north-west. |
 
 ### BuildingRequestPriority
 
-Used by ConstructionPlacement.
+| Value | Description |
+|-------|-------------|
+| LOW | Lowest build queue priority. |
+| MEDIUM | Default build queue priority. |
+| HIGH | High build queue priority. |
+| CRITICAL | Highest build queue priority. |
 
 ## Engine Enum
 
 ### Key
 
-Virtual key codes for keybinds (e.g. `Key.Add` for +, `Key.F`, `Key.SPACE`). Used with `Settings.AddKeybind` and `IsKeyPressed`.
+Virtual key codes for keybinds (for example `Key.Add`, `Key.F`, `Key.SPACE`).
 
 ```lua
 Settings.AddKeybind("Hotkey", Key.Add)

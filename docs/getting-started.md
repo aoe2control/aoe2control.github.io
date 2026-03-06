@@ -1,70 +1,72 @@
 # Getting Started
 
-This guide walks you through installing CONTROL and creating your first Lua module.
+This guide walks through installing CONTROL, creating a Lua module, and attaching it to a player slot.
 
 ## Installation
 
-1. **Start Age of Empires II: Definitive Edition** — Ensure the game is running
-2. **Run the CONTROL launcher**
-3. **Press START** — Attach the engine to the game
+1. Start Age of Empires II: Definitive Edition.
+2. Run the CONTROL launcher.
+3. Press **START** to attach CONTROL to the game.
 
-Once attached, the engine overlay appears and the config folder is created.
+Once attached, the overlay appears and the config folder is created.
 
 ## First Run
 
-After the first run, the configuration folder is created at:
+CONTROL creates its config folder at:
 
-```
+```text
 %appdata%\CONTROL\AoE2Control\
 ```
 
-This folder contains:
+Important contents:
 
-- `settings.ini` — Engine and module settings
-- `imgui.ini` — UI layout preferences
-- `modules/` — Your Lua module projects
+- `settings.ini`
+- `imgui.ini`
+- `modules/`
 
-## First Script
+## First Module
 
-Create a new module in the `modules` folder:
+Create:
 
-1. Create a folder: `modules\my_first_module\`
-2. Create the entry file: `my_first_module.main.lua`
-3. Add the required callbacks:
+```text
+modules\my_first_module\my_first_module.main.lua
+```
+
+Starter file:
 
 ```lua
 function Load()
-    -- Settings go here (add checkboxes, sliders, etc.)
+    Settings.AddBool("Enabled", true)
 end
 
 function Init()
-    -- Runs when game starts/resets
+    ChatMessage("Hello from CONTROL")
 end
 
 function Update()
-    -- Runs every update tick (configurable interval)
 end
 
 function Render()
-    -- Runs every frame — draw overlays here
 end
 
 function End(hasWon)
-    -- Runs when game ends
 end
 ```
 
-All callbacks are optional — implement only what you need.
+All callbacks are optional.
 
-## Enable Your Module
+## Attach The Module
 
-1. Open the CONTROL interface (in-game overlay)
-2. Select your module from the **Module** dropdown
-3. Enable **AI** (toggle)
-4. Start or load a single-player game
+1. Open the CONTROL overlay.
+2. Click **Add Module**.
+3. Choose your module in the **Module** dropdown.
+4. Choose a **Player ID**.
+5. Leave **Enabled** on.
+6. Start or load a single-player match.
 
 ## Next Steps
 
-- [Quick Example](quick-example.md) — A complete working module with Settings and Render
-- [Lifecycle](lifecycle.md) — When each callback runs
-- [Module System](module-system.md) — `require`, depth limits, encrypted modules
+- [Quick Example](quick-example.md)
+- [Lifecycle](lifecycle.md)
+- [Module System](module-system.md)
+- [Interface Options](interface-options.md)

@@ -1,86 +1,91 @@
 # Quick Example
 
-This page shows a minimal working module based on `my_first_module`. It demonstrates Settings, Render, Init, End, and `require`.
+This example shows a small but current CONTROL module. It uses the renamed APIs, explicit setting defaults, and the assigned-player model.
 
 ## Module Structure
 
-```
+```text
 modules/
 └── my_first_module/
-    ├── my_first_module.main.lua   ← Entry point
+    ├── my_first_module.main.lua
     └── utils/
-        └── logger.lua             ← Submodule
+        └── logger.lua
 ```
 
 ## Full Example
 
 ```lua
--- my_first_module.main.lua
 local logger = require("utils.logger")
 
-function Load() -- runs when module is selected
-    Settings.AddColor("Villager Color", Color.new(0, 255, 0))
-    Settings.AddKeybind("Increase Game Speed", Key.Add)
+function Load()
+    Settings.AddBool("Highlight Villagers", true)
+    Settings.AddColor("Villager Color", Color(0, 255, 0, 90))
+    Settings.AddKeybind("Fast Speed Key", Key.Add)
+    Settings.AddTooltip("Fast Speed Key", "Hold to temporarily increase game speed.")
 
-    logger.info("Module loaded")
+    logger.info("Load complete")
 end
 
-function Init() -- runs when the game starts / resets
-    ChatLocal("Hello from my first module!")
+function Init()
+    ChatMessage("Module active for player " .. tostring(GetAssignedPlayerId()))
 end
 
-function Update() -- runs every update tick
-end
-
-function Render() -- runs every frame
-    local toggleColorKey = Settings.GetKeybind("Increase Game Speed", Key.Add)
-    if IsKeyPressed(toggleColorKey) then
-        SetGameSpeedMultiplier(30)
+function Update()
+    local fastKey = Settings.GetKeybind("Fast Speed Key", Key.Add)
+    if IsKeyPressed(fastKey) then
+        SetGameSpeedMultiplier(3.0)
     else
-        SetGameSpeedMultiplier(1.5)
-    end
-
-    local villagerColor = Settings.GetColor("Villager Color", Color.new(0, 255, 0))
-
-    local objects = GetObjectsByClass(UnitClass.VILLAGER)
-    for i = 1, #objects do
-        RenderObjectBoundsFilled(objects[i], villagerColor)
+        SetGameSpeedMultiplier(1.0)
     end
 end
 
-function End(hasWon) -- runs when the game ends
-    logger.info("Game ended: " .. (hasWon and "Victory!" or "Defeat!"))
+function Render()
+    if not Settings.GetBool("Highlight Villagers", true) then
+        return
+    end
+
+    local color = Settings.GetColor("Villager Color", Color(0, 255, 0, 90))
+    local player = GetAssignedPlayer()
+    if not player then
+        return
+    end
+
+    for _, villager in ipairs(player:GetObjectsByClass(UnitClass.VILLAGER)) do
+        if villager:IsAlive() then
+            RenderObjectBoundsFilled(villager, color)
+        end
+    end
+end
+
+function End(hasWon)
+    logger.info(hasWon and "Assigned player won." or "Assigned player lost.")
 end
 ```
 
 ## Logger Submodule
 
 ```lua
--- utils/logger.lua
 local logger = {}
 
 function logger.info(message)
-    Log("[Bot] " .. message)
+    Log("[my_first_module] " .. message)
 end
 
 return logger
 ```
 
-## What This Example Demonstrates
+## What This Example Covers
 
-| Feature | Usage |
-|---------|-------|
-| `require` | `require("utils.logger")` loads `utils/logger.lua` |
-| Settings.AddColor | Defines a color picker in the module UI |
-| Settings.AddKeybind | Defines a hotkey (default: +) |
-| Settings.GetKeybind / GetColor | Read values in Render |
-| IsKeyPressed | Check if key is held (for hotkey) |
-| GetObjectsByClass | Get all villagers |
-| RenderObjectBoundsFilled | Draw filled overlay on each villager |
-| SetGameSpeedMultiplier | Change game speed |
-| ChatLocal | Send message to chat |
-| End(hasWon) | React to game end |
+| API | Why it is here |
+|-----|----------------|
+| `require("utils.logger")` | Loads a local helper module. |
+| `Settings.Add*` | Declares module UI settings during `Load()`. |
+| `Settings.Get*` | Reads setting values with explicit fallback arguments. |
+| `GetAssignedPlayer()` | Uses the player assigned to this module instance. |
+| `GetAssignedPlayerId()` | Reads the controlled player id directly. |
+| `ChatMessage()` | Uses the renamed chat API. |
+| `RenderObjectBoundsFilled()` | Draws an overlay on owned villagers. |
 
-## Module Folder Convention
+## Folder Convention
 
-Use `modules/{moduleName}/{moduleName}.main.lua` — the folder name matches the module name. The engine searches recursively for `*.main.lua` or `*.main.module` files (up to depth 3).
+Use `modules/{moduleName}/{moduleName}.main.lua` or `.main.module`. CONTROL discovers entries recursively up to depth 3.

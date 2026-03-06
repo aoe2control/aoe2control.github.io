@@ -8,6 +8,8 @@
       
       
       
+        <link rel="canonical" href="https://aoe2control.github.io/getting-started/">
+      
       
         <link rel="prev" href="..">
       
@@ -584,10 +586,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#first-script" class="md-nav__link">
+  <a href="#first-module" class="md-nav__link">
     <span class="md-ellipsis">
       
-        First Script
+        First Module
       
     </span>
   </a>
@@ -595,10 +597,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#enable-your-module" class="md-nav__link">
+  <a href="#attach-the-module" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Enable Your Module
+        Attach The Module
       
     </span>
   </a>
@@ -1506,64 +1508,62 @@
 
 
 <h1 id="getting-started">Getting Started</h1>
-<p>This guide walks you through installing CONTROL and creating your first Lua module.</p>
+<p>This guide walks through installing CONTROL, creating a Lua module, and attaching it to a player slot.</p>
 <h2 id="installation">Installation</h2>
 <ol>
-<li><strong>Start Age of Empires II: Definitive Edition</strong> — Ensure the game is running</li>
-<li><strong>Run the CONTROL launcher</strong></li>
-<li><strong>Press START</strong> — Attach the engine to the game</li>
+<li>Start Age of Empires II: Definitive Edition.</li>
+<li>Run the CONTROL launcher.</li>
+<li>Press <strong>START</strong> to attach CONTROL to the game.</li>
 </ol>
-<p>Once attached, the engine overlay appears and the config folder is created.</p>
+<p>Once attached, the overlay appears and the config folder is created.</p>
 <h2 id="first-run">First Run</h2>
-<p>After the first run, the configuration folder is created at:</p>
+<p>CONTROL creates its config folder at:</p>
 <div class="highlight"><pre><span></span><code>%appdata%\CONTROL\AoE2Control\
 </code></pre></div>
-<p>This folder contains:</p>
+<p>Important contents:</p>
 <ul>
-<li><code>settings.ini</code> — Engine and module settings</li>
-<li><code>imgui.ini</code> — UI layout preferences</li>
-<li><code>modules/</code> — Your Lua module projects</li>
+<li><code>settings.ini</code></li>
+<li><code>imgui.ini</code></li>
+<li><code>modules/</code></li>
 </ul>
-<h2 id="first-script">First Script</h2>
-<p>Create a new module in the <code>modules</code> folder:</p>
-<ol>
-<li>Create a folder: <code>modules\my_first_module\</code></li>
-<li>Create the entry file: <code>my_first_module.main.lua</code></li>
-<li>Add the required callbacks:</li>
-</ol>
+<h2 id="first-module">First Module</h2>
+<p>Create:</p>
+<div class="highlight"><pre><span></span><code>modules\my_first_module\my_first_module.main.lua
+</code></pre></div>
+<p>Starter file:</p>
 <div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Load</span><span class="p">()</span>
-<span class="w">    </span><span class="c1">-- Settings go here (add checkboxes, sliders, etc.)</span>
+<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddBool</span><span class="p">(</span><span class="s2">&quot;Enabled&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
 <span class="kr">end</span>
 
 <span class="kr">function</span><span class="w"> </span><span class="nf">Init</span><span class="p">()</span>
-<span class="w">    </span><span class="c1">-- Runs when game starts/resets</span>
+<span class="w">    </span><span class="nf">ChatMessage</span><span class="p">(</span><span class="s2">&quot;Hello from CONTROL&quot;</span><span class="p">)</span>
 <span class="kr">end</span>
 
 <span class="kr">function</span><span class="w"> </span><span class="nf">Update</span><span class="p">()</span>
-<span class="w">    </span><span class="c1">-- Runs every update tick (configurable interval)</span>
 <span class="kr">end</span>
 
 <span class="kr">function</span><span class="w"> </span><span class="nf">Render</span><span class="p">()</span>
-<span class="w">    </span><span class="c1">-- Runs every frame — draw overlays here</span>
 <span class="kr">end</span>
 
 <span class="kr">function</span><span class="w"> </span><span class="nf">End</span><span class="p">(</span><span class="nv">hasWon</span><span class="p">)</span>
-<span class="w">    </span><span class="c1">-- Runs when game ends</span>
 <span class="kr">end</span>
 </code></pre></div>
-<p>All callbacks are optional — implement only what you need.</p>
-<h2 id="enable-your-module">Enable Your Module</h2>
+<p>All callbacks are optional.</p>
+<h2 id="attach-the-module">Attach The Module</h2>
 <ol>
-<li>Open the CONTROL interface (in-game overlay)</li>
-<li>Select your module from the <strong>Module</strong> dropdown</li>
-<li>Enable <strong>AI</strong> (toggle)</li>
-<li>Start or load a single-player game</li>
+<li>Open the CONTROL overlay.</li>
+<li>Click <strong>Add Module</strong>.</li>
+<li>Choose your module in the <strong>Module</strong> dropdown.</li>
+<li>Choose a <strong>Player ID</strong>.</li>
+<li>Leave <strong>Enabled</strong> on.</li>
+<li>Start or load a single-player match.</li>
 </ol>
 <h2 id="next-steps">Next Steps</h2>
 <ul>
-<li><a href="../quick-example/">Quick Example</a> — A complete working module with Settings and Render</li>
-<li><a href="../lifecycle/">Lifecycle</a> — When each callback runs</li>
-<li><a href="../module-system/">Module System</a> — <code>require</code>, depth limits, encrypted modules</li>
+<li><a href="../quick-example/">Quick Example</a></li>
+<li><a href="../lifecycle/">Lifecycle</a></li>
+<li><a href="../module-system/">Module System</a></li>
+<li><a href="../interface-options/">Interface Options</a></li>
 </ul>
 
 

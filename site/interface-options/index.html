@@ -8,6 +8,8 @@
       
       
       
+        <link rel="canonical" href="https://aoe2control.github.io/interface-options/">
+      
       
         <link rel="prev" href="../quick-example/">
       
@@ -677,10 +679,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#module-selection" class="md-nav__link">
+  <a href="#module-discovery" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Module Selection
+        Module Discovery
       
     </span>
   </a>
@@ -688,10 +690,54 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ai-settings" class="md-nav__link">
+  <a href="#global-ai-settings" class="md-nav__link">
     <span class="md-ellipsis">
       
-        AI Settings
+        Global AI Settings
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#module-items" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module Items
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multi-module-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Module Behavior
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#misc-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Misc Settings
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#perspective-warning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Perspective Warning
       
     </span>
   </a>
@@ -1484,61 +1530,136 @@
 
 
 <h1 id="interface-options">Interface Options</h1>
-<p>The CONTROL engine provides an in-game overlay with options for module selection and AI behavior.</p>
+<p>The CONTROL overlay now manages multiple module instances, each assigned to a specific player slot.</p>
 <p><img alt="CONTROL Interface — AI Settings" src="../images/ControlUI.png" /></p>
-<h2 id="module-selection">Module Selection</h2>
-<p>A <strong>dropdown</strong> lists all available modules. The engine searches recursively for:</p>
+<h2 id="module-discovery">Module Discovery</h2>
+<p>CONTROL scans <code>modules/</code> recursively for:</p>
 <ul>
-<li><code>*.main.lua</code> — Plain Lua entry points</li>
-<li><code>*.main.module</code> — Encrypted precompiled modules</li>
+<li><code>*.main.lua</code></li>
+<li><code>*.main.module</code></li>
 </ul>
-<p><strong>Search depth:</strong> Up to 3 levels inside <code>modules/</code>.</p>
-<p>Example: <code>modules/my_first_module/my_first_module.main.lua</code> appears as <code>my_first_module</code> in the dropdown.</p>
-<h2 id="ai-settings">AI Settings</h2>
+<p><strong>Depth limit:</strong> 3 levels below <code>modules/</code>.</p>
+<h2 id="global-ai-settings">Global AI Settings</h2>
 <table>
 <thead>
 <tr>
 <th>Setting</th>
-<th>Description</th>
 <th>Default</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><strong>Enabled</strong></td>
-<td>Toggle to run the selected module</td>
-<td>Off</td>
-</tr>
-<tr>
-<td><strong>Module</strong></td>
-<td>Dropdown to select which module runs; <strong>Open Folder</strong> opens the module directory</td>
-<td>—</td>
+<td>On</td>
+<td>Master toggle for all configured module instances.</td>
 </tr>
 <tr>
 <td><strong>Update Interval</strong></td>
-<td>Seconds between <code>Update()</code> calls</td>
-<td>1.0</td>
+<td><code>1.0</code></td>
+<td>Seconds between <code>Update()</code> calls.</td>
 </tr>
 <tr>
 <td><strong>Sequential Actions</strong></td>
-<td>When enabled, limits commands per tick</td>
 <td>On</td>
+<td>Allows only one successful command per update tick.</td>
 </tr>
 <tr>
 <td><strong>Auto Move Camera</strong></td>
-<td>Move camera to command targets</td>
 <td>On</td>
+<td>Auto-centers the camera on executed command targets.</td>
 </tr>
 <tr>
 <td><strong>Command Visualization</strong></td>
-<td>Show visual feedback for commands</td>
 <td>On</td>
+<td>Draws command feedback overlays.</td>
+</tr>
+<tr>
+<td><strong>Player Perspective</strong></td>
+<td><code>Default</code></td>
+<td>Fog-of-war perspective override: <code>Default</code>, <code>Player 1</code> to <code>Player 8</code>, <code>All Players</code>, or <code>Gaia</code>.</td>
 </tr>
 </tbody>
 </table>
-<p>The Update Interval is clamped to a minimum of 0.1 seconds in the ui and 0.01 seconds when manually editing the settings file.</p>
+<p>The update interval is clamped to <code>0.1</code> seconds in the UI and <code>0.01</code> seconds if edited directly in <code>settings.ini</code>.</p>
+<h2 id="module-items">Module Items</h2>
+<p>Use <strong>Add Module</strong> to create a new module instance. Each module item has its own runtime and assigned player.</p>
+<table>
+<thead>
+<tr>
+<th>Control</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Enabled</strong></td>
+<td>Turns this module instance on or off without deleting it.</td>
+</tr>
+<tr>
+<td><strong>Sync Settings</strong></td>
+<td>Shares module settings through a named profile instead of per-player settings.</td>
+</tr>
+<tr>
+<td><strong>Module</strong></td>
+<td>Selects the module entry point for this instance. Selecting the same module again reloads it.</td>
+</tr>
+<tr>
+<td><strong>Player ID</strong></td>
+<td>Chooses which in-game player this module controls.</td>
+</tr>
+<tr>
+<td><strong>Settings Profile</strong></td>
+<td>Appears when <strong>Sync Settings</strong> is enabled. Multiple instances can share the same profile.</td>
+</tr>
+<tr>
+<td><strong>Create Profile / Remove Profile</strong></td>
+<td>Manages reusable module settings profiles.</td>
+</tr>
+<tr>
+<td><strong>Remove Module</strong></td>
+<td>Deletes the instance configuration.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="multi-module-behavior">Multi-Module Behavior</h2>
+<ul>
+<li>Only one enabled module can control a given player at a time.</li>
+<li>Duplicate player assignments are automatically warned about and disabled at runtime.</li>
+<li>Module-created settings panels appear per configured settings group while AI is enabled.</li>
+<li><strong>Open Folder</strong> opens the modules directory.</li>
+</ul>
+<h2 id="misc-settings">Misc Settings</h2>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Reveal Map</strong></td>
+<td>Off</td>
+<td>Useful when controlling non-local players. Release note: may cause crashes.</td>
+</tr>
+<tr>
+<td><strong>Unlock Zoom</strong></td>
+<td>Off</td>
+<td>Removes the normal zoom limit. Release note: may cause rendering issues or crashes.</td>
+</tr>
+<tr>
+<td><strong>Chat Welcome Message</strong></td>
+<td>On</td>
+<td>Enables CONTROL's startup chat message behavior.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="perspective-warning">Perspective Warning</h2>
+<p><code>Player Perspective</code> can force the fog view of a specific player. This is powerful for debugging and for multi-player-slot control, but the current release notes warn that perspective switching may cause a crash on the next game start.</p>
 <h2 id="log-window">Log Window</h2>
-<p>An option exists to show <strong>only script logs</strong> (default) — filtering out engine-internal messages. Use <code>Log("message")</code> in your scripts to write to this window.</p>
+<p>Use <code>Log("message")</code> from Lua to write script messages to the log window.</p>
 
 
 

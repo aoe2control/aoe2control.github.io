@@ -8,6 +8,8 @@
       
       
       
+        <link rel="canonical" href="https://aoe2control.github.io/ipc-api/">
+      
       
         <link rel="prev" href="../render-api-impl/">
       
@@ -1242,10 +1244,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#lua-server-example-ipc_test" class="md-nav__link">
+  <a href="#routing-model" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Lua Server Example (ipc_test)
+        Routing Model
       
     </span>
   </a>
@@ -1253,10 +1255,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#python-client-example" class="md-nav__link">
+  <a href="#outgoing-envelope" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Python Client Example
+        Outgoing Envelope
       
     </span>
   </a>
@@ -1264,10 +1266,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#protocol" class="md-nav__link">
+  <a href="#lua-example" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Protocol
+        Lua Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
       
     </span>
   </a>
@@ -1506,13 +1530,13 @@
 
 
 <h1 id="ipc-api">IPC API</h1>
-<p>The IPC API lets external processes (e.g. Python ML agents) communicate with your Lua module via named pipes and JSON.</p>
+<p>The IPC API connects Lua modules to external processes through Windows named pipes and JSON strings.</p>
 <h2 id="functions">Functions</h2>
 <table>
 <thead>
 <tr>
 <th>Function</th>
-<th>Parameters</th>
+<th>Signature</th>
 <th>Returns</th>
 <th>Description</th>
 </tr>
@@ -1521,26 +1545,26 @@
 <tr>
 <td><code>IPC.StartServer</code></td>
 <td><code>(pipeName)</code></td>
-<td>boolean</td>
-<td>Start named pipe server</td>
+<td><code>boolean</code></td>
+<td>Starts or joins a named pipe server.</td>
 </tr>
 <tr>
 <td><code>IPC.StopServer</code></td>
 <td><code>()</code></td>
-<td>—</td>
-<td>Stop server</td>
+<td><code>nil</code></td>
+<td>Stops the current module instance's server endpoint.</td>
 </tr>
 <tr>
 <td><code>IPC.Send</code></td>
 <td><code>(message)</code></td>
-<td>—</td>
-<td>Send string to client</td>
+<td><code>boolean</code></td>
+<td>Sends a message to all connected pipe clients.</td>
 </tr>
 <tr>
 <td><code>IPC.GetMessages</code></td>
 <td><code>()</code></td>
-<td>Table of strings</td>
-<td>Receive messages from client</td>
+<td><code>string[]</code></td>
+<td>Returns queued messages for this module instance.</td>
 </tr>
 </tbody>
 </table>
@@ -1549,7 +1573,7 @@
 <thead>
 <tr>
 <th>Function</th>
-<th>Parameters</th>
+<th>Signature</th>
 <th>Returns</th>
 <th>Description</th>
 </tr>
@@ -1558,112 +1582,125 @@
 <tr>
 <td><code>ParseJSON</code></td>
 <td><code>(str)</code></td>
-<td>table</td>
-<td>Parse JSON string to Lua table</td>
+<td><code>table</code></td>
+<td>Parses a JSON string into Lua values. Returns <code>nil</code> on parse error.</td>
 </tr>
 <tr>
 <td><code>ToJSON</code></td>
 <td><code>(obj)</code></td>
-<td>string</td>
-<td>Serialize Lua table to JSON</td>
+<td><code>string</code></td>
+<td>Serializes a Lua value to JSON. Returns <code>"{}"</code> on serialization error.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="lua-server-example-ipc_test">Lua Server Example (ipc_test)</h2>
+<h2 id="routing-model">Routing Model</h2>
+<p>Multiple module instances can now share one pipe name. Incoming messages can target specific module instances.</p>
+<p>Accepted routing fields:</p>
+<ul>
+<li><code>instanceId</code> or <code>assignedInstanceId</code></li>
+<li><code>assignedPlayerId</code> or <code>playerId</code></li>
+<li><code>moduleName</code></li>
+<li><code>settingsGroup</code></li>
+</ul>
+<p>These fields can appear either:</p>
+<ul>
+<li>at the root object, or</li>
+<li>inside a root <code>target</code> object</li>
+</ul>
+<p>When routing fields are present, CONTROL only delivers the message to matching module instances. The Lua side receives the message payload without the routing wrapper.</p>
+<h2 id="outgoing-envelope">Outgoing Envelope</h2>
+<p><code>IPC.Send(message)</code> wraps your payload before sending it to the client:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;module_message&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;pipeName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;AoE_ML_Pipe&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;source&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;instanceId&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;assignedPlayerId&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;moduleName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;my_module&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;settingsGroup&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;my_module [P1]&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;payload&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;...&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;your data&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>If the original message is plain text instead of JSON, the payload stays a string.</p>
+<h2 id="lua-example">Lua Example</h2>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">pipeName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;AoE_ML_Pipe&quot;</span>
 
 <span class="kr">function</span><span class="w"> </span><span class="nf">Init</span><span class="p">()</span>
-<span class="w">    </span><span class="nf">Log</span><span class="p">(</span><span class="s2">&quot;Starting IPC Server on pipe: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">pipeName</span><span class="p">)</span>
 <span class="w">    </span><span class="nv">IPC</span><span class="p">.</span><span class="nf">StartServer</span><span class="p">(</span><span class="nv">pipeName</span><span class="p">)</span>
+<span class="w">    </span><span class="nf">ChatMessage</span><span class="p">(</span><span class="s2">&quot;IPC online for player &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nf">GetAssignedPlayerId</span><span class="p">()))</span>
 <span class="kr">end</span>
 
 <span class="kr">function</span><span class="w"> </span><span class="nf">Update</span><span class="p">()</span>
-<span class="w">    </span><span class="c1">-- 1. Ingest commands from the ML Agent</span>
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">messages</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">IPC</span><span class="p">.</span><span class="nf">GetMessages</span><span class="p">()</span>
-
-<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">msgStr</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nv">messages</span><span class="p">)</span><span class="w"> </span><span class="kr">do</span>
-<span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">cmd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">ParseJSON</span><span class="p">(</span><span class="nv">msgStr</span><span class="p">)</span>
-
-<span class="w">        </span><span class="kr">if</span><span class="w"> </span><span class="nv">cmd</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">            </span><span class="nf">Log</span><span class="p">(</span><span class="s2">&quot;ML Command Received: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">cmd</span><span class="p">.</span><span class="py">action</span><span class="p">)</span>
-<span class="w">            </span><span class="kr">if</span><span class="w"> </span><span class="nv">cmd</span><span class="p">.</span><span class="py">action</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;Scout&quot;</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">                </span><span class="kr">if</span><span class="w"> </span><span class="nv">cmd</span><span class="p">.</span><span class="py">target</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">cmd</span><span class="p">.</span><span class="py">target</span><span class="p">.</span><span class="py">x</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">cmd</span><span class="p">.</span><span class="py">target</span><span class="p">.</span><span class="py">y</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">                    </span><span class="c1">-- UnitsMove(cmd.unitIds, Vector3(cmd.target.x, cmd.target.y, 0))</span>
-<span class="w">                </span><span class="kr">end</span>
-<span class="w">            </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">raw</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nv">IPC</span><span class="p">.</span><span class="nf">GetMessages</span><span class="p">())</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">ParseJSON</span><span class="p">(</span><span class="nv">raw</span><span class="p">)</span>
+<span class="w">        </span><span class="kr">if</span><span class="w"> </span><span class="nv">msg</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">msg</span><span class="p">.</span><span class="py">action</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;ping&quot;</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">            </span><span class="nv">IPC</span><span class="p">.</span><span class="nf">Send</span><span class="p">(</span><span class="nf">ToJSON</span><span class="p">({</span>
+<span class="w">                </span><span class="nv">action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pong&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="nv">assignedPlayerId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetAssignedPlayerId</span><span class="p">(),</span>
+<span class="w">                </span><span class="nv">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetGameTime</span><span class="p">()</span>
+<span class="w">            </span><span class="p">}))</span>
 <span class="w">        </span><span class="kr">end</span>
 <span class="w">    </span><span class="kr">end</span>
-
-<span class="w">    </span><span class="c1">-- 2. Build the current game state</span>
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">gameState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nv">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetGameTime</span><span class="p">(),</span>
-<span class="w">        </span><span class="nv">playerCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetPlayerCount</span><span class="p">(),</span>
-<span class="w">        </span><span class="nv">isAlive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="c1">-- 3. Broadcast state to the ML Agent</span>
-<span class="w">    </span><span class="nv">IPC</span><span class="p">.</span><span class="nf">Send</span><span class="p">(</span><span class="nf">ToJSON</span><span class="p">(</span><span class="nv">gameState</span><span class="p">))</span>
 <span class="kr">end</span>
 
 <span class="kr">function</span><span class="w"> </span><span class="nf">End</span><span class="p">()</span>
-<span class="w">    </span><span class="nf">Log</span><span class="p">(</span><span class="s2">&quot;Shutting down IPC Server...&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">IPC</span><span class="p">.</span><span class="nf">StopServer</span><span class="p">()</span>
+<span class="kr">end</span>
+
+<span class="kr">function</span><span class="w"> </span><span class="nf">Unload</span><span class="p">()</span>
 <span class="w">    </span><span class="nv">IPC</span><span class="p">.</span><span class="nf">StopServer</span><span class="p">()</span>
 <span class="kr">end</span>
 </code></pre></div>
-<h2 id="python-client-example">Python Client Example</h2>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">win32pipe</span><span class="o">,</span><span class="w"> </span><span class="nn">win32file</span><span class="o">,</span><span class="w"> </span><span class="nn">pywintypes</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<h2 id="python-example">Python Example</h2>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pywintypes</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">win32file</span>
 
 <span class="n">PIPE_NAME</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">.\pipe\AoE_ML_Pipe&quot;</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">connect_to_engine</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">():</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">handle</span> <span class="o">=</span> <span class="n">win32file</span><span class="o">.</span><span class="n">CreateFile</span><span class="p">(</span>
-                <span class="n">PIPE_NAME</span><span class="p">,</span> <span class="n">win32file</span><span class="o">.</span><span class="n">GENERIC_READ</span> <span class="o">|</span> <span class="n">win32file</span><span class="o">.</span><span class="n">GENERIC_WRITE</span><span class="p">,</span>
-                <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">win32file</span><span class="o">.</span><span class="n">OPEN_EXISTING</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="n">win32file</span><span class="o">.</span><span class="n">CreateFile</span><span class="p">(</span>
+                <span class="n">PIPE_NAME</span><span class="p">,</span>
+                <span class="n">win32file</span><span class="o">.</span><span class="n">GENERIC_READ</span> <span class="o">|</span> <span class="n">win32file</span><span class="o">.</span><span class="n">GENERIC_WRITE</span><span class="p">,</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="kc">None</span><span class="p">,</span>
+                <span class="n">win32file</span><span class="o">.</span><span class="n">OPEN_EXISTING</span><span class="p">,</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="kc">None</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="k">return</span> <span class="n">handle</span>
-        <span class="k">except</span> <span class="n">pywintypes</span><span class="o">.</span><span class="n">error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">winerror</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">231</span><span class="p">):</span>  <span class="c1"># ERROR_FILE_NOT_FOUND or ERROR_PIPE_BUSY</span>
-                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span>
+        <span class="k">except</span> <span class="n">pywintypes</span><span class="o">.</span><span class="n">error</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">winerror</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">231</span><span class="p">):</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">raise</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-    <span class="n">handle</span> <span class="o">=</span> <span class="n">connect_to_engine</span><span class="p">()</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="c1"># Read state from engine</span>
-            <span class="n">result</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">win32file</span><span class="o">.</span><span class="n">ReadFile</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="mi">4096</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="n">msg</span><span class="p">:</span>
-                        <span class="n">state</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;State -&gt; Time: </span><span class="si">{</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">handle</span> <span class="o">=</span> <span class="n">connect</span><span class="p">()</span>
 
-            <span class="c1"># Send command to engine</span>
-            <span class="n">command</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;Scout&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;unitIds&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">],</span>
-                <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mf">150.5</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mf">200.0</span><span class="p">}</span>
-            <span class="p">}</span>
-            <span class="n">win32file</span><span class="o">.</span><span class="n">WriteFile</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">command</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+<span class="n">targeted_ping</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;assignedPlayerId&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">&quot;moduleName&quot;</span><span class="p">:</span> <span class="s2">&quot;my_module&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;payload&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;ping&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 
-            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-    <span class="k">finally</span><span class="p">:</span>
-        <span class="n">win32file</span><span class="o">.</span><span class="n">CloseHandle</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">main</span><span class="p">()</span>
+<span class="n">win32file</span><span class="o">.</span><span class="n">WriteFile</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">targeted_ping</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+<span class="n">result</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">win32file</span><span class="o">.</span><span class="n">ReadFile</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="mi">4096</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
 </code></pre></div>
-<h2 id="protocol">Protocol</h2>
+<h2 id="notes">Notes</h2>
 <ul>
-<li><strong>Pipe name:</strong> Pass to <code>StartServer</code> (e.g. <code>"AoE_ML_Pipe"</code> → <code>\\.\pipe\AoE_ML_Pipe</code>)</li>
-<li><strong>Format:</strong> Newline-delimited JSON messages</li>
-<li><strong>Read:</strong> <code>IPC.GetMessages()</code> returns array of received strings</li>
-<li><strong>Write:</strong> <code>IPC.Send(ToJSON(gameState))</code> sends one message</li>
+<li>Pipe names are normalized automatically. Passing <code>"AoE_ML_Pipe"</code> is enough.</li>
+<li><code>IPC.Send</code> returns <code>false</code> if no client is connected.</li>
+<li>Use both <code>End</code> and <code>Unload</code> for cleanup so pipe servers stop on normal game end and on module disable/reload.</li>
 </ul>
 
 

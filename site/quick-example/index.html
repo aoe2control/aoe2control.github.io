@@ -8,6 +8,8 @@
       
       
       
+        <link rel="canonical" href="https://aoe2control.github.io/quick-example/">
+      
       
         <link rel="prev" href="../getting-started/">
       
@@ -623,10 +625,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-this-example-demonstrates" class="md-nav__link">
+  <a href="#what-this-example-covers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What This Example Demonstrates
+        What This Example Covers
       
     </span>
   </a>
@@ -634,10 +636,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#module-folder-convention" class="md-nav__link">
+  <a href="#folder-convention" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Module Folder Convention
+        Folder Convention
       
     </span>
   </a>
@@ -1506,115 +1508,111 @@
 
 
 <h1 id="quick-example">Quick Example</h1>
-<p>This page shows a minimal working module based on <code>my_first_module</code>. It demonstrates Settings, Render, Init, End, and <code>require</code>.</p>
+<p>This example shows a small but current CONTROL module. It uses the renamed APIs, explicit setting defaults, and the assigned-player model.</p>
 <h2 id="module-structure">Module Structure</h2>
 <div class="highlight"><pre><span></span><code>modules/
 └── my_first_module/
-    ├── my_first_module.main.lua   ← Entry point
+    ├── my_first_module.main.lua
     └── utils/
-        └── logger.lua             ← Submodule
+        └── logger.lua
 </code></pre></div>
 <h2 id="full-example">Full Example</h2>
-<div class="highlight"><pre><span></span><code><span class="c1">-- my_first_module.main.lua</span>
-<span class="kd">local</span><span class="w"> </span><span class="nv">logger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;utils.logger&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">logger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;utils.logger&quot;</span><span class="p">)</span>
 
-<span class="kr">function</span><span class="w"> </span><span class="nf">Load</span><span class="p">()</span><span class="w"> </span><span class="c1">-- runs when module is selected</span>
-<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddColor</span><span class="p">(</span><span class="s2">&quot;Villager Color&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">Color</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span>
-<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddKeybind</span><span class="p">(</span><span class="s2">&quot;Increase Game Speed&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">Key</span><span class="p">.</span><span class="py">Add</span><span class="p">)</span>
+<span class="kr">function</span><span class="w"> </span><span class="nf">Load</span><span class="p">()</span>
+<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddBool</span><span class="p">(</span><span class="s2">&quot;Highlight Villagers&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddColor</span><span class="p">(</span><span class="s2">&quot;Villager Color&quot;</span><span class="p">,</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">))</span>
+<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddKeybind</span><span class="p">(</span><span class="s2">&quot;Fast Speed Key&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">Key</span><span class="p">.</span><span class="py">Add</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddTooltip</span><span class="p">(</span><span class="s2">&quot;Fast Speed Key&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Hold to temporarily increase game speed.&quot;</span><span class="p">)</span>
 
-<span class="w">    </span><span class="nv">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="s2">&quot;Module loaded&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="s2">&quot;Load complete&quot;</span><span class="p">)</span>
 <span class="kr">end</span>
 
-<span class="kr">function</span><span class="w"> </span><span class="nf">Init</span><span class="p">()</span><span class="w"> </span><span class="c1">-- runs when the game starts / resets</span>
-<span class="w">    </span><span class="nf">ChatLocal</span><span class="p">(</span><span class="s2">&quot;Hello from my first module!&quot;</span><span class="p">)</span>
+<span class="kr">function</span><span class="w"> </span><span class="nf">Init</span><span class="p">()</span>
+<span class="w">    </span><span class="nf">ChatMessage</span><span class="p">(</span><span class="s2">&quot;Module active for player &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nf">GetAssignedPlayerId</span><span class="p">()))</span>
 <span class="kr">end</span>
 
-<span class="kr">function</span><span class="w"> </span><span class="nf">Update</span><span class="p">()</span><span class="w"> </span><span class="c1">-- runs every update tick</span>
-<span class="kr">end</span>
-
-<span class="kr">function</span><span class="w"> </span><span class="nf">Render</span><span class="p">()</span><span class="w"> </span><span class="c1">-- runs every frame</span>
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">toggleColorKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetKeybind</span><span class="p">(</span><span class="s2">&quot;Increase Game Speed&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">Key</span><span class="p">.</span><span class="py">Add</span><span class="p">)</span>
-<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nf">IsKeyPressed</span><span class="p">(</span><span class="nv">toggleColorKey</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">        </span><span class="nf">SetGameSpeedMultiplier</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+<span class="kr">function</span><span class="w"> </span><span class="nf">Update</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">fastKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetKeybind</span><span class="p">(</span><span class="s2">&quot;Fast Speed Key&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">Key</span><span class="p">.</span><span class="py">Add</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nf">IsKeyPressed</span><span class="p">(</span><span class="nv">fastKey</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="nf">SetGameSpeedMultiplier</span><span class="p">(</span><span class="mf">3.0</span><span class="p">)</span>
 <span class="w">    </span><span class="kr">else</span>
-<span class="w">        </span><span class="nf">SetGameSpeedMultiplier</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
-<span class="w">    </span><span class="kr">end</span>
-
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">villagerColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetColor</span><span class="p">(</span><span class="s2">&quot;Villager Color&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">Color</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span>
-
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">objects</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetObjectsByClass</span><span class="p">(</span><span class="nv">UnitClass</span><span class="p">.</span><span class="py">VILLAGER</span><span class="p">)</span>
-<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">#</span><span class="nv">objects</span><span class="w"> </span><span class="kr">do</span>
-<span class="w">        </span><span class="nf">RenderObjectBoundsFilled</span><span class="p">(</span><span class="nv">objects</span><span class="p">[</span><span class="nv">i</span><span class="p">],</span><span class="w"> </span><span class="nv">villagerColor</span><span class="p">)</span>
+<span class="w">        </span><span class="nf">SetGameSpeedMultiplier</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
 <span class="w">    </span><span class="kr">end</span>
 <span class="kr">end</span>
 
-<span class="kr">function</span><span class="w"> </span><span class="nf">End</span><span class="p">(</span><span class="nv">hasWon</span><span class="p">)</span><span class="w"> </span><span class="c1">-- runs when the game ends</span>
-<span class="w">    </span><span class="nv">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="s2">&quot;Game ended: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="p">(</span><span class="nv">hasWon</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="s2">&quot;Victory!&quot;</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;Defeat!&quot;</span><span class="p">))</span>
+<span class="kr">function</span><span class="w"> </span><span class="nf">Render</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetBool</span><span class="p">(</span><span class="s2">&quot;Highlight Villagers&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetColor</span><span class="p">(</span><span class="s2">&quot;Villager Color&quot;</span><span class="p">,</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">))</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">player</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetAssignedPlayer</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">player</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">villager</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nv">player</span><span class="p">:</span><span class="nf">GetObjectsByClass</span><span class="p">(</span><span class="nv">UnitClass</span><span class="p">.</span><span class="py">VILLAGER</span><span class="p">))</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">        </span><span class="kr">if</span><span class="w"> </span><span class="nv">villager</span><span class="p">:</span><span class="nf">IsAlive</span><span class="p">()</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">            </span><span class="nf">RenderObjectBoundsFilled</span><span class="p">(</span><span class="nv">villager</span><span class="p">,</span><span class="w"> </span><span class="nv">color</span><span class="p">)</span>
+<span class="w">        </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+
+<span class="kr">function</span><span class="w"> </span><span class="nf">End</span><span class="p">(</span><span class="nv">hasWon</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="nv">hasWon</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="s2">&quot;Assigned player won.&quot;</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">&quot;Assigned player lost.&quot;</span><span class="p">)</span>
 <span class="kr">end</span>
 </code></pre></div>
 <h2 id="logger-submodule">Logger Submodule</h2>
-<div class="highlight"><pre><span></span><code><span class="c1">-- utils/logger.lua</span>
-<span class="kd">local</span><span class="w"> </span><span class="nv">logger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{}</span>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">logger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{}</span>
 
 <span class="kr">function</span><span class="w"> </span><span class="nc">logger</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="nv">message</span><span class="p">)</span>
-<span class="w">    </span><span class="nf">Log</span><span class="p">(</span><span class="s2">&quot;[Bot] &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">message</span><span class="p">)</span>
+<span class="w">    </span><span class="nf">Log</span><span class="p">(</span><span class="s2">&quot;[my_first_module] &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">message</span><span class="p">)</span>
 <span class="kr">end</span>
 
 <span class="kr">return</span><span class="w"> </span><span class="nv">logger</span>
 </code></pre></div>
-<h2 id="what-this-example-demonstrates">What This Example Demonstrates</h2>
+<h2 id="what-this-example-covers">What This Example Covers</h2>
 <table>
 <thead>
 <tr>
-<th>Feature</th>
-<th>Usage</th>
+<th>API</th>
+<th>Why it is here</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>require</code></td>
-<td><code>require("utils.logger")</code> loads <code>utils/logger.lua</code></td>
+<td><code>require("utils.logger")</code></td>
+<td>Loads a local helper module.</td>
 </tr>
 <tr>
-<td>Settings.AddColor</td>
-<td>Defines a color picker in the module UI</td>
+<td><code>Settings.Add*</code></td>
+<td>Declares module UI settings during <code>Load()</code>.</td>
 </tr>
 <tr>
-<td>Settings.AddKeybind</td>
-<td>Defines a hotkey (default: +)</td>
+<td><code>Settings.Get*</code></td>
+<td>Reads setting values with explicit fallback arguments.</td>
 </tr>
 <tr>
-<td>Settings.GetKeybind / GetColor</td>
-<td>Read values in Render</td>
+<td><code>GetAssignedPlayer()</code></td>
+<td>Uses the player assigned to this module instance.</td>
 </tr>
 <tr>
-<td>IsKeyPressed</td>
-<td>Check if key is held (for hotkey)</td>
+<td><code>GetAssignedPlayerId()</code></td>
+<td>Reads the controlled player id directly.</td>
 </tr>
 <tr>
-<td>GetObjectsByClass</td>
-<td>Get all villagers</td>
+<td><code>ChatMessage()</code></td>
+<td>Uses the renamed chat API.</td>
 </tr>
 <tr>
-<td>RenderObjectBoundsFilled</td>
-<td>Draw filled overlay on each villager</td>
-</tr>
-<tr>
-<td>SetGameSpeedMultiplier</td>
-<td>Change game speed</td>
-</tr>
-<tr>
-<td>ChatLocal</td>
-<td>Send message to chat</td>
-</tr>
-<tr>
-<td>End(hasWon)</td>
-<td>React to game end</td>
+<td><code>RenderObjectBoundsFilled()</code></td>
+<td>Draws an overlay on owned villagers.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="module-folder-convention">Module Folder Convention</h2>
-<p>Use <code>modules/{moduleName}/{moduleName}.main.lua</code> — the folder name matches the module name. The engine searches recursively for <code>*.main.lua</code> or <code>*.main.module</code> files (up to depth 3).</p>
+<h2 id="folder-convention">Folder Convention</h2>
+<p>Use <code>modules/{moduleName}/{moduleName}.main.lua</code> or <code>.main.module</code>. CONTROL discovers entries recursively up to depth 3.</p>
 
 
 

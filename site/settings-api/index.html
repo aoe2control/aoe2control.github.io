@@ -8,6 +8,8 @@
       
       
       
+        <link rel="canonical" href="https://aoe2control.github.io/settings-api/">
+      
       
         <link rel="prev" href="../enums/">
       
@@ -1164,10 +1166,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#add-functions-load-only" class="md-nav__link">
+  <a href="#add-functions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Add Functions (Load only)
+        Add Functions
       
     </span>
   </a>
@@ -1175,10 +1177,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#get-functions-anywhere" class="md-nav__link">
+  <a href="#get-functions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Get Functions (anywhere)
+        Get Functions
       
     </span>
   </a>
@@ -1186,10 +1188,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#iskeypressed" class="md-nav__link">
+  <a href="#input-helper" class="md-nav__link">
     <span class="md-ellipsis">
       
-        IsKeyPressed
+        Input Helper
       
     </span>
   </a>
@@ -1197,10 +1199,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-my_first_module" class="md-nav__link">
+  <a href="#example" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Example (my_first_module)
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multi-module-note" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Module Note
       
     </span>
   </a>
@@ -1495,62 +1508,66 @@
 
 
 <h1 id="settings-api">Settings API</h1>
-<p>The Settings API lets modules add UI controls (checkboxes, sliders, dropdowns, keybinds, colors) to the engine interface. Settings are per-module.</p>
-<h2 id="add-functions-load-only">Add Functions (Load only)</h2>
-<p>Call these <strong>only from <code>Load()</code></strong>:</p>
+<p>The Settings API adds module-specific controls to CONTROL's UI.</p>
+<div class="admonition note">
+<p class="admonition-title">Lua signatures are strict</p>
+<p>Getter functions require the fallback/default argument in Lua. They are not optional overloads.</p>
+</div>
+<h2 id="add-functions">Add Functions</h2>
+<p>Call these only from <code>Load()</code>.</p>
 <table>
 <thead>
 <tr>
 <th>Function</th>
-<th>Parameters</th>
+<th>Signature</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>Settings.AddBool</code></td>
-<td><code>(key, default)</code></td>
-<td>Checkbox</td>
+<td><code>(key, defaultValue)</code></td>
+<td>Adds a checkbox.</td>
 </tr>
 <tr>
 <td><code>Settings.AddInt</code></td>
-<td><code>(key, default, min, max)</code></td>
-<td>Integer slider</td>
+<td><code>(key, defaultValue, minValue, maxValue)</code></td>
+<td>Adds an integer slider.</td>
 </tr>
 <tr>
 <td><code>Settings.AddFloat</code></td>
-<td><code>(key, default, min, max)</code></td>
-<td>Float slider</td>
+<td><code>(key, defaultValue, minValue, maxValue)</code></td>
+<td>Adds a float slider.</td>
 </tr>
 <tr>
 <td><code>Settings.AddDropdown</code></td>
-<td><code>(key, default, options)</code></td>
-<td>Dropdown (options = table of strings)</td>
+<td><code>(key, defaultValue, options)</code></td>
+<td>Adds a dropdown from a string array.</td>
 </tr>
 <tr>
 <td><code>Settings.AddKeybind</code></td>
 <td><code>(key, defaultVkCode)</code></td>
-<td>Keybind (use <code>Key.Add</code>, <code>Key.F</code>, etc.)</td>
-</tr>
-<tr>
-<td><code>Settings.AddColor</code></td>
-<td><code>(key, defaultColor)</code></td>
-<td>Color picker</td>
+<td>Adds a keybind picker.</td>
 </tr>
 <tr>
 <td><code>Settings.AddTooltip</code></td>
 <td><code>(key, tooltip)</code></td>
-<td>Tooltip for a setting</td>
+<td>Adds a tooltip to an existing setting.</td>
+</tr>
+<tr>
+<td><code>Settings.AddColor</code></td>
+<td><code>(key, defaultColor)</code></td>
+<td>Adds a color picker.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="get-functions-anywhere">Get Functions (anywhere)</h2>
-<p>Call these from <code>Load</code>, <code>Init</code>, <code>Update</code>, or <code>Render</code>:</p>
+<h2 id="get-functions">Get Functions</h2>
+<p>Call these from <code>Load</code>, <code>Init</code>, <code>Update</code>, or <code>Render</code>.</p>
 <table>
 <thead>
 <tr>
 <th>Function</th>
-<th>Parameters</th>
+<th>Signature</th>
 <th>Returns</th>
 <th>Description</th>
 </tr>
@@ -1558,64 +1575,87 @@
 <tbody>
 <tr>
 <td><code>Settings.GetBool</code></td>
-<td><code>(key, default?)</code></td>
-<td>boolean</td>
-<td>Get checkbox value</td>
+<td><code>(key, defaultValue)</code></td>
+<td><code>boolean</code></td>
+<td>Reads a checkbox value.</td>
 </tr>
 <tr>
 <td><code>Settings.GetInt</code></td>
-<td><code>(key, default?)</code></td>
-<td>number</td>
-<td>Get int value</td>
+<td><code>(key, defaultValue)</code></td>
+<td><code>number</code></td>
+<td>Reads an integer value.</td>
 </tr>
 <tr>
 <td><code>Settings.GetFloat</code></td>
-<td><code>(key, default?)</code></td>
-<td>number</td>
-<td>Get float value</td>
+<td><code>(key, defaultValue)</code></td>
+<td><code>number</code></td>
+<td>Reads a float value.</td>
 </tr>
 <tr>
 <td><code>Settings.GetString</code></td>
-<td><code>(key, default?)</code></td>
-<td>string</td>
-<td>Get string/dropdown value</td>
+<td><code>(key, defaultValue)</code></td>
+<td><code>string</code></td>
+<td>Reads a string or dropdown value.</td>
 </tr>
 <tr>
 <td><code>Settings.GetKeybind</code></td>
-<td><code>(key, defaultVkCode?)</code></td>
-<td>number</td>
-<td>Get keybind VK code</td>
+<td><code>(key, defaultVkCode)</code></td>
+<td><code>number</code></td>
+<td>Reads a keybind virtual key code.</td>
 </tr>
 <tr>
 <td><code>Settings.GetColor</code></td>
 <td><code>(key, defaultColor)</code></td>
-<td>Color</td>
-<td>Get color value</td>
+<td><code>Color</code></td>
+<td>Reads a color value.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="iskeypressed">IsKeyPressed</h2>
-<div class="highlight"><pre><span></span><code><span class="nf">IsKeyPressed</span><span class="p">(</span><span class="nv">vkCode</span><span class="p">)</span><span class="w">  </span><span class="c1">-- returns boolean</span>
-</code></pre></div>
-<p>Check if a key is currently pressed. Use with <code>Settings.GetKeybind</code> for hotkeys.</p>
-<h2 id="example-my_first_module">Example (my_first_module)</h2>
+<h2 id="input-helper">Input Helper</h2>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Signature</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>IsKeyPressed</code></td>
+<td><code>(vkCode)</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether a key is currently pressed.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="example">Example</h2>
 <div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Load</span><span class="p">()</span>
-<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddColor</span><span class="p">(</span><span class="s2">&quot;Villager Color&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">Color</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span>
-<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddKeybind</span><span class="p">(</span><span class="s2">&quot;Increase Game Speed&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">Key</span><span class="p">.</span><span class="py">Add</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddBool</span><span class="p">(</span><span class="s2">&quot;Show Overlay&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddDropdown</span><span class="p">(</span><span class="s2">&quot;Mode&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Eco&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;Eco&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Rush&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Boom&quot;</span><span class="w"> </span><span class="p">})</span>
+<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddColor</span><span class="p">(</span><span class="s2">&quot;Overlay Color&quot;</span><span class="p">,</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">))</span>
+<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddKeybind</span><span class="p">(</span><span class="s2">&quot;Toggle Speed&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">Key</span><span class="p">.</span><span class="py">Add</span><span class="p">)</span>
 <span class="kr">end</span>
 
 <span class="kr">function</span><span class="w"> </span><span class="nf">Render</span><span class="p">()</span>
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">toggleColorKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetKeybind</span><span class="p">(</span><span class="s2">&quot;Increase Game Speed&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">Key</span><span class="p">.</span><span class="py">Add</span><span class="p">)</span>
-<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nf">IsKeyPressed</span><span class="p">(</span><span class="nv">toggleColorKey</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">        </span><span class="nf">SetGameSpeedMultiplier</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
-<span class="w">    </span><span class="kr">else</span>
-<span class="w">        </span><span class="nf">SetGameSpeedMultiplier</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetBool</span><span class="p">(</span><span class="s2">&quot;Show Overlay&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span>
 <span class="w">    </span><span class="kr">end</span>
 
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">villagerColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetColor</span><span class="p">(</span><span class="s2">&quot;Villager Color&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">Color</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span>
-<span class="w">    </span><span class="c1">-- use villagerColor for rendering</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetString</span><span class="p">(</span><span class="s2">&quot;Mode&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Eco&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetKeybind</span><span class="p">(</span><span class="s2">&quot;Toggle Speed&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">Key</span><span class="p">.</span><span class="py">Add</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetColor</span><span class="p">(</span><span class="s2">&quot;Overlay Color&quot;</span><span class="p">,</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">))</span>
+
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nf">IsKeyPressed</span><span class="p">(</span><span class="nv">key</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="nf">SetGameSpeedMultiplier</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="nf">RenderText</span><span class="p">(</span><span class="s2">&quot;Mode: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">mode</span><span class="p">,</span><span class="w"> </span><span class="nf">Vector2</span><span class="p">(</span><span class="mi">120</span><span class="p">,</span><span class="w"> </span><span class="mi">40</span><span class="p">),</span><span class="w"> </span><span class="mf">16.0</span><span class="p">,</span><span class="w"> </span><span class="nv">color</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
 <span class="kr">end</span>
 </code></pre></div>
+<h2 id="multi-module-note">Multi-Module Note</h2>
+<p>When <strong>Sync Settings</strong> is enabled for a module instance, the UI stores values under a shared profile-specific settings group instead of a per-player group.</p>
 
 
 

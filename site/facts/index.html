@@ -8,6 +8,8 @@
       
       
       
+        <link rel="canonical" href="https://aoe2control.github.io/facts/">
+      
       
         <link rel="prev" href="../commands/">
       
@@ -935,10 +937,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#reference-table" class="md-nav__link">
+  <a href="#reference" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Reference Table
+        Reference
       
     </span>
   </a>
@@ -946,30 +948,24 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#notable-signatures" class="md-nav__link">
+  <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Notable Signatures
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Notable Signatures">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#getfact" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        GetFact
+        Examples
       
     </span>
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
+      
+    </span>
+  </a>
   
 </li>
       
@@ -1490,155 +1486,168 @@
 
 
 <h1 id="game-api-facts">Game API — Facts</h1>
-<p>Facts read game state. Call them from <code>Init</code>, <code>Update</code>, or <code>Render</code> when the game is active.</p>
+<p>Facts read game state. Call them from <code>Init</code>, <code>Update</code>, or <code>Render</code> while a match is running.</p>
 <div class="admonition warning">
 <p class="admonition-title">Game must be running</p>
-<p>Calling game API before the game starts logs an error. Move logic to <code>Init</code>, <code>Update</code>, or <code>Render</code>.</p>
+<p>Calling game API before the game starts logs an error.</p>
 </div>
-<h2 id="reference-table">Reference Table</h2>
+<div class="admonition note">
+<p class="admonition-title">Lua signatures are strict</p>
+<p>Pass every argument shown below. A C++ default value does not make the parameter optional in Lua unless a separate overload is bound.</p>
+</div>
+<h2 id="reference">Reference</h2>
 <table>
 <thead>
 <tr>
 <th>Function</th>
-<th>Parameters</th>
+<th>Signature</th>
 <th>Returns</th>
 <th>Description</th>
-<th>Complexity</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>GetFact</code></td>
-<td><code>(factId, parameter?)</code></td>
-<td>number</td>
-<td>Get fact value (population, resources, etc.)</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>(factId, parameter)</code></td>
+<td><code>number</code></td>
+<td>Returns a fact value for the assigned player.</td>
 </tr>
 <tr>
 <td><code>GetUnitTypeCount</code></td>
 <td><code>(unitId)</code></td>
-<td>number</td>
-<td>Count of unit type for local player</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>number</code></td>
+<td>Returns the assigned player's count for a unit type.</td>
 </tr>
 <tr>
 <td><code>GetAttribute</code></td>
 <td><code>(attribute)</code></td>
-<td>number</td>
-<td>Get player attribute (food, wood, etc.)</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>number</code></td>
+<td>Returns a <code>PlayerAttribute</code> value for the assigned player.</td>
 </tr>
 <tr>
 <td><code>CanAfford</code></td>
-<td><code>(unitId, isBuilding?)</code></td>
-<td>boolean</td>
-<td>Can local player afford unit/structure</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>(unitId, isBuilding)</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether the assigned player can afford an item.</td>
 </tr>
 <tr>
 <td><code>CanResearch</code></td>
 <td><code>(technology)</code></td>
-<td>boolean</td>
-<td>Can research technology</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>boolean</code></td>
+<td>Returns whether the assigned player can currently research a technology.</td>
 </tr>
 <tr>
 <td><code>IsTechnologyResearched</code></td>
 <td><code>(technology)</code></td>
-<td>boolean</td>
-<td>Is technology already researched</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>boolean</code></td>
+<td>Returns whether the assigned player has researched a technology.</td>
 </tr>
 <tr>
 <td><code>GetObjectsByType</code></td>
 <td><code>(unitType)</code></td>
-<td>Table of Object</td>
-<td>Objects of specific type</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>Object[]</code></td>
+<td>Returns matching alive world objects, not just owned objects.</td>
 </tr>
 <tr>
 <td><code>GetObjectsByTypes</code></td>
 <td><code>(unitTypes)</code></td>
-<td>Table of Object</td>
-<td>Objects matching any of the types</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>Object[]</code></td>
+<td>Returns alive world objects matching any type in the list.</td>
 </tr>
 <tr>
 <td><code>GetObjectsByClass</code></td>
 <td><code>(unitClass)</code></td>
-<td>Table of Object</td>
-<td>Objects of class (e.g. VILLAGER)</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>Object[]</code></td>
+<td>Returns alive world objects of a class, not just owned objects.</td>
 </tr>
 <tr>
 <td><code>GetGameTime</code></td>
 <td><code>()</code></td>
-<td>number</td>
-<td>Current game time (seconds)</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>number</code></td>
+<td>Returns the current match time in seconds.</td>
 </tr>
 <tr>
-<td><code>GetLocalPlayer</code></td>
+<td><code>GetAssignedPlayer</code></td>
 <td><code>()</code></td>
-<td>Player</td>
-<td>Local player object</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>Player</code></td>
+<td>Returns the player currently assigned to this module instance.</td>
+</tr>
+<tr>
+<td><code>GetAssignedPlayerId</code></td>
+<td><code>()</code></td>
+<td><code>number</code></td>
+<td>Returns the player id currently assigned to this module instance.</td>
 </tr>
 <tr>
 <td><code>GetPlayerById</code></td>
 <td><code>(id)</code></td>
-<td>Player</td>
-<td>Player by ID</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>Player</code></td>
+<td>Returns a player by index. Gaia is typically <code>0</code>, regular players are typically <code>1</code> to <code>8</code>.</td>
 </tr>
 <tr>
 <td><code>GetPlayerCount</code></td>
 <td><code>()</code></td>
-<td>number</td>
-<td>Number of players</td>
-<td><span class="badge badge--gray">Not complex</span></td>
+<td><code>number</code></td>
+<td>Returns the size of the world player list.</td>
 </tr>
 <tr>
 <td><code>IsEnemyPlayer</code></td>
 <td><code>(player)</code></td>
-<td>boolean</td>
-<td>Is player an enemy</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>boolean</code></td>
+<td>Returns whether the given player is an enemy of the assigned player.</td>
 </tr>
 <tr>
 <td><code>GetObjectById</code></td>
 <td><code>(id)</code></td>
-<td>Object</td>
-<td>Object by ID</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>Object</code></td>
+<td>Returns a world object by id.</td>
 </tr>
 <tr>
 <td><code>GetVictoryCondition</code></td>
 <td><code>()</code></td>
-<td>VictoryCondition</td>
-<td>Current victory condition</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>VictoryCondition</code></td>
+<td>Returns the current victory condition.</td>
 </tr>
 <tr>
 <td><code>GetVictoryPlayer</code></td>
 <td><code>()</code></td>
-<td>Player?</td>
-<td>Winning player (if game ended)</td>
-<td><span class="badge badge--low">Low</span></td>
+<td><code>Player</code></td>
+<td>Returns the winner when the game has ended, otherwise <code>nil</code>.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="notable-signatures">Notable Signatures</h2>
-<h3 id="getfact">GetFact</h3>
-<div class="highlight"><pre><span></span><code><span class="nf">GetFact</span><span class="p">(</span><span class="nv">factId</span><span class="p">,</span><span class="w"> </span><span class="nv">parameter</span><span class="err">?</span><span class="p">)</span>
+<h2 id="examples">Examples</h2>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Update</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">assigned</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetAssignedPlayer</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">assigned</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">population</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetFact</span><span class="p">(</span><span class="nv">FactId</span><span class="p">.</span><span class="py">POPULATION</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">wood</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetAttribute</span><span class="p">(</span><span class="nv">PlayerAttribute</span><span class="p">.</span><span class="py">WOOD</span><span class="p">)</span>
+
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nv">population</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">60</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nf">CanAfford</span><span class="p">(</span><span class="nv">UnitObjectType</span><span class="p">.</span><span class="py">HOUSE</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="nf">Log</span><span class="p">(</span><span class="s2">&quot;Player &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nf">GetAssignedPlayerId</span><span class="p">())</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot; has &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nv">wood</span><span class="p">)</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot; wood.&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
 </code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Render</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nf">GetPlayerCount</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">player</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetPlayerById</span><span class="p">(</span><span class="nv">i</span><span class="p">)</span>
+<span class="w">        </span><span class="kr">if</span><span class="w"> </span><span class="nv">player</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nf">IsEnemyPlayer</span><span class="p">(</span><span class="nv">player</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">            </span><span class="kr">for</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">tc</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nv">player</span><span class="p">:</span><span class="nf">GetTownCenters</span><span class="p">())</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">                </span><span class="nf">RenderObjectBounds</span><span class="p">(</span><span class="nv">tc</span><span class="p">,</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">),</span><span class="w"> </span><span class="mf">2.0</span><span class="p">)</span>
+<span class="w">            </span><span class="kr">end</span>
+<span class="w">        </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+</code></pre></div>
+<h2 id="notes">Notes</h2>
 <ul>
-<li><strong>factId:</strong> <code>FactId</code> enum (e.g. <code>FactId.POPULATION</code>, <code>FactId.FOOD_AMOUNT</code>)</li>
-<li><strong>parameter:</strong> Optional, often 0 for local player</li>
+<li><code>GetLocalPlayer</code> was renamed to <code>GetAssignedPlayer</code>.</li>
+<li><code>GetObjectsByType</code>, <code>GetObjectsByTypes</code>, and <code>GetObjectsByClass</code> now scan world objects instead of only the assigned player's objects.</li>
+<li><code>CanAfford(unitId, isBuilding)</code> accepts both parameters in Lua, but the current binding does not distinguish the second flag internally yet.</li>
 </ul>
-<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">pop</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetFact</span><span class="p">(</span><span class="nv">FactId</span><span class="p">.</span><span class="py">POPULATION</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
-<span class="kd">local</span><span class="w"> </span><span class="nv">food</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetFact</span><span class="p">(</span><span class="nv">FactId</span><span class="p">.</span><span class="py">FOOD_AMOUNT</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
-</code></pre></div>
 
 
 

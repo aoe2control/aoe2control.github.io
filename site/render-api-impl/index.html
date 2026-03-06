@@ -8,6 +8,8 @@
       
       
       
+        <link rel="canonical" href="https://aoe2control.github.io/render-api-impl/">
+      
       
         <link rel="prev" href="../settings-api/">
       
@@ -1192,10 +1194,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#when-to-use-each-space" class="md-nav__link">
+  <a href="#screen-space-hud" class="md-nav__link">
     <span class="md-ellipsis">
       
-        When to Use Each Space
+        Screen-Space HUD
       
     </span>
   </a>
@@ -1203,10 +1205,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-villager-overlay-my_first_module" class="md-nav__link">
+  <a href="#owned-unit-overlay" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Example: Villager Overlay (my_first_module)
+        Owned-Unit Overlay
       
     </span>
   </a>
@@ -1214,10 +1216,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-custom-hud-screen-space" class="md-nav__link">
+  <a href="#world-marker" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Example: Custom HUD (Screen Space)
+        World Marker
       
     </span>
   </a>
@@ -1225,21 +1227,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-world-space-marker" class="md-nav__link">
+  <a href="#minimap-enemy-markers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Example: World-Space Marker
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#example-minimap-indicators" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Example: Minimap Indicators
+        Minimap Enemy Markers
       
     </span>
   </a>
@@ -1506,77 +1497,49 @@
 
 
 <h1 id="render-api-implementation">Render API Implementation</h1>
-<p>This page shows practical usage patterns for the Render API.</p>
-<h2 id="when-to-use-each-space">When to Use Each Space</h2>
-<table>
-<thead>
-<tr>
-<th>Space</th>
-<th>Use for</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Screen</strong></td>
-<td>HUD, fixed UI, resource display, FPS counter</td>
-</tr>
-<tr>
-<td><strong>World</strong></td>
-<td>Unit highlights, building markers, circles around selected units</td>
-</tr>
-<tr>
-<td><strong>Minimap</strong></td>
-<td>Enemy positions, resource locations, strategic markers</td>
-</tr>
-</tbody>
-</table>
-<h2 id="example-villager-overlay-my_first_module">Example: Villager Overlay (my_first_module)</h2>
-<p>Draw filled bounds on each villager, with color from Settings:</p>
+<p>This page shows small, current examples of the render helpers in practice.</p>
+<h2 id="screen-space-hud">Screen-Space HUD</h2>
 <div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Render</span><span class="p">()</span>
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">villagerColor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetColor</span><span class="p">(</span><span class="s2">&quot;Villager Color&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">Color</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span>
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">objects</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetObjectsByClass</span><span class="p">(</span><span class="nv">UnitClass</span><span class="p">.</span><span class="py">VILLAGER</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">anchor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">Vector2</span><span class="p">(</span><span class="mi">150</span><span class="p">,</span><span class="w"> </span><span class="mi">40</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">white</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">)</span>
 
-<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">#</span><span class="nv">objects</span><span class="w"> </span><span class="kr">do</span>
-<span class="w">        </span><span class="nf">RenderObjectBoundsFilled</span><span class="p">(</span><span class="nv">objects</span><span class="p">[</span><span class="nv">i</span><span class="p">],</span><span class="w"> </span><span class="nv">villagerColor</span><span class="p">)</span>
+<span class="w">    </span><span class="nf">RenderText</span><span class="p">(</span><span class="s2">&quot;Food: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nf">GetAttribute</span><span class="p">(</span><span class="nv">PlayerAttribute</span><span class="p">.</span><span class="py">FOOD</span><span class="p">)),</span><span class="w"> </span><span class="nv">anchor</span><span class="p">,</span><span class="w"> </span><span class="mf">16.0</span><span class="p">,</span><span class="w"> </span><span class="nv">white</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">anchor</span><span class="p">.</span><span class="py">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">anchor</span><span class="p">.</span><span class="py">y</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">20</span>
+<span class="w">    </span><span class="nf">RenderText</span><span class="p">(</span><span class="s2">&quot;Wood: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nf">GetAttribute</span><span class="p">(</span><span class="nv">PlayerAttribute</span><span class="p">.</span><span class="py">WOOD</span><span class="p">)),</span><span class="w"> </span><span class="nv">anchor</span><span class="p">,</span><span class="w"> </span><span class="mf">16.0</span><span class="p">,</span><span class="w"> </span><span class="nv">white</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">anchor</span><span class="p">.</span><span class="py">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">anchor</span><span class="p">.</span><span class="py">y</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">20</span>
+<span class="w">    </span><span class="nf">RenderText</span><span class="p">(</span><span class="s2">&quot;Gold: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nf">GetAttribute</span><span class="p">(</span><span class="nv">PlayerAttribute</span><span class="p">.</span><span class="py">GOLD</span><span class="p">)),</span><span class="w"> </span><span class="nv">anchor</span><span class="p">,</span><span class="w"> </span><span class="mf">16.0</span><span class="p">,</span><span class="w"> </span><span class="nv">white</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
+<h2 id="owned-unit-overlay">Owned-Unit Overlay</h2>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Render</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">player</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetAssignedPlayer</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">player</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetColor</span><span class="p">(</span><span class="s2">&quot;Villager Color&quot;</span><span class="p">,</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">))</span>
+<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">villager</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nv">player</span><span class="p">:</span><span class="nf">GetObjectsByClass</span><span class="p">(</span><span class="nv">UnitClass</span><span class="p">.</span><span class="py">VILLAGER</span><span class="p">))</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">        </span><span class="nf">RenderObjectBoundsFilled</span><span class="p">(</span><span class="nv">villager</span><span class="p">,</span><span class="w"> </span><span class="nv">color</span><span class="p">)</span>
 <span class="w">    </span><span class="kr">end</span>
 <span class="kr">end</span>
 </code></pre></div>
-<h2 id="example-custom-hud-screen-space">Example: Custom HUD (Screen Space)</h2>
-<p>Resource display in a corner:</p>
+<h2 id="world-marker">World Marker</h2>
 <div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Render</span><span class="p">()</span>
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">player</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetLocalPlayer</span><span class="p">()</span>
-<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">player</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="kr">return</span><span class="w"> </span><span class="kr">end</span>
-
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">pos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">Vector2</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">)</span>
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">14.0</span>
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Color</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">)</span>
-
-<span class="w">    </span><span class="nf">RenderText</span><span class="p">(</span><span class="s2">&quot;Food: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nf">GetAttribute</span><span class="p">(</span><span class="nv">PlayerAttribute</span><span class="p">.</span><span class="py">FOOD</span><span class="p">)),</span><span class="w"> </span><span class="nv">pos</span><span class="p">,</span><span class="w"> </span><span class="nv">size</span><span class="p">,</span><span class="w"> </span><span class="nv">color</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-<span class="w">    </span><span class="nv">pos</span><span class="p">.</span><span class="py">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">pos</span><span class="p">.</span><span class="py">y</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">20</span>
-<span class="w">    </span><span class="nf">RenderText</span><span class="p">(</span><span class="s2">&quot;Wood: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nf">GetAttribute</span><span class="p">(</span><span class="nv">PlayerAttribute</span><span class="p">.</span><span class="py">WOOD</span><span class="p">)),</span><span class="w"> </span><span class="nv">pos</span><span class="p">,</span><span class="w"> </span><span class="nv">size</span><span class="p">,</span><span class="w"> </span><span class="nv">color</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-<span class="w">    </span><span class="nv">pos</span><span class="p">.</span><span class="py">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">pos</span><span class="p">.</span><span class="py">y</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">20</span>
-<span class="w">    </span><span class="nf">RenderText</span><span class="p">(</span><span class="s2">&quot;Gold: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nf">GetAttribute</span><span class="p">(</span><span class="nv">PlayerAttribute</span><span class="p">.</span><span class="py">GOLD</span><span class="p">)),</span><span class="w"> </span><span class="nv">pos</span><span class="p">,</span><span class="w"> </span><span class="nv">size</span><span class="p">,</span><span class="w"> </span><span class="nv">color</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">hovered</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetAssignedPlayer</span><span class="p">():</span><span class="nf">GetMouseHoveredObject</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nv">hovered</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">hovered</span><span class="p">:</span><span class="nf">IsAlive</span><span class="p">()</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">pos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">hovered</span><span class="p">:</span><span class="nf">GetPosition</span><span class="p">()</span>
+<span class="w">        </span><span class="nf">RenderWorldCircle</span><span class="p">(</span><span class="nv">pos</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">128</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">),</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mi">24</span><span class="p">)</span>
+<span class="w">        </span><span class="nf">RenderWorldText</span><span class="p">(</span><span class="s2">&quot;Target&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">pos</span><span class="p">,</span><span class="w"> </span><span class="mf">14.0</span><span class="p">,</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">),</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span>
 <span class="kr">end</span>
 </code></pre></div>
-<h2 id="example-world-space-marker">Example: World-Space Marker</h2>
-<p>Circle around a unit's position:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">unit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetObjectById</span><span class="p">(</span><span class="nv">someId</span><span class="p">)</span>
-<span class="kr">if</span><span class="w"> </span><span class="nv">unit</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">unit</span><span class="p">:</span><span class="nf">IsAlive</span><span class="p">()</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">pos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">unit</span><span class="p">:</span><span class="nf">GetPosition</span><span class="p">()</span>
-<span class="w">    </span><span class="nf">RenderWorldCircleFilled</span><span class="p">(</span><span class="nv">pos</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="nv">Color</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">80</span><span class="p">))</span>
-<span class="kr">end</span>
-</code></pre></div>
-<h2 id="example-minimap-indicators">Example: Minimap Indicators</h2>
-<p>Mark positions on the minimap:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">-- Mark enemy positions</span>
-<span class="kd">local</span><span class="w"> </span><span class="nv">players</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{}</span>
-<span class="kr">for</span><span class="w"> </span><span class="nv">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nf">GetPlayerCount</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="kr">do</span>
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetPlayerById</span><span class="p">(</span><span class="nv">i</span><span class="p">)</span>
-<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nv">p</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nf">IsEnemyPlayer</span><span class="p">(</span><span class="nv">p</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">townCenters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">p</span><span class="p">:</span><span class="nf">GetTownCenters</span><span class="p">()</span>
-<span class="w">        </span><span class="kr">for</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">tc</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nv">townCenters</span><span class="p">)</span><span class="w"> </span><span class="kr">do</span>
-<span class="w">            </span><span class="kr">if</span><span class="w"> </span><span class="nv">tc</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">tc</span><span class="p">:</span><span class="nf">IsAlive</span><span class="p">()</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">                </span><span class="nf">RenderMinimapDot</span><span class="p">(</span><span class="nv">tc</span><span class="p">:</span><span class="nf">GetPosition</span><span class="p">(),</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="nv">Color</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span>
+<h2 id="minimap-enemy-markers">Minimap Enemy Markers</h2>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Render</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nf">GetPlayerCount</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">player</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetPlayerById</span><span class="p">(</span><span class="nv">i</span><span class="p">)</span>
+<span class="w">        </span><span class="kr">if</span><span class="w"> </span><span class="nv">player</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nf">IsEnemyPlayer</span><span class="p">(</span><span class="nv">player</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">            </span><span class="kr">for</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">tc</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nv">player</span><span class="p">:</span><span class="nf">GetTownCenters</span><span class="p">())</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">                </span><span class="nf">RenderMinimapDot</span><span class="p">(</span><span class="nv">tc</span><span class="p">:</span><span class="nf">GetPosition</span><span class="p">(),</span><span class="w"> </span><span class="mf">3.0</span><span class="p">,</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">))</span>
 <span class="w">            </span><span class="kr">end</span>
 <span class="w">        </span><span class="kr">end</span>
 <span class="w">    </span><span class="kr">end</span>

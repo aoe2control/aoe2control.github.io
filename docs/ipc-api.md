@@ -1,130 +1,142 @@
 # IPC API
 
-The IPC API lets external processes (e.g. Python ML agents) communicate with your Lua module via named pipes and JSON.
+The IPC API connects Lua modules to external processes through Windows named pipes and JSON strings.
 
 ## Functions
 
-| Function | Parameters | Returns | Description |
-|----------|------------|---------|-------------|
-| `IPC.StartServer` | `(pipeName)` | boolean | Start named pipe server |
-| `IPC.StopServer` | `()` | — | Stop server |
-| `IPC.Send` | `(message)` | — | Send string to client |
-| `IPC.GetMessages` | `()` | Table of strings | Receive messages from client |
+| Function | Signature | Returns | Description |
+|----------|-----------|---------|-------------|
+| `IPC.StartServer` | `(pipeName)` | `boolean` | Starts or joins a named pipe server. |
+| `IPC.StopServer` | `()` | `nil` | Stops the current module instance's server endpoint. |
+| `IPC.Send` | `(message)` | `boolean` | Sends a message to all connected pipe clients. |
+| `IPC.GetMessages` | `()` | `string[]` | Returns queued messages for this module instance. |
 
 ## JSON Helpers
 
-| Function | Parameters | Returns | Description |
-|----------|------------|---------|-------------|
-| `ParseJSON` | `(str)` | table | Parse JSON string to Lua table |
-| `ToJSON` | `(obj)` | string | Serialize Lua table to JSON |
+| Function | Signature | Returns | Description |
+|----------|-----------|---------|-------------|
+| `ParseJSON` | `(str)` | `table` | Parses a JSON string into Lua values. Returns `nil` on parse error. |
+| `ToJSON` | `(obj)` | `string` | Serializes a Lua value to JSON. Returns `"{}"` on serialization error. |
 
-## Lua Server Example (ipc_test)
+## Routing Model
+
+Multiple module instances can now share one pipe name. Incoming messages can target specific module instances.
+
+Accepted routing fields:
+
+- `instanceId` or `assignedInstanceId`
+- `assignedPlayerId` or `playerId`
+- `moduleName`
+- `settingsGroup`
+
+These fields can appear either:
+
+- at the root object, or
+- inside a root `target` object
+
+When routing fields are present, CONTROL only delivers the message to matching module instances. The Lua side receives the message payload without the routing wrapper.
+
+## Outgoing Envelope
+
+`IPC.Send(message)` wraps your payload before sending it to the client:
+
+```json
+{
+  "type": "module_message",
+  "pipeName": "AoE_ML_Pipe",
+  "source": {
+    "instanceId": 3,
+    "assignedPlayerId": 2,
+    "moduleName": "my_module",
+    "settingsGroup": "my_module [P1]"
+  },
+  "payload": {
+    "...": "your data"
+  }
+}
+```
+
+If the original message is plain text instead of JSON, the payload stays a string.
+
+## Lua Example
 
 ```lua
 local pipeName = "AoE_ML_Pipe"
 
 function Init()
-    Log("Starting IPC Server on pipe: " .. pipeName)
     IPC.StartServer(pipeName)
+    ChatMessage("IPC online for player " .. tostring(GetAssignedPlayerId()))
 end
 
 function Update()
-    -- 1. Ingest commands from the ML Agent
-    local messages = IPC.GetMessages()
-
-    for _, msgStr in ipairs(messages) do
-        local cmd = ParseJSON(msgStr)
-
-        if cmd then
-            Log("ML Command Received: " .. cmd.action)
-            if cmd.action == "Scout" then
-                if cmd.target and cmd.target.x and cmd.target.y then
-                    -- UnitsMove(cmd.unitIds, Vector3(cmd.target.x, cmd.target.y, 0))
-                end
-            end
+    for _, raw in ipairs(IPC.GetMessages()) do
+        local msg = ParseJSON(raw)
+        if msg and msg.action == "ping" then
+            IPC.Send(ToJSON({
+                action = "pong",
+                assignedPlayerId = GetAssignedPlayerId(),
+                time = GetGameTime()
+            }))
         end
     end
-
-    -- 2. Build the current game state
-    local gameState = {
-        time = GetGameTime(),
-        playerCount = GetPlayerCount(),
-        isAlive = true
-    }
-
-    -- 3. Broadcast state to the ML Agent
-    IPC.Send(ToJSON(gameState))
 end
 
 function End()
-    Log("Shutting down IPC Server...")
     IPC.StopServer()
 end
 
--- Unload runs when module is unloaded, AI is disabled, or engine is ejected.
--- Use it for IPC cleanup when the game may not have ended (e.g. user switches module or detaches).
 function Unload()
-    Log("Unloading — stopping IPC Server...")
     IPC.StopServer()
 end
 ```
 
-**Note:** Use `Unload` for IPC cleanup when the module is switched, AI is disabled, or the engine is ejected. Use `End` for cleanup when the game ends normally. Implementing both ensures proper cleanup in all cases.
-
-## Python Client Example
+## Python Example
 
 ```python
-import win32pipe, win32file, pywintypes
 import json
 import time
+import pywintypes
+import win32file
 
 PIPE_NAME = r"\\.\pipe\AoE_ML_Pipe"
 
-def connect_to_engine():
+def connect():
     while True:
         try:
-            handle = win32file.CreateFile(
-                PIPE_NAME, win32file.GENERIC_READ | win32file.GENERIC_WRITE,
-                0, None, win32file.OPEN_EXISTING, 0, None
+            return win32file.CreateFile(
+                PIPE_NAME,
+                win32file.GENERIC_READ | win32file.GENERIC_WRITE,
+                0,
+                None,
+                win32file.OPEN_EXISTING,
+                0,
+                None,
             )
-            return handle
-        except pywintypes.error as e:
-            if e.winerror in (2, 231):  # ERROR_FILE_NOT_FOUND or ERROR_PIPE_BUSY
-                time.sleep(1)
-            else:
-                raise
+        except pywintypes.error as exc:
+            if exc.winerror in (2, 231):
+                time.sleep(0.5)
+                continue
+            raise
 
-def main():
-    handle = connect_to_engine()
-    try:
-        while True:
-            # Read state from engine
-            result, data = win32file.ReadFile(handle, 4096)
-            if result == 0:
-                for msg in data.decode('utf-8').strip().split('\n'):
-                    if msg:
-                        state = json.loads(msg)
-                        print(f"State -> Time: {state.get('time')}")
+handle = connect()
 
-            # Send command to engine
-            command = {
-                "action": "Scout",
-                "unitIds": [101],
-                "target": {"x": 150.5, "y": 200.0}
-            }
-            win32file.WriteFile(handle, (json.dumps(command) + "\n").encode('utf-8'))
+targeted_ping = {
+    "target": {
+        "assignedPlayerId": 2,
+        "moduleName": "my_module"
+    },
+    "payload": {
+        "action": "ping"
+    }
+}
 
-            time.sleep(0.1)
-    finally:
-        win32file.CloseHandle(handle)
-
-if __name__ == "__main__":
-    main()
+win32file.WriteFile(handle, (json.dumps(targeted_ping) + "\n").encode("utf-8"))
+result, data = win32file.ReadFile(handle, 4096)
+print(data.decode("utf-8"))
 ```
 
-## Protocol
+## Notes
 
-- **Pipe name:** Pass to `StartServer` (e.g. `"AoE_ML_Pipe"` → `\\.\pipe\AoE_ML_Pipe`)
-- **Format:** Newline-delimited JSON messages
-- **Read:** `IPC.GetMessages()` returns array of received strings
-- **Write:** `IPC.Send(ToJSON(gameState))` sends one message
+- Pipe names are normalized automatically. Passing `"AoE_ML_Pipe"` is enough.
+- `IPC.Send` returns `false` if no client is connected.
+- Use both `End` and `Unload` for cleanup so pipe servers stop on normal game end and on module disable/reload.
