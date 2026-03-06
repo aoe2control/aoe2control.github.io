@@ -1558,7 +1558,7 @@
 <td><code>IPC.Send</code></td>
 <td><code>(message)</code></td>
 <td><code>boolean</code></td>
-<td>Sends a message to all connected pipe clients.</td>
+<td>Sends a string or Lua value to all connected pipe clients. Non-string values are serialized to JSON automatically.</td>
 </tr>
 <tr>
 <td><code>IPC.GetMessages</code></td>
@@ -1624,7 +1624,7 @@
 <span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>If the original message is plain text instead of JSON, the payload stays a string.</p>
+<p>If the original message is plain text instead of JSON, the payload stays a string. If you pass a Lua table or other non-string Lua value, CONTROL serializes it to JSON first.</p>
 <h2 id="lua-example">Lua Example</h2>
 <div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">pipeName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;AoE_ML_Pipe&quot;</span>
 
@@ -1637,11 +1637,11 @@
 <span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">raw</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nv">IPC</span><span class="p">.</span><span class="nf">GetMessages</span><span class="p">())</span><span class="w"> </span><span class="kr">do</span>
 <span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">ParseJSON</span><span class="p">(</span><span class="nv">raw</span><span class="p">)</span>
 <span class="w">        </span><span class="kr">if</span><span class="w"> </span><span class="nv">msg</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">msg</span><span class="p">.</span><span class="py">action</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;ping&quot;</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">            </span><span class="nv">IPC</span><span class="p">.</span><span class="nf">Send</span><span class="p">(</span><span class="nf">ToJSON</span><span class="p">({</span>
+<span class="w">            </span><span class="nv">IPC</span><span class="p">.</span><span class="nf">Send</span><span class="p">({</span>
 <span class="w">                </span><span class="nv">action</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;pong&quot;</span><span class="p">,</span>
 <span class="w">                </span><span class="nv">assignedPlayerId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetAssignedPlayerId</span><span class="p">(),</span>
 <span class="w">                </span><span class="nv">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetGameTime</span><span class="p">()</span>
-<span class="w">            </span><span class="p">}))</span>
+<span class="w">            </span><span class="p">})</span>
 <span class="w">        </span><span class="kr">end</span>
 <span class="w">    </span><span class="kr">end</span>
 <span class="kr">end</span>
@@ -1700,6 +1700,8 @@
 <ul>
 <li>Pipe names are normalized automatically. Passing <code>"AoE_ML_Pipe"</code> is enough.</li>
 <li><code>IPC.Send</code> returns <code>false</code> if no client is connected.</li>
+<li><code>IPC.GetMessages()</code> still returns strings. Use <code>ParseJSON()</code> when you expect JSON payloads.</li>
+<li><code>IPC.Send()</code> and <code>IPC.GetMessages()</code> are safe to poll continuously; they no longer wait for the pipe to close before returning data.</li>
 <li>Use both <code>End</code> and <code>Unload</code> for cleanup so pipe servers stop on normal game end and on module disable/reload.</li>
 </ul>
 

@@ -8,7 +8,7 @@ The IPC API connects Lua modules to external processes through Windows named pip
 |----------|-----------|---------|-------------|
 | `IPC.StartServer` | `(pipeName)` | `boolean` | Starts or joins a named pipe server. |
 | `IPC.StopServer` | `()` | `nil` | Stops the current module instance's server endpoint. |
-| `IPC.Send` | `(message)` | `boolean` | Sends a message to all connected pipe clients. |
+| `IPC.Send` | `(message)` | `boolean` | Sends a string or Lua value to all connected pipe clients. Non-string values are serialized to JSON automatically. |
 | `IPC.GetMessages` | `()` | `string[]` | Returns queued messages for this module instance. |
 
 ## JSON Helpers
@@ -56,7 +56,7 @@ When routing fields are present, CONTROL only delivers the message to matching m
 }
 ```
 
-If the original message is plain text instead of JSON, the payload stays a string.
+If the original message is plain text instead of JSON, the payload stays a string. If you pass a Lua table or other non-string Lua value, CONTROL serializes it to JSON first.
 
 ## Lua Example
 
@@ -72,11 +72,11 @@ function Update()
     for _, raw in ipairs(IPC.GetMessages()) do
         local msg = ParseJSON(raw)
         if msg and msg.action == "ping" then
-            IPC.Send(ToJSON({
+            IPC.Send({
                 action = "pong",
                 assignedPlayerId = GetAssignedPlayerId(),
                 time = GetGameTime()
-            }))
+            })
         end
     end
 end
@@ -139,4 +139,6 @@ print(data.decode("utf-8"))
 
 - Pipe names are normalized automatically. Passing `"AoE_ML_Pipe"` is enough.
 - `IPC.Send` returns `false` if no client is connected.
+- `IPC.GetMessages()` still returns strings. Use `ParseJSON()` when you expect JSON payloads.
+- `IPC.Send()` and `IPC.GetMessages()` are safe to poll continuously; they no longer wait for the pipe to close before returning data.
 - Use both `End` and `Unload` for cleanup so pipe servers stop on normal game end and on module disable/reload.

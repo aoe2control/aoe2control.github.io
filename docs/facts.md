@@ -1,9 +1,9 @@
 # Game API — Facts
 
-Facts read game state. Call them from `Init`, `Update`, or `Render` while a match is running.
+Most facts read game state and should be called from `Init`, `Update`, or `Render` while a match is running.
 
 !!! warning "Game must be running"
-    Calling game API before the game starts logs an error.
+    Calling game API before the game starts logs an error, except for `GetAssignedPlayerId()`, which is also available in `Load`.
 
 !!! note "Lua signatures are strict"
     Pass every argument shown below. A C++ default value does not make the parameter optional in Lua unless a separate overload is bound.
@@ -23,7 +23,7 @@ Facts read game state. Call them from `Init`, `Update`, or `Render` while a matc
 | `GetObjectsByClass` | `(unitClass)` | `Object[]` | Returns alive world objects of a class, not just owned objects. |
 | `GetGameTime` | `()` | `number` | Returns the current match time in seconds. |
 | `GetAssignedPlayer` | `()` | `Player` | Returns the player currently assigned to this module instance. |
-| `GetAssignedPlayerId` | `()` | `number` | Returns the player id currently assigned to this module instance. |
+| `GetAssignedPlayerId` | `()` | `number` | Returns the player id currently assigned to this module instance. Available in `Load`. |
 | `GetPlayerById` | `(id)` | `Player` | Returns a player by index. Gaia is typically `0`, regular players are typically `1` to `8`. |
 | `GetPlayerCount` | `()` | `number` | Returns the size of the world player list. |
 | `IsEnemyPlayer` | `(player)` | `boolean` | Returns whether the given player is an enemy of the assigned player. |
@@ -65,5 +65,6 @@ end
 ## Notes
 
 - `GetLocalPlayer` was renamed to `GetAssignedPlayer`.
+- `GetAssignedPlayerId()` is intentionally available in `Load(playerId)` before the match is running.
 - `GetObjectsByType`, `GetObjectsByTypes`, and `GetObjectsByClass` now scan world objects instead of only the assigned player's objects.
 - `CanAfford(unitId, isBuilding)` accepts both parameters in Lua, but the current binding does not distinguish the second flag internally yet.

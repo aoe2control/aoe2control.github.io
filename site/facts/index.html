@@ -1486,10 +1486,10 @@
 
 
 <h1 id="game-api-facts">Game API — Facts</h1>
-<p>Facts read game state. Call them from <code>Init</code>, <code>Update</code>, or <code>Render</code> while a match is running.</p>
+<p>Most facts read game state and should be called from <code>Init</code>, <code>Update</code>, or <code>Render</code> while a match is running.</p>
 <div class="admonition warning">
 <p class="admonition-title">Game must be running</p>
-<p>Calling game API before the game starts logs an error.</p>
+<p>Calling game API before the game starts logs an error, except for <code>GetAssignedPlayerId()</code>, which is also available in <code>Load</code>.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Lua signatures are strict</p>
@@ -1576,7 +1576,7 @@
 <td><code>GetAssignedPlayerId</code></td>
 <td><code>()</code></td>
 <td><code>number</code></td>
-<td>Returns the player id currently assigned to this module instance.</td>
+<td>Returns the player id currently assigned to this module instance. Available in <code>Load</code>.</td>
 </tr>
 <tr>
 <td><code>GetPlayerById</code></td>
@@ -1645,6 +1645,7 @@
 <h2 id="notes">Notes</h2>
 <ul>
 <li><code>GetLocalPlayer</code> was renamed to <code>GetAssignedPlayer</code>.</li>
+<li><code>GetAssignedPlayerId()</code> is intentionally available in <code>Load(playerId)</code> before the match is running.</li>
 <li><code>GetObjectsByType</code>, <code>GetObjectsByTypes</code>, and <code>GetObjectsByClass</code> now scan world objects instead of only the assigned player's objects.</li>
 <li><code>CanAfford(unitId, isBuilding)</code> accepts both parameters in Lua, but the current binding does not distinguish the second flag internally yet.</li>
 </ul>

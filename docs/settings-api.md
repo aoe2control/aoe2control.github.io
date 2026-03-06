@@ -7,7 +7,7 @@ The Settings API adds module-specific controls to CONTROL's UI.
 
 ## Add Functions
 
-Call these only from `Load()`.
+Call these only from `Load(playerId)`.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
@@ -41,11 +41,12 @@ Call these from `Load`, `Init`, `Update`, or `Render`.
 ## Example
 
 ```lua
-function Load()
+function Load(playerId)
     Settings.AddBool("Show Overlay", true)
     Settings.AddDropdown("Mode", "Eco", { "Eco", "Rush", "Boom" })
     Settings.AddColor("Overlay Color", Color(0, 255, 0, 90))
     Settings.AddKeybind("Toggle Speed", Key.Add)
+    Log("Registered settings for player " .. tostring(playerId))
 end
 
 function Render()

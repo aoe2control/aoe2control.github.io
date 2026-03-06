@@ -1531,8 +1531,9 @@
 <div class="highlight"><pre><span></span><code>modules\my_first_module\my_first_module.main.lua
 </code></pre></div>
 <p>Starter file:</p>
-<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Load</span><span class="p">()</span>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Load</span><span class="p">(</span><span class="nv">playerId</span><span class="p">)</span>
 <span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddBool</span><span class="p">(</span><span class="s2">&quot;Enabled&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="w">    </span><span class="nf">Log</span><span class="p">(</span><span class="s2">&quot;Loading for player &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nv">playerId</span><span class="p">))</span>
 <span class="kr">end</span>
 
 <span class="kr">function</span><span class="w"> </span><span class="nf">Init</span><span class="p">()</span>

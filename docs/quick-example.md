@@ -17,13 +17,13 @@ modules/
 ```lua
 local logger = require("utils.logger")
 
-function Load()
+function Load(playerId)
     Settings.AddBool("Highlight Villagers", true)
     Settings.AddColor("Villager Color", Color(0, 255, 0, 90))
     Settings.AddKeybind("Fast Speed Key", Key.Add)
     Settings.AddTooltip("Fast Speed Key", "Hold to temporarily increase game speed.")
 
-    logger.info("Load complete")
+    logger.info("Load complete for player " .. tostring(playerId))
 end
 
 function Init()
@@ -79,10 +79,11 @@ return logger
 | API | Why it is here |
 |-----|----------------|
 | `require("utils.logger")` | Loads a local helper module. |
-| `Settings.Add*` | Declares module UI settings during `Load()`. |
+| `Load(playerId)` | Receives the assigned player id before the match starts. |
+| `Settings.Add*` | Declares module UI settings during `Load(playerId)`. |
 | `Settings.Get*` | Reads setting values with explicit fallback arguments. |
 | `GetAssignedPlayer()` | Uses the player assigned to this module instance. |
-| `GetAssignedPlayerId()` | Reads the controlled player id directly. |
+| `GetAssignedPlayerId()` | Reads the controlled player id directly, including in `Load`. |
 | `ChatMessage()` | Uses the renamed chat API. |
 | `RenderObjectBoundsFilled()` | Draws an overlay on owned villagers. |
 

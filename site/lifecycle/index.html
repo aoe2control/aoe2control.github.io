@@ -1562,8 +1562,10 @@
 <h2 id="callbacks">Callbacks</h2>
 <h3 id="load">Load</h3>
 <p><strong>When:</strong> When the module instance is loaded or when AI becomes active for that instance.</p>
-<p><strong>Use for:</strong> <code>Settings.Add*</code> only.</p>
-<p><strong>Do not:</strong> Call game API here.</p>
+<p><strong>Signature:</strong> <code>Load(playerId)</code></p>
+<p><strong>Use for:</strong> <code>Settings.Add*</code> and other setup that only needs the assigned player id.</p>
+<p><strong>Notes:</strong> <code>playerId</code> is the assigned player id for this instance. <code>GetAssignedPlayerId()</code> is also available here.</p>
+<p><strong>Do not:</strong> Call in-game state APIs here. <code>GetAssignedPlayer()</code> still requires a running match.</p>
 <h3 id="init">Init</h3>
 <p><strong>When:</strong> When the game becomes ready, the world changes, the module is reloaded, or the instance becomes active again.</p>
 <p><strong>Use for:</strong> One-time per-match setup such as <code>IPC.StartServer()</code> or <code>ChatMessage()</code>.</p>

@@ -8,9 +8,13 @@ Each configured module instance can implement up to six callbacks. All of them a
 
 **When:** When the module instance is loaded or when AI becomes active for that instance.
 
-**Use for:** `Settings.Add*` only.
+**Signature:** `Load(playerId)`
 
-**Do not:** Call game API here.
+**Use for:** `Settings.Add*` and other setup that only needs the assigned player id.
+
+**Notes:** `playerId` is the assigned player id for this instance. `GetAssignedPlayerId()` is also available here.
+
+**Do not:** Call in-game state APIs here. `GetAssignedPlayer()` still requires a running match.
 
 ### Init
 

@@ -46,7 +46,7 @@ All callbacks are optional.
 
 | Callback | When | Notes |
 |----------|------|-------|
-| `Load()` | Instance is loaded or re-enabled | Use only for `Settings.Add*`. Do not call game API. |
+| `Load(playerId)` | Instance is loaded or re-enabled | Use for `Settings.Add*` and setup that only needs the assigned player id. `GetAssignedPlayerId()` is also available here. |
 | `Init()` | Match becomes ready, world changes, or instance reloads | Per-instance setup. |
 | `Update()` | Every configured update interval while a match is running | Main logic. |
 | `Render()` | Every frame while a match is running | Overlay rendering. |
@@ -111,7 +111,7 @@ Notes:
 | `GetObjectsByClass` | `(unitClass)` | `Object[]` | Scan alive world objects by class. Not restricted to owned objects. |
 | `GetGameTime` | `()` | `number` | Match time in seconds. |
 | `GetAssignedPlayer` | `()` | `Player` | Player currently assigned to this module instance. |
-| `GetAssignedPlayerId` | `()` | `number` | Assigned player id for this module instance. |
+| `GetAssignedPlayerId` | `()` | `number` | Assigned player id for this module instance. Available in `Load`. |
 | `GetPlayerById` | `(id)` | `Player` | Player by list index. Gaia is usually `0`. |
 | `GetPlayerCount` | `()` | `number` | Size of the player list. |
 | `IsEnemyPlayer` | `(player)` | `boolean` | Whether `player` is an enemy of the assigned player. |
@@ -122,6 +122,7 @@ Notes:
 Notes:
 
 - `GetLocalPlayer` was renamed to `GetAssignedPlayer`.
+- `GetAssignedPlayerId()` is available before the match starts and can be used from `Load(playerId)`.
 - `CanAfford(unitId, isBuilding)` currently accepts both parameters, but the binding does not distinguish the flag internally yet.
 
 ---
@@ -162,7 +163,7 @@ All parameters shown are required in Lua.
 
 ## 7. Settings API
 
-Use `Settings.Add*` only in `Load()`.
+Use `Settings.Add*` only in `Load(playerId)`.
 
 | Function | Signature |
 |----------|-----------|
@@ -202,7 +203,10 @@ Behavior:
 - Multiple module instances can share one pipe
 - Incoming messages can route by `instanceId`, `assignedPlayerId`, `moduleName`, or `settingsGroup`
 - Routing fields can appear at the root or under a root `target` object
+- `IPC.Send` accepts strings or Lua values; non-string values are serialized to JSON automatically
 - `IPC.Send` wraps payloads in an envelope with source metadata
+- `IPC.GetMessages` returns strings; use `ParseJSON` when expecting JSON
+- `IPC.Send` and `IPC.GetMessages` no longer block waiting for the pipe to close
 
 ---
 
@@ -366,9 +370,10 @@ Not exposed to Lua:
 ## 11. Minimal Example
 
 ```lua
-function Load()
+function Load(playerId)
     Settings.AddBool("Highlight Villagers", true)
     Settings.AddColor("Villager Color", Color(0, 255, 0, 90))
+    Log("Loading for player " .. tostring(playerId))
 end
 
 function Init()

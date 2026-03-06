@@ -35,8 +35,9 @@ modules\my_first_module\my_first_module.main.lua
 Starter file:
 
 ```lua
-function Load()
+function Load(playerId)
     Settings.AddBool("Enabled", true)
+    Log("Loading for player " .. tostring(playerId))
 end
 
 function Init()
