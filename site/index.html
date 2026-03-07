@@ -6,6 +6,8 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
+        <meta name="description" content="AoE2Control is a Lua scripting engine for Age of Empires II: Definitive Edition with direct game-state access, commands, rendering APIs, and IPC for bots, overlays, and automation.">
+      
       
       
         <link rel="canonical" href="https://aoe2control.github.io/">
@@ -23,7 +25,7 @@
     
     
       
-        <title>AoE 2 Control - Lua Scripting Engine Documentation</title>
+        <title>AoE2Control Documentation</title>
       
     
     
@@ -57,6 +59,9 @@
 
     
     
+  
+  <meta name="google-site-verification" content="zMo1xWvMox5uFoE_LK0xapy0L8Aa48jKeXCzilfC2Ww" />
+
   </head>
   
   
@@ -74,7 +79,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#control-lua-scripting-engine-for-age-of-empires-ii" class="md-skip">
+        <a href="#aoe2control-lua-scripting-engine-for-age-of-empires-ii-definitive-edition" class="md-skip">
           Skip to content
         </a>
       
@@ -92,7 +97,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="AoE 2 Control - Lua Scripting Engine Documentation" class="md-header__button md-logo" aria-label="AoE 2 Control - Lua Scripting Engine Documentation" data-md-component="logo">
+    <a href="." title="AoE2Control Documentation" class="md-header__button md-logo" aria-label="AoE2Control Documentation" data-md-component="logo">
       
   <img src="assets/logo.png" alt="logo">
 
@@ -105,7 +110,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            AoE 2 Control - Lua Scripting Engine Documentation
+            AoE2Control Documentation
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -403,12 +408,12 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="AoE 2 Control - Lua Scripting Engine Documentation" class="md-nav__button md-logo" aria-label="AoE 2 Control - Lua Scripting Engine Documentation" data-md-component="logo">
+    <a href="." title="AoE2Control Documentation" class="md-nav__button md-logo" aria-label="AoE2Control Documentation" data-md-component="logo">
       
   <img src="assets/logo.png" alt="logo">
 
     </a>
-    AoE 2 Control - Lua Scripting Engine Documentation
+    AoE2Control Documentation
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -480,10 +485,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-is-it" class="md-nav__link">
+  <a href="#what-is-aoe2control" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What is it?
+        What Is AoE2Control?
       
     </span>
   </a>
@@ -491,10 +496,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-features" class="md-nav__link">
+  <a href="#key-features-for-aoe2-lua-scripting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Key Features
+        Key Features for AoE2 Lua Scripting
       
     </span>
   </a>
@@ -502,10 +507,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#target-audience" class="md-nav__link">
+  <a href="#who-this-documentation-is-for" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Target Audience
+        Who This Documentation Is For
       
     </span>
   </a>
@@ -1502,20 +1507,20 @@
 
 
 
-<h1 id="control-lua-scripting-engine-for-age-of-empires-ii">CONTROL — Lua Scripting Engine for Age of Empires II</h1>
-<p><img alt="CONTROL Banner" src="assets/banner.png" /></p>
-<p><strong>CONTROL</strong> is a Lua scripting engine that communicates directly with Age of Empires II: Definitive Edition. It reads game state and sends commands without pixel scanning or mouse/keyboard simulation.</p>
+<h1 id="aoe2control-lua-scripting-engine-for-age-of-empires-ii-definitive-edition">AoE2Control: Lua Scripting Engine for Age of Empires II: Definitive Edition</h1>
+<p><img alt="AoE2Control Lua scripting engine documentation banner for Age of Empires II: Definitive Edition" src="assets/banner.png" /></p>
+<p><strong>AoE2Control</strong> is a Lua scripting engine and documentation hub for Age of Empires II: Definitive Edition. It reads live game state and sends commands directly without pixel scanning or mouse/keyboard simulation, making it suitable for automation, overlays, bots, and external AI agents.</p>
 <p><a href="https://discord.gg/DENDVuWq5t"><img alt="Join Discord" src="https://img.shields.io/badge/Discord-Join%20Community-5865F2?style=for-the-badge&amp;logo=discord&amp;logoColor=white" /></a></p>
 <p><a href="https://github.com/aoe2control/AoE2Control/releases">Download Latest Release</a></p>
-<h2 id="what-is-it">What is it?</h2>
-<p>The engine talks directly to the game, allowing scripters to:</p>
+<h2 id="what-is-aoe2control">What Is AoE2Control?</h2>
+<p>AoE2Control talks directly to the game, allowing developers to:</p>
 <ul>
 <li><strong>Read</strong> game state (units, resources, players, map data)</li>
 <li><strong>Send</strong> commands (train units, move armies, research technologies)</li>
 <li><strong>Render</strong> custom overlays (HUD elements, minimap markers, world-space indicators)</li>
 <li><strong>Configure</strong> one or more module instances via a built-in settings interface</li>
 </ul>
-<h2 id="key-features">Key Features</h2>
+<h2 id="key-features-for-aoe2-lua-scripting">Key Features for AoE2 Lua Scripting</h2>
 <table>
 <thead>
 <tr>
@@ -1562,7 +1567,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="target-audience">Target Audience</h2>
+<h2 id="who-this-documentation-is-for">Who This Documentation Is For</h2>
 <ul>
 <li><strong>Lua scripters</strong> — Build bots, overlays, or automation</li>
 <li><strong>AI/ML developers</strong> — Connect external agents via IPC</li>
@@ -1588,6 +1593,9 @@
 
 
 
+
+  
+  
 
 
 

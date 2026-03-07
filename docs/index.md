@@ -1,23 +1,27 @@
-# CONTROL — Lua Scripting Engine for Age of Empires II
+---
+description: "AoE2Control is a Lua scripting engine for Age of Empires II: Definitive Edition with direct game-state access, commands, rendering APIs, and IPC for bots, overlays, and automation."
+---
 
-![CONTROL Banner](assets/banner.png)
+# AoE2Control: Lua Scripting Engine for Age of Empires II: Definitive Edition
 
-**CONTROL** is a Lua scripting engine that communicates directly with Age of Empires II: Definitive Edition. It reads game state and sends commands without pixel scanning or mouse/keyboard simulation.
+![AoE2Control Lua scripting engine documentation banner for Age of Empires II: Definitive Edition](assets/banner.png)
+
+**AoE2Control** is a Lua scripting engine and documentation hub for Age of Empires II: Definitive Edition. It reads live game state and sends commands directly without pixel scanning or mouse/keyboard simulation, making it suitable for automation, overlays, bots, and external AI agents.
 
 [![Join Discord](https://img.shields.io/badge/Discord-Join%20Community-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/DENDVuWq5t)
 
 [Download Latest Release](https://github.com/aoe2control/AoE2Control/releases)
 
-## What is it?
+## What Is AoE2Control?
 
-The engine talks directly to the game, allowing scripters to:
+AoE2Control talks directly to the game, allowing developers to:
 
 - **Read** game state (units, resources, players, map data)
 - **Send** commands (train units, move armies, research technologies)
 - **Render** custom overlays (HUD elements, minimap markers, world-space indicators)
 - **Configure** one or more module instances via a built-in settings interface
 
-## Key Features
+## Key Features for AoE2 Lua Scripting
 
 | Feature | Description |
 |---------|-------------|
@@ -31,7 +35,7 @@ The engine talks directly to the game, allowing scripters to:
 | **Encrypted Modules** | Precompiled `.module` files for code protection |
 | **VS Code Plugin** | [Available on Marketplace](https://marketplace.visualstudio.com/items?itemName=BigJohn.aoe2-control-lua) — IntelliSense, snippets, and API definitions |
 
-## Target Audience
+## Who This Documentation Is For
 
 - **Lua scripters** — Build bots, overlays, or automation
 - **AI/ML developers** — Connect external agents via IPC

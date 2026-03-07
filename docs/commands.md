@@ -1,3 +1,7 @@
+---
+description: Reference for AoE2Control game commands in Lua, including training units, moving armies, researching technologies, camera control, and chat.
+---
+
 # Game API — Commands
 
 Commands perform actions in the game. Call them from `Init`, `Update`, or `Render` while a match is running.

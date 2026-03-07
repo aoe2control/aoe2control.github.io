@@ -1,3 +1,7 @@
+---
+description: "Reference for the AoE2Control Render API, including screen-space, world-space, and minimap overlays for Age of Empires II: Definitive Edition."
+---
+
 # Render API
 
 Use the Render API from `Render()` to draw overlays in screen, world, or minimap space.

@@ -1,3 +1,7 @@
+---
+description: Build a working AoE2Control Lua module example with settings, rendering, player access, and modular require() usage.
+---
+
 # Quick Example
 
 This example shows a small but current CONTROL module. It uses the renamed APIs, explicit setting defaults, and the assigned-player model.

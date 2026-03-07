@@ -1,3 +1,7 @@
+---
+description: "Install AoE2Control for Age of Empires II: Definitive Edition, create your first Lua module, and attach it to a player slot."
+---
+
 # Getting Started
 
 This guide walks through installing CONTROL, creating a Lua module, and attaching it to a player slot.
