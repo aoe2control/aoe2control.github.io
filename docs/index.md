@@ -6,6 +6,8 @@
 
 [![Join Discord](https://img.shields.io/badge/Discord-Join%20Community-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/DENDVuWq5t)
 
+[Download Latest Release](https://github.com/aoe2control/AoE2Control/releases)
+
 ## What is it?
 
 The engine talks directly to the game, allowing scripters to:
@@ -43,6 +45,7 @@ The engine talks directly to the game, allowing scripters to:
 
 ## Quick Links
 
+- [Download Latest Release](https://github.com/aoe2control/AoE2Control/releases) — Launcher and packaged builds
 - [Getting Started](getting-started.md) — Installation and first script
 - [Quick Example](quick-example.md) — Minimal working module
 - [Game API](commands.md) — Commands and facts reference

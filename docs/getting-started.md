@@ -4,6 +4,8 @@ This guide walks through installing CONTROL, creating a Lua module, and attachin
 
 ## Installation
 
+Download the latest packaged build from the [GitHub Releases page](https://github.com/aoe2control/AoE2Control/releases).
+
 1. Start Age of Empires II: Definitive Edition.
 2. Run the CONTROL launcher.
 3. Press **START** to attach CONTROL to the game.
