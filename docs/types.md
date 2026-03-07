@@ -106,7 +106,7 @@ Returned by `GetObjectsByType`, `GetObjectsByTypes`, `GetObjectsByClass`, and `G
 | `GetTargetPosition()` | `Vector3` | Returns the AI target position. |
 | `GetTargetObject()` | `Object` | Returns the current AI target object. |
 | `GetDirection()` | `Vector3` | Returns the current facing vector. |
-| `IsVisible()` | `boolean` | Returns whether the object is visible in the current perspective. |
+| `IsVisible()` | `boolean` | Returns whether the object is visible on the assigned player's current map tile visibility. |
 | `IsAlive()` | `boolean` | Returns whether the object is alive. |
 | `GetUnitObjectType()` | `UnitObjectType` | Returns the unit or building type id. |
 | `GetClass()` | `UnitClass` | Returns the unit class id. |
@@ -118,6 +118,22 @@ Returned by `GetObjectsByType`, `GetObjectsByTypes`, `GetObjectsByClass`, and `G
 | `GetHitpoints()` | `number` | Returns current hitpoints. |
 | `GetMaxHitpoints()` | `number` | Returns max hitpoints. |
 | `GetPosition()` | `Vector3` | Returns the world position. |
+| `GetCurrentMapTile()` | `MapTile` | Returns the map tile the object is currently standing on. |
+
+### MapTile
+
+Returned by `GetMapTile`, `GetAllMapTiles`, and `Object:GetCurrentMapTile()`.
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `GetPosX()` | `number` | Returns the tile x coordinate. |
+| `GetPosY()` | `number` | Returns the tile y coordinate. |
+| `GetTerrain()` | `Terrain` | Returns the tile terrain id. Returns `Terrain.UNKNOWN` for unexplored tiles. |
+| `GetElevation()` | `number` | Returns the tile elevation. Returns `0` for unexplored tiles. |
+| `GetTileVisibility()` | `TileVisibility` | Returns the assigned player's visibility state for the tile. |
+| `IsWalkable()` | `boolean` | Returns whether the tile is walkable. Unexplored tiles return `false`. |
+| `GetObjectCount()` | `number` | Returns the count of currently visible objects on the tile. Only populated for visible tiles. |
+| `GetObjects()` | `Object[]` | Returns currently visible objects on the tile. Returns an empty list unless the tile is visible. |
 
 ### Player
 
@@ -152,6 +168,31 @@ Returned by `GetAssignedPlayer`, `GetPlayerById`, and `GetVictoryPlayer`.
 | `GetObjectsByClass(unitClass)` | `Object[]` | Returns owned objects in a class. |
 | `GetObjectsByClassDeadInclusive(unitClass)` | `Object[]` | Returns owned objects in a class, including dead objects. |
 | `GetTownCenters()` | `Object[]` | Returns owned town centers. |
+
+## Visibility Example
+
+```lua
+function Render()
+    local player = GetAssignedPlayer()
+    if not player then
+        return
+    end
+
+    local selected = player:GetSelectedObject()
+    if not selected or not selected:IsVisible() then
+        return
+    end
+
+    local tile = selected:GetCurrentMapTile()
+    if not tile then
+        return
+    end
+
+    local label = "Tile " .. tostring(tile:GetPosX()) .. "," .. tostring(tile:GetPosY())
+        .. " terrain=" .. tostring(tile:GetTerrain())
+    RenderWorldText(label, selected:GetPosition(), 14.0, Color(255, 255, 255), true, true)
+end
+```
 
 ## Strategic Component Types
 
@@ -225,3 +266,6 @@ end
 
 - `ResourceTracker:Update()` exists in C++ but is not exposed to Lua.
 - `ConstructionPlacement:TryBuildStructureAtTown()` and `ConstructionPlacement:RenderDebug()` exist in C++ but are not exposed to Lua.
+- Cached `Object` references can become invalid for method calls when the object becomes invisible in fog-aware mode. Re-fetch objects in the current frame or enable **Modules See Everything** if you need persistent access.
+- `Object:IsVisible()` is the safe visibility check for cached objects and now uses map-tile visibility instead of the old object visibility field.
+- `MapTile:GetObjectCount()` and `MapTile:GetObjects()` only expose data for tiles that are currently `TileVisibility.VISIBLE`.

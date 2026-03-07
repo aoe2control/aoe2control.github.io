@@ -706,10 +706,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#module-items" class="md-nav__link">
+  <a href="#player-module-slots" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Module Items
+        Player Module Slots
       
     </span>
   </a>
@@ -1535,7 +1535,7 @@
 
 
 <h1 id="interface-options">Interface Options</h1>
-<p>The CONTROL overlay now manages multiple module instances, each assigned to a specific player slot.</p>
+<p>The CONTROL overlay now groups module configuration by player. Each <code>Player 1</code> to <code>Player 8</code> section exposes that player's module slot and runtime status.</p>
 <p><img alt="CONTROL Interface — AI Settings" src="../images/ControlUI.png" /></p>
 <h2 id="module-discovery">Module Discovery</h2>
 <p>CONTROL scans <code>modules/</code> recursively for:</p>
@@ -1584,11 +1584,16 @@
 <td><code>Default</code></td>
 <td>Fog-of-war perspective override: <code>Default</code>, <code>Player 1</code> to <code>Player 8</code>, <code>All Players</code>, or <code>Gaia</code>.</td>
 </tr>
+<tr>
+<td><strong>Modules See Everything</strong></td>
+<td>Off</td>
+<td>If enabled, Lua modules ignore fog-of-war when reading map tiles and objects.</td>
+</tr>
 </tbody>
 </table>
 <p>The update interval is clamped to <code>0.1</code> seconds in the UI and <code>0.01</code> seconds if edited directly in <code>settings.ini</code>.</p>
-<h2 id="module-items">Module Items</h2>
-<p>Use <strong>Add Module</strong> to create a new module instance. Each module item has its own runtime and assigned player.</p>
+<h2 id="player-module-slots">Player Module Slots</h2>
+<p>Open a player section to configure that player's module slot. If no module is assigned yet, the section shows <code>No modules assigned.</code>.</p>
 <table>
 <thead>
 <tr>
@@ -1599,38 +1604,35 @@
 <tbody>
 <tr>
 <td><strong>Enabled</strong></td>
-<td>Turns this module instance on or off without deleting it.</td>
+<td>Turns that player's module slot on or off without clearing the selected module.</td>
 </tr>
 <tr>
 <td><strong>Sync Settings</strong></td>
-<td>Shares module settings through a named profile instead of per-player settings.</td>
+<td>Shares module settings through a named profile instead of player-specific settings.</td>
 </tr>
 <tr>
 <td><strong>Module</strong></td>
-<td>Selects the module entry point for this instance. Selecting the same module again reloads it.</td>
+<td>Selects the module entry point for that player. Selecting the same module again reloads it.</td>
 </tr>
 <tr>
-<td><strong>Player ID</strong></td>
-<td>Chooses which in-game player this module controls.</td>
-</tr>
-<tr>
-<td><strong>Settings Profile</strong></td>
-<td>Appears when <strong>Sync Settings</strong> is enabled. Multiple instances can share the same profile.</td>
+<td><strong>Sync Profile</strong></td>
+<td>Appears when <strong>Sync Settings</strong> is enabled. Multiple player slots can share the same profile.</td>
 </tr>
 <tr>
 <td><strong>Create Profile / Remove Profile</strong></td>
-<td>Manages reusable module settings profiles.</td>
+<td>Manages reusable module settings profiles for the selected module.</td>
 </tr>
 <tr>
 <td><strong>Remove Module</strong></td>
-<td>Deletes the instance configuration.</td>
+<td>Clears the selected module from that player's slot.</td>
 </tr>
 </tbody>
 </table>
 <h2 id="multi-module-behavior">Multi-Module Behavior</h2>
 <ul>
-<li>Only one enabled module can control a given player at a time.</li>
-<li>Duplicate player assignments are automatically warned about and disabled at runtime.</li>
+<li>The UI is grouped by player, not by a flat <code>Add Module</code> list.</li>
+<li>Each player section represents one module slot for that player id.</li>
+<li>Module runtime warnings and Lua errors are shown directly inside the player section.</li>
 <li>Module-created settings panels appear per configured settings group while AI is enabled.</li>
 <li><strong>Open Folder</strong> opens the modules directory.</li>
 </ul>
@@ -1645,9 +1647,9 @@
 </thead>
 <tbody>
 <tr>
-<td><strong>Reveal Map</strong></td>
+<td><strong>Spectator Mode</strong></td>
 <td>Off</td>
-<td>Useful when controlling non-local players. Release note: may cause crashes.</td>
+<td>Enables the spectator-style reveal behavior that replaced the old <code>Reveal Map</code> option.</td>
 </tr>
 <tr>
 <td><strong>Unlock Zoom</strong></td>
@@ -1662,9 +1664,9 @@
 </tbody>
 </table>
 <h2 id="perspective-warning">Perspective Warning</h2>
-<p><code>Player Perspective</code> can force the fog view of a specific player. This is powerful for debugging and for multi-player-slot control, but the current release notes warn that perspective switching may cause a crash on the next game start.</p>
+<p><code>Player Perspective</code> changes the rendered fog view. <code>Modules See Everything</code> only changes what Lua can read. When <strong>Modules See Everything</strong> is off, map tiles and objects follow the assigned player's fog-of-war.</p>
 <h2 id="log-window">Log Window</h2>
-<p>Use <code>Log("message")</code> from Lua to write script messages to the log window.</p>
+<p>Use <code>Log("message")</code> from Lua to write script messages to the log window. Runtime Lua errors are also displayed and logged through the interface now.</p>
 
 
 

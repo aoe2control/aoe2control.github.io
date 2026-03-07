@@ -91,6 +91,34 @@ return logger
 | `ChatMessage()` | Uses the renamed chat API. |
 | `RenderObjectBoundsFilled()` | Draws an overlay on owned villagers. |
 
+## Map API Add-On
+
+```lua
+function Render()
+    local player = GetAssignedPlayer()
+    if not player then
+        return
+    end
+
+    local selected = player:GetSelectedObject()
+    if not selected or not selected:IsVisible() then
+        return
+    end
+
+    local tile = selected:GetCurrentMapTile()
+    if not tile then
+        return
+    end
+
+    local text = "Tile " .. tostring(tile:GetPosX()) .. "," .. tostring(tile:GetPosY())
+        .. " vis=" .. tostring(tile:GetTileVisibility())
+        .. " terrain=" .. tostring(tile:GetTerrain())
+    RenderWorldText(text, selected:GetPosition(), 14.0, Color(255, 255, 255), true, true)
+end
+```
+
+This add-on uses the new map API and stays safe in fog-aware mode by checking `selected:IsVisible()` before reading other object methods.
+
 ## Folder Convention
 
 Use `modules/{moduleName}/{moduleName}.main.lua` or `.main.module`. CONTROL discovers entries recursively up to depth 3.

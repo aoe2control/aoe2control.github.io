@@ -1596,6 +1596,30 @@
 <td>Returns the size of the world player list.</td>
 </tr>
 <tr>
+<td><code>GetMapWidth</code></td>
+<td><code>()</code></td>
+<td><code>number</code></td>
+<td>Returns the current map width in tiles.</td>
+</tr>
+<tr>
+<td><code>GetMapHeight</code></td>
+<td><code>()</code></td>
+<td><code>number</code></td>
+<td>Returns the current map height in tiles.</td>
+</tr>
+<tr>
+<td><code>GetMapTile</code></td>
+<td><code>(x, y)</code></td>
+<td><code>MapTile</code></td>
+<td>Returns the tile at map coordinates, or <code>nil</code> if the coordinates are out of bounds.</td>
+</tr>
+<tr>
+<td><code>GetAllMapTiles</code></td>
+<td><code>()</code></td>
+<td><code>MapTile[]</code></td>
+<td>Returns all map tiles. Individual tile methods still respect fog-aware visibility.</td>
+</tr>
+<tr>
 <td><code>IsEnemyPlayer</code></td>
 <td><code>(player)</code></td>
 <td><code>boolean</code></td>
@@ -1647,11 +1671,28 @@
 <span class="w">    </span><span class="kr">end</span>
 <span class="kr">end</span>
 </code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Update</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">tile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetMapTile</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span><span class="w"> </span><span class="mi">40</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">tile</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nv">tile</span><span class="p">:</span><span class="nf">GetTileVisibility</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nv">TileVisibility</span><span class="p">.</span><span class="py">VISIBLE</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="nf">Log</span><span class="p">(</span>
+<span class="w">            </span><span class="s2">&quot;Tile 40,40 terrain=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nv">tile</span><span class="p">:</span><span class="nf">GetTerrain</span><span class="p">())</span>
+<span class="w">            </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot; elevation=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nv">tile</span><span class="p">:</span><span class="nf">GetElevation</span><span class="p">())</span>
+<span class="w">            </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot; objects=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nv">tile</span><span class="p">:</span><span class="nf">GetObjectCount</span><span class="p">())</span>
+<span class="w">        </span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+</code></pre></div>
 <h2 id="notes">Notes</h2>
 <ul>
 <li><code>GetLocalPlayer</code> was renamed to <code>GetAssignedPlayer</code>.</li>
 <li><code>GetAssignedPlayerId()</code> is intentionally available in <code>Load(playerId)</code> before the match is running.</li>
 <li><code>GetObjectsByType</code>, <code>GetObjectsByTypes</code>, and <code>GetObjectsByClass</code> now scan world objects instead of only the assigned player's objects.</li>
+<li>When <strong>Modules See Everything</strong> is disabled, object retrieval functions filter by the assigned player's current fog-of-war. This includes <code>GetObjectById()</code>.</li>
+<li><code>GetAllMapTiles()</code> returns the full map grid, but <code>MapTile</code> methods only expose what the assigned player is currently allowed to know.</li>
 <li><code>CanAfford(unitId, isBuilding)</code> accepts both parameters in Lua, but the current binding does not distinguish the second flag internally yet.</li>
 </ul>
 

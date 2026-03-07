@@ -16,7 +16,7 @@ description: "AoE2Control is a Lua scripting engine for Age of Empires II: Defin
 
 AoE2Control talks directly to the game, allowing developers to:
 
-- **Read** game state (units, resources, players, map data)
+- **Read** game state (units, resources, players, map tiles, fog-aware object visibility)
 - **Send** commands (train units, move armies, research technologies)
 - **Render** custom overlays (HUD elements, minimap markers, world-space indicators)
 - **Configure** one or more module instances via a built-in settings interface
@@ -27,7 +27,7 @@ AoE2Control talks directly to the game, allowing developers to:
 |---------|-------------|
 | **CONTROL Launcher** | Attaches the engine to the game |
 | **Extensive API** | Commands, facts, render functions, and strategic components |
-| **Per-Player Modules** | Run different modules for different player slots in the same session |
+| **Per-Player Modules** | Configure one module slot for each player and run different modules in the same session |
 | **Custom Rendering** | Draw shapes and text in screen, world, or minimap space |
 | **Menu Settings** | Add checkboxes, sliders, dropdowns, keybinds, and color pickers |
 | **Multi-file Projects** | Use `require()` for modular Lua code (depth limit: 3) |

@@ -1543,7 +1543,7 @@
 <span class="kr">end</span>
 
 <span class="kr">function</span><span class="w"> </span><span class="nf">Init</span><span class="p">()</span>
-<span class="w">    </span><span class="nf">ChatMessage</span><span class="p">(</span><span class="s2">&quot;Hello from CONTROL&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="nf">ChatMessage</span><span class="p">(</span><span class="s2">&quot;Hello from player &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nf">GetAssignedPlayerId</span><span class="p">()))</span>
 <span class="kr">end</span>
 
 <span class="kr">function</span><span class="w"> </span><span class="nf">Update</span><span class="p">()</span>
@@ -1559,9 +1559,8 @@
 <h2 id="attach-the-module">Attach The Module</h2>
 <ol>
 <li>Open the CONTROL overlay.</li>
-<li>Click <strong>Add Module</strong>.</li>
+<li>Expand the player section you want to configure, for example <strong>Player 1</strong>.</li>
 <li>Choose your module in the <strong>Module</strong> dropdown.</li>
-<li>Choose a <strong>Player ID</strong>.</li>
 <li>Leave <strong>Enabled</strong> on.</li>
 <li>Start or load a single-player match.</li>
 </ol>

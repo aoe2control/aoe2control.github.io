@@ -114,6 +114,10 @@ Notes:
 | `GetAssignedPlayerId` | `()` | `number` | Assigned player id for this module instance. Available in `Load`. |
 | `GetPlayerById` | `(id)` | `Player` | Player by list index. Gaia is usually `0`. |
 | `GetPlayerCount` | `()` | `number` | Size of the player list. |
+| `GetMapWidth` | `()` | `number` | Current map width in tiles. |
+| `GetMapHeight` | `()` | `number` | Current map height in tiles. |
+| `GetMapTile` | `(x, y)` | `MapTile` | Tile at map coordinates, or `nil` if out of bounds. |
+| `GetAllMapTiles` | `()` | `MapTile[]` | Full map tile list. Tile methods still respect fog-aware visibility. |
 | `IsEnemyPlayer` | `(player)` | `boolean` | Whether `player` is an enemy of the assigned player. |
 | `GetObjectById` | `(id)` | `Object` | Object by id. |
 | `GetVictoryCondition` | `()` | `VictoryCondition` | Current victory condition. |
@@ -123,6 +127,8 @@ Notes:
 
 - `GetLocalPlayer` was renamed to `GetAssignedPlayer`.
 - `GetAssignedPlayerId()` is available before the match starts and can be used from `Load(playerId)`.
+- Object retrieval respects the assigned player's fog-of-war when **Modules See Everything** is disabled. This includes `GetObjectById()`.
+- `GetAllMapTiles()` returns the full grid, but each `MapTile` only exposes data allowed by the current fog state.
 - `CanAfford(unitId, isBuilding)` currently accepts both parameters, but the binding does not distinguish the flag internally yet.
 
 ---
@@ -268,6 +274,40 @@ Methods:
 - `GetHitpoints()`
 - `GetMaxHitpoints()`
 - `GetPosition()`
+- `GetCurrentMapTile()`
+
+Behavior:
+
+- `IsVisible()` uses map-tile visibility
+- Cached objects can throw a Lua error on most method calls after they become invisible
+- Re-fetch object references in the current frame when fog-aware mode is active
+
+### MapTile
+
+Methods:
+
+- `GetPosX()`
+- `GetPosY()`
+- `GetTerrain()`
+- `GetElevation()`
+- `GetTileVisibility()`
+- `IsWalkable()`
+- `GetObjectCount()`
+- `GetObjects()`
+
+Behavior:
+
+- `GetTerrain()` returns `Terrain.UNKNOWN` for unexplored tiles
+- `GetElevation()` returns `0` for unexplored tiles
+- `IsWalkable()` returns `false` for unexplored tiles
+- `GetObjectCount()` and `GetObjects()` only expose currently visible tiles
+
+Enum notes:
+
+- `Terrain.UNKNOWN = -1`
+- `TileVisibility.UNEXPLORED = 0`
+- `TileVisibility.VISIBLE = 15`
+- `TileVisibility.EXPLORED = 128`
 
 ### Player
 
@@ -361,10 +401,12 @@ Not exposed to Lua:
 ## 10. Important UI Behavior
 
 - Global AI toggle defaults to enabled
-- Multiple module instances can be configured
-- Only one enabled instance may control a given player slot
+- Module configuration is grouped by `Player 1` to `Player 8`
+- Each player group exposes one module slot for that player
 - Player perspective options: `Default`, `Player 1` to `Player 8`, `All Players`, `Gaia`
-- `Reveal Map` and forced perspective are powerful for non-local-player control, but current release notes warn they may be unstable
+- `Modules See Everything` defaults to `false` and affects both map-tile and object reads from Lua
+- `Spectator Mode` replaced the old `Reveal Map` misc option
+- Runtime Lua errors are displayed and logged through the UI
 
 ---
 

@@ -1,6 +1,6 @@
 # Interface Options
 
-The CONTROL overlay now manages multiple module instances, each assigned to a specific player slot.
+The CONTROL overlay now groups module configuration by player. Each `Player 1` to `Player 8` section exposes that player's module slot and runtime status.
 
 ![CONTROL Interface — AI Settings](images/ControlUI.png)
 
@@ -23,27 +23,28 @@ CONTROL scans `modules/` recursively for:
 | **Auto Move Camera** | On | Auto-centers the camera on executed command targets. |
 | **Command Visualization** | On | Draws command feedback overlays. |
 | **Player Perspective** | `Default` | Fog-of-war perspective override: `Default`, `Player 1` to `Player 8`, `All Players`, or `Gaia`. |
+| **Modules See Everything** | Off | If enabled, Lua modules ignore fog-of-war when reading map tiles and objects. |
 
 The update interval is clamped to `0.1` seconds in the UI and `0.01` seconds if edited directly in `settings.ini`.
 
-## Module Items
+## Player Module Slots
 
-Use **Add Module** to create a new module instance. Each module item has its own runtime and assigned player.
+Open a player section to configure that player's module slot. If no module is assigned yet, the section shows `No modules assigned.`.
 
 | Control | Description |
 |---------|-------------|
-| **Enabled** | Turns this module instance on or off without deleting it. |
-| **Sync Settings** | Shares module settings through a named profile instead of per-player settings. |
-| **Module** | Selects the module entry point for this instance. Selecting the same module again reloads it. |
-| **Player ID** | Chooses which in-game player this module controls. |
-| **Settings Profile** | Appears when **Sync Settings** is enabled. Multiple instances can share the same profile. |
-| **Create Profile / Remove Profile** | Manages reusable module settings profiles. |
-| **Remove Module** | Deletes the instance configuration. |
+| **Enabled** | Turns that player's module slot on or off without clearing the selected module. |
+| **Sync Settings** | Shares module settings through a named profile instead of player-specific settings. |
+| **Module** | Selects the module entry point for that player. Selecting the same module again reloads it. |
+| **Sync Profile** | Appears when **Sync Settings** is enabled. Multiple player slots can share the same profile. |
+| **Create Profile / Remove Profile** | Manages reusable module settings profiles for the selected module. |
+| **Remove Module** | Clears the selected module from that player's slot. |
 
 ## Multi-Module Behavior
 
-- Only one enabled module can control a given player at a time.
-- Duplicate player assignments are automatically warned about and disabled at runtime.
+- The UI is grouped by player, not by a flat `Add Module` list.
+- Each player section represents one module slot for that player id.
+- Module runtime warnings and Lua errors are shown directly inside the player section.
 - Module-created settings panels appear per configured settings group while AI is enabled.
 - **Open Folder** opens the modules directory.
 
@@ -51,14 +52,14 @@ Use **Add Module** to create a new module instance. Each module item has its own
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| **Reveal Map** | Off | Useful when controlling non-local players. Release note: may cause crashes. |
+| **Spectator Mode** | Off | Enables the spectator-style reveal behavior that replaced the old `Reveal Map` option. |
 | **Unlock Zoom** | Off | Removes the normal zoom limit. Release note: may cause rendering issues or crashes. |
 | **Chat Welcome Message** | On | Enables CONTROL's startup chat message behavior. |
 
 ## Perspective Warning
 
-`Player Perspective` can force the fog view of a specific player. This is powerful for debugging and for multi-player-slot control, but the current release notes warn that perspective switching may cause a crash on the next game start.
+`Player Perspective` changes the rendered fog view. `Modules See Everything` only changes what Lua can read. When **Modules See Everything** is off, map tiles and objects follow the assigned player's fog-of-war.
 
 ## Log Window
 
-Use `Log("message")` from Lua to write script messages to the log window.
+Use `Log("message")` from Lua to write script messages to the log window. Runtime Lua errors are also displayed and logged through the interface now.

@@ -47,7 +47,7 @@ function Load(playerId)
 end
 
 function Init()
-    ChatMessage("Hello from CONTROL")
+    ChatMessage("Hello from player " .. tostring(GetAssignedPlayerId()))
 end
 
 function Update()
@@ -65,11 +65,10 @@ All callbacks are optional.
 ## Attach The Module
 
 1. Open the CONTROL overlay.
-2. Click **Add Module**.
+2. Expand the player section you want to configure, for example **Player 1**.
 3. Choose your module in the **Module** dropdown.
-4. Choose a **Player ID**.
-5. Leave **Enabled** on.
-6. Start or load a single-player match.
+4. Leave **Enabled** on.
+5. Start or load a single-player match.
 
 ## Next Steps
 
