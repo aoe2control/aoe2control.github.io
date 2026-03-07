@@ -58,6 +58,119 @@ When routing fields are present, CONTROL only delivers the message to matching m
 
 If the original message is plain text instead of JSON, the payload stays a string. If you pass a Lua table or other non-string Lua value, CONTROL serializes it to JSON first.
 
+## Snapshot Buffers For IPC / ML
+
+`GetMapTilesPtr()` and `GetObjectsPtr()` are part of the game API, not `IPC.*`, but they exist mainly for IPC users who want efficient bulk transfer instead of serializing thousands of Lua objects.
+
+Both functions return two Lua values:
+
+- `ptr`: the address of an engine-owned packed buffer
+- `count`: the number of elements in that buffer
+
+Important behavior:
+
+- The buffer is rebuilt on demand every time you call the function.
+- The pointer is transient. Copy or read the buffer immediately.
+- `count` is an element count, not a byte count.
+- Byte size is `count * sizeof(Tile)` or `count * sizeof(Object)`.
+- `GetObjectsPtr()` is dead-inclusive.
+- Snapshot visibility follows the same fog-aware access rules used by the Lua API for object inclusion, tile visibility, and tile-derived flags.
+
+Exact engine layouts:
+
+```cpp
+#pragma pack(push, 1)
+namespace game::snapshot {
+    struct Tile {
+        uint16_t x;
+        uint16_t y;
+        uint8_t terrain;
+        uint8_t elevation;
+        uint8_t isVisible;
+        uint8_t flags;
+    };
+
+    struct Object {
+        uint32_t id;
+        uint16_t unitObjectType;
+        uint16_t x;
+        uint16_t y;
+        uint8_t playerId;
+        uint8_t flags;
+    };
+}
+#pragma pack(pop)
+
+static_assert(sizeof(game::snapshot::Tile) == 8);
+static_assert(sizeof(game::snapshot::Object) == 12);
+```
+
+Flag bits:
+
+- `Tile.flags` bit `0`: walkable
+- `Tile.flags` bit `1`: navigatable
+- `Object.flags` bit `0`: alive
+
+Recommended flow:
+
+1. Lua calls `GetMapTilesPtr()` / `GetObjectsPtr()`.
+2. Lua sends the returned pointer and count through IPC.
+3. The external reader uses `ReadProcessMemory` against the game process and decodes the packed structs.
+
+Lua example:
+
+```lua
+function Update()
+    local tilesPtr, tileCount = GetMapTilesPtr()
+    local objectsPtr, objectCount = GetObjectsPtr()
+
+    IPC.Send({
+        type = "snapshot_meta",
+        tilesPtr = tilesPtr,
+        tileCount = tileCount,
+        objectsPtr = objectsPtr,
+        objectCount = objectCount
+    })
+end
+```
+
+Python `ctypes` definitions:
+
+```python
+import ctypes
+
+class Tile(ctypes.Structure):
+    _pack_ = 1
+    _fields_ = [
+        ("x", ctypes.c_uint16),
+        ("y", ctypes.c_uint16),
+        ("terrain", ctypes.c_uint8),
+        ("elevation", ctypes.c_uint8),
+        ("isVisible", ctypes.c_uint8),
+        ("flags", ctypes.c_uint8),
+    ]
+
+class Object(ctypes.Structure):
+    _pack_ = 1
+    _fields_ = [
+        ("id", ctypes.c_uint32),
+        ("unitObjectType", ctypes.c_uint16),
+        ("x", ctypes.c_uint16),
+        ("y", ctypes.c_uint16),
+        ("playerId", ctypes.c_uint8),
+        ("flags", ctypes.c_uint8),
+    ]
+```
+
+Reading example after you received `ptr` and `count` through IPC:
+
+```python
+def decode_snapshot(process_handle, ptr, count, struct_type):
+    byte_count = count * ctypes.sizeof(struct_type)
+    raw = read_process_memory(process_handle, ptr, byte_count)
+    return (struct_type * count).from_buffer_copy(raw)
+```
+
 ## Lua Example
 
 ```lua
@@ -140,4 +253,5 @@ print(data.decode("utf-8"))
 - `IPC.Send` returns `false` if no client is connected.
 - `IPC.GetMessages()` still returns strings. Use `ParseJSON()` when you expect JSON payloads.
 - `IPC.Send()` and `IPC.GetMessages()` are safe to poll continuously; they no longer wait for the pipe to close before returning data.
+- `GetMapTilesPtr()` and `GetObjectsPtr()` are intended for high-throughput IPC / ML workflows, not normal in-Lua iteration.
 - Explicit `IPC.StopServer()` in `Unload()` is optional in practice because CONTROL also stops the server automatically after module unload.

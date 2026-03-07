@@ -105,19 +105,21 @@ function Render()
         return
     end
 
-    local tile = selected:GetCurrentMapTile()
+    local tile = GetMapTile(Vector2(selected:GetPosition().x, selected:GetPosition().y))
     if not tile then
         return
     end
 
-    local text = "Tile " .. tostring(tile:GetPosX()) .. "," .. tostring(tile:GetPosY())
+    local tilePos = tile:GetPos()
+    local text = "Tile " .. tostring(tilePos.x) .. "," .. tostring(tilePos.y)
         .. " vis=" .. tostring(tile:GetTileVisibility())
         .. " terrain=" .. tostring(tile:GetTerrain())
+        .. " nav=" .. tostring(tile:IsNavigatable())
     RenderWorldText(text, selected:GetPosition(), 14.0, Color(255, 255, 255), true, true)
 end
 ```
 
-This add-on uses the new map API and stays safe in fog-aware mode by checking `selected:IsVisible()` before reading other object methods.
+This add-on uses the newer `GetMapTile(Vector2)` overload and stays safe in fog-aware mode by checking `selected:IsVisible()` before reading other object methods.
 
 ## Folder Convention
 

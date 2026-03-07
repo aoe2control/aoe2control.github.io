@@ -114,10 +114,16 @@ Notes:
 | `GetAssignedPlayerId` | `()` | `number` | Assigned player id for this module instance. Available in `Load`. |
 | `GetPlayerById` | `(id)` | `Player` | Player by list index. Gaia is usually `0`. |
 | `GetPlayerCount` | `()` | `number` | Size of the player list. |
+| `GetMapTilesPtr` | `()` | `number, number` | Returns `(ptr, count)` for an engine-owned packed tile snapshot buffer. Intended for IPC / RPM readers. |
 | `GetMapWidth` | `()` | `number` | Current map width in tiles. |
 | `GetMapHeight` | `()` | `number` | Current map height in tiles. |
-| `GetMapTile` | `(x, y)` | `MapTile` | Tile at map coordinates, or `nil` if out of bounds. |
+| `GetMapTile` | `(x, y)` | `MapTile` | Overload: tile at integer map coordinates, or `nil` if out of bounds. |
+| `GetMapTile` | `(position)` | `MapTile` | Overload: floors a `Vector2` position to a tile lookup. |
 | `GetAllMapTiles` | `()` | `MapTile[]` | Full map tile list. Tile methods still respect fog-aware visibility. |
+| `GetObjectsInArea` | `(pos1, pos2)` | `Object[]` | Alive objects inside the rectangle defined by two `Vector2` positions. |
+| `GetObjectsPtr` | `()` | `number, number` | Returns `(ptr, count)` for an engine-owned packed object snapshot buffer. Intended for IPC / RPM readers. |
+| `GetObjectTypeData` | `(objectTypeId, objectData)` | `number` | Static object-type data lookup for a `UnitObjectType`. |
+| `GetObjectAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number` | Static object-type attribute lookup for a `UnitObjectType`. |
 | `IsEnemyPlayer` | `(player)` | `boolean` | Whether `player` is an enemy of the assigned player. |
 | `GetObjectById` | `(id)` | `Object` | Object by id. |
 | `GetVictoryCondition` | `()` | `VictoryCondition` | Current victory condition. |
@@ -127,8 +133,12 @@ Notes:
 
 - `GetLocalPlayer` was renamed to `GetAssignedPlayer`.
 - `GetAssignedPlayerId()` is available before the match starts and can be used from `Load(playerId)`.
+- `GetMapTile(position)` floors `position.x` and `position.y`.
+- `GetObjectsInArea(pos1, pos2)` only returns alive objects and still respects fog-aware visibility.
 - Object retrieval respects the assigned player's fog-of-war when **Modules See Everything** is disabled. This includes `GetObjectById()`.
 - `GetAllMapTiles()` returns the full grid, but each `MapTile` only exposes data allowed by the current fog state.
+- `GetMapTilesPtr()` and `GetObjectsPtr()` return `(ptr, count)`, where `count` is an element count, not a byte count.
+- `GetObjectsPtr()` is dead-inclusive.
 - `CanAfford(unitId, isBuilding)` currently accepts both parameters, but the binding does not distinguish the flag internally yet.
 
 ---
@@ -213,7 +223,42 @@ Behavior:
 - `IPC.Send` wraps payloads in an envelope with source metadata
 - `IPC.GetMessages` returns strings; use `ParseJSON` when expecting JSON
 - `IPC.Send` and `IPC.GetMessages` no longer block waiting for the pipe to close
+- `GetMapTilesPtr()` and `GetObjectsPtr()` are meant for high-throughput IPC / ML readers
+- Snapshot buffers are engine-owned, rebuilt on demand, and should be copied immediately
+- Snapshot byte size is `count * sizeof(Tile)` or `count * sizeof(Object)`
 - Explicit `IPC.StopServer()` in `Unload()` is optional in practice because CONTROL also stops the server automatically after module unload
+
+Snapshot layouts:
+
+```cpp
+#pragma pack(push, 1)
+namespace game::snapshot {
+    struct Tile {
+        uint16_t x;
+        uint16_t y;
+        uint8_t terrain;
+        uint8_t elevation;
+        uint8_t isVisible;
+        uint8_t flags;
+    };
+
+    struct Object {
+        uint32_t id;
+        uint16_t unitObjectType;
+        uint16_t x;
+        uint16_t y;
+        uint8_t playerId;
+        uint8_t flags;
+    };
+}
+#pragma pack(pop)
+```
+
+Flags:
+
+- `Tile.flags` bit `0`: walkable
+- `Tile.flags` bit `1`: navigatable
+- `Object.flags` bit `0`: alive
 
 ---
 
@@ -286,12 +331,12 @@ Behavior:
 
 Methods:
 
-- `GetPosX()`
-- `GetPosY()`
+- `GetPos()`
 - `GetTerrain()`
 - `GetElevation()`
 - `GetTileVisibility()`
 - `IsWalkable()`
+- `IsNavigatable()`
 - `GetObjectCount()`
 - `GetObjects()`
 
@@ -308,6 +353,8 @@ Enum notes:
 - `TileVisibility.UNEXPLORED = 0`
 - `TileVisibility.VISIBLE = 15`
 - `TileVisibility.EXPLORED = 128`
+- `ObjectAttribute` replaced the older `UnitAttribute` enum name
+- `ObjectData` entries no longer use the `OBJECT_DATA_` prefix
 
 ### Player
 

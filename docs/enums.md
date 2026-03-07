@@ -186,6 +186,25 @@ Used by `MapTile:GetTileVisibility()`.
 | VISIBLE | 15. The tile is currently visible. |
 | EXPLORED | 128. The tile was seen earlier but is not currently visible. |
 
+### ObjectAttribute
+
+Used by `Object:GetAttribute()` and `GetObjectAttribute()`.
+
+This enum was renamed from `UnitAttribute` to `ObjectAttribute` and now mirrors the full game reference list exposed by the binding.
+
+Common examples:
+
+| Value | Description |
+|-------|-------------|
+| HITPOINTS | 0 |
+| LINE_OF_SIGHT | 1 |
+| SPEED | 5 |
+| ARMOR | 8 |
+| WEAPON | 9 |
+| WEAPON_RANGE | 12 |
+| RESOURCE_COST | 100 |
+| CREATION_TIME | 101 |
+
 ### UnitClass
 
 See the [community Objects Table (ClassId)](https://airef.github.io/parameters/parameters-details.html#ClassId) for the full list of class IDs.
@@ -239,6 +258,8 @@ GetFact(FactId.FOOD_AMOUNT, 0)
 ### ObjectData
 
 See the [community Parameter Details (ObjectData)](https://airef.github.io/parameters/parameters-details.html#ObjectData) for the full list of object data field IDs.
+
+The enum entries no longer include the old `OBJECT_DATA_` prefix. For example, use `ObjectData.POINT_X` instead of `ObjectData.OBJECT_DATA_POINT_X`.
 
 ## Strategic Enums
 

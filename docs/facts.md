@@ -26,10 +26,16 @@ Most facts read game state and should be called from `Init`, `Update`, or `Rende
 | `GetAssignedPlayerId` | `()` | `number` | Returns the player id currently assigned to this module instance. Available in `Load`. |
 | `GetPlayerById` | `(id)` | `Player` | Returns a player by index. Gaia is typically `0`, regular players are typically `1` to `8`. |
 | `GetPlayerCount` | `()` | `number` | Returns the size of the world player list. |
+| `GetMapTilesPtr` | `()` | `number, number` | Returns `(ptr, count)` for an engine-owned packed tile snapshot buffer. Intended for IPC / RPM readers. |
 | `GetMapWidth` | `()` | `number` | Returns the current map width in tiles. |
 | `GetMapHeight` | `()` | `number` | Returns the current map height in tiles. |
-| `GetMapTile` | `(x, y)` | `MapTile` | Returns the tile at map coordinates, or `nil` if the coordinates are out of bounds. |
+| `GetMapTile` | `(x, y)` | `MapTile` | Overload: returns the tile at integer map coordinates, or `nil` if out of bounds. |
+| `GetMapTile` | `(position)` | `MapTile` | Overload: floors a `Vector2` world/tile position to a map tile lookup. |
 | `GetAllMapTiles` | `()` | `MapTile[]` | Returns all map tiles. Individual tile methods still respect fog-aware visibility. |
+| `GetObjectsInArea` | `(pos1, pos2)` | `Object[]` | Returns alive objects whose current tile lies inside the rectangular area between two `Vector2` positions. |
+| `GetObjectsPtr` | `()` | `number, number` | Returns `(ptr, count)` for an engine-owned packed object snapshot buffer. Intended for IPC / RPM readers. |
+| `GetObjectTypeData` | `(objectTypeId, objectData)` | `number` | Returns static object-type data for a `UnitObjectType` and `ObjectData` field. |
+| `GetObjectAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number` | Returns a static object-type attribute value for a `UnitObjectType`. |
 | `IsEnemyPlayer` | `(player)` | `boolean` | Returns whether the given player is an enemy of the assigned player. |
 | `GetObjectById` | `(id)` | `Object` | Returns a world object by id. |
 | `GetVictoryCondition` | `()` | `VictoryCondition` | Returns the current victory condition. |
@@ -83,11 +89,25 @@ function Update()
 end
 ```
 
+```lua
+function Init()
+    local villagerHp = GetObjectAttribute(UnitObjectType.VILLAGER_MALE, ObjectAttribute.HITPOINTS, 0)
+    local villagerTrainTime = GetObjectTypeData(UnitObjectType.VILLAGER_MALE, ObjectData.CREATION_TIME)
+
+    Log("Villager HP=" .. tostring(villagerHp) .. ", train time=" .. tostring(villagerTrainTime))
+end
+```
+
 ## Notes
 
 - `GetLocalPlayer` was renamed to `GetAssignedPlayer`.
 - `GetAssignedPlayerId()` is intentionally available in `Load(playerId)` before the match is running.
 - `GetObjectsByType`, `GetObjectsByTypes`, and `GetObjectsByClass` now scan world objects instead of only the assigned player's objects.
+- `GetMapTile(position)` floors `position.x` and `position.y` to integer tile coordinates before resolving the tile.
+- `GetObjectsInArea(pos1, pos2)` only returns alive objects and follows the same fog-aware visibility checks as the rest of the object API.
 - When **Modules See Everything** is disabled, object retrieval functions filter by the assigned player's current fog-of-war. This includes `GetObjectById()`.
 - `GetAllMapTiles()` returns the full map grid, but `MapTile` methods only expose what the assigned player is currently allowed to know.
+- `GetMapTilesPtr()` and `GetObjectsPtr()` return engine-owned buffers rebuilt on demand. The second return value is an element count, not a byte count.
+- `GetObjectsPtr()` is dead-inclusive. Read the alive state from the snapshot flags instead of assuming every entry is alive.
+- The snapshot helpers are primarily intended for IPC / external ML readers that want to transfer compact RPM-friendly buffers. See the IPC page for the exact packed C++ layouts.
 - `CanAfford(unitId, isBuilding)` accepts both parameters in Lua, but the current binding does not distinguish the second flag internally yet.

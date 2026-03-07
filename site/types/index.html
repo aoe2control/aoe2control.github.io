@@ -1975,7 +1975,7 @@
 <tr>
 <td><code>GetAttribute(attribute, damageType)</code></td>
 <td><code>number</code></td>
-<td>Returns a unit attribute value.</td>
+<td>Returns an <code>ObjectAttribute</code> value for this object.</td>
 </tr>
 <tr>
 <td><code>GetObjectData(objectData)</code></td>
@@ -2031,14 +2031,9 @@
 </thead>
 <tbody>
 <tr>
-<td><code>GetPosX()</code></td>
-<td><code>number</code></td>
-<td>Returns the tile x coordinate.</td>
-</tr>
-<tr>
-<td><code>GetPosY()</code></td>
-<td><code>number</code></td>
-<td>Returns the tile y coordinate.</td>
+<td><code>GetPos()</code></td>
+<td><code>Vector2</code></td>
+<td>Returns the tile position as <code>Vector2(x, y)</code>.</td>
 </tr>
 <tr>
 <td><code>GetTerrain()</code></td>
@@ -2059,6 +2054,11 @@
 <td><code>IsWalkable()</code></td>
 <td><code>boolean</code></td>
 <td>Returns whether the tile is walkable. Unexplored tiles return <code>false</code>.</td>
+</tr>
+<tr>
+<td><code>IsNavigatable()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether the tile is navigatable for pathing. Unexplored tiles return <code>false</code>.</td>
 </tr>
 <tr>
 <td><code>GetObjectCount()</code></td>
@@ -2237,8 +2237,10 @@
 <span class="w">        </span><span class="kr">return</span>
 <span class="w">    </span><span class="kr">end</span>
 
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Tile &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nv">tile</span><span class="p">:</span><span class="nf">GetPosX</span><span class="p">())</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;,&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nv">tile</span><span class="p">:</span><span class="nf">GetPosY</span><span class="p">())</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">tilePos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">tile</span><span class="p">:</span><span class="nf">GetPos</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Tile &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nv">tilePos</span><span class="p">.</span><span class="py">x</span><span class="p">)</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;,&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nv">tilePos</span><span class="p">.</span><span class="py">y</span><span class="p">)</span>
 <span class="w">        </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot; terrain=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nv">tile</span><span class="p">:</span><span class="nf">GetTerrain</span><span class="p">())</span>
+<span class="w">        </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot; nav=&quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nv">tile</span><span class="p">:</span><span class="nf">IsNavigatable</span><span class="p">())</span>
 <span class="w">    </span><span class="nf">RenderWorldText</span><span class="p">(</span><span class="nv">label</span><span class="p">,</span><span class="w"> </span><span class="nv">selected</span><span class="p">:</span><span class="nf">GetPosition</span><span class="p">(),</span><span class="w"> </span><span class="mf">14.0</span><span class="p">,</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">),</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
 <span class="kr">end</span>
 </code></pre></div>
@@ -2442,6 +2444,7 @@
 <li><code>ConstructionPlacement:TryBuildStructureAtTown()</code> and <code>ConstructionPlacement:RenderDebug()</code> exist in C++ but are not exposed to Lua.</li>
 <li>Cached <code>Object</code> references can become invalid for method calls when the object becomes invisible in fog-aware mode. Re-fetch objects in the current frame or enable <strong>Modules See Everything</strong> if you need persistent access.</li>
 <li><code>Object:IsVisible()</code> is the safe visibility check for cached objects and now uses map-tile visibility instead of the old object visibility field.</li>
+<li><code>MapTile:GetPos()</code> replaced the older <code>GetPosX()</code> / <code>GetPosY()</code> pair.</li>
 <li><code>MapTile:GetObjectCount()</code> and <code>MapTile:GetObjects()</code> only expose data for tiles that are currently <code>TileVisibility.VISIBLE</code>.</li>
 </ul>
 

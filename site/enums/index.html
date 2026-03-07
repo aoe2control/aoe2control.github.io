@@ -1173,6 +1173,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#objectattribute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ObjectAttribute
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#unitclass" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2371,6 +2382,52 @@
 </tr>
 </tbody>
 </table>
+<h3 id="objectattribute">ObjectAttribute</h3>
+<p>Used by <code>Object:GetAttribute()</code> and <code>GetObjectAttribute()</code>.</p>
+<p>This enum was renamed from <code>UnitAttribute</code> to <code>ObjectAttribute</code> and now mirrors the full game reference list exposed by the binding.</p>
+<p>Common examples:</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HITPOINTS</td>
+<td>0</td>
+</tr>
+<tr>
+<td>LINE_OF_SIGHT</td>
+<td>1</td>
+</tr>
+<tr>
+<td>SPEED</td>
+<td>5</td>
+</tr>
+<tr>
+<td>ARMOR</td>
+<td>8</td>
+</tr>
+<tr>
+<td>WEAPON</td>
+<td>9</td>
+</tr>
+<tr>
+<td>WEAPON_RANGE</td>
+<td>12</td>
+</tr>
+<tr>
+<td>RESOURCE_COST</td>
+<td>100</td>
+</tr>
+<tr>
+<td>CREATION_TIME</td>
+<td>101</td>
+</tr>
+</tbody>
+</table>
 <h3 id="unitclass">UnitClass</h3>
 <p>See the <a href="https://airef.github.io/parameters/parameters-details.html#ClassId">community Objects Table (ClassId)</a> for the full list of class IDs.</p>
 <div class="highlight"><pre><span></span><code><span class="nf">GetObjectsByClass</span><span class="p">(</span><span class="nv">UnitClass</span><span class="p">.</span><span class="py">VILLAGER</span><span class="p">)</span>
@@ -2461,6 +2518,7 @@
 </code></pre></div>
 <h3 id="objectdata">ObjectData</h3>
 <p>See the <a href="https://airef.github.io/parameters/parameters-details.html#ObjectData">community Parameter Details (ObjectData)</a> for the full list of object data field IDs.</p>
+<p>The enum entries no longer include the old <code>OBJECT_DATA_</code> prefix. For example, use <code>ObjectData.POINT_X</code> instead of <code>ObjectData.OBJECT_DATA_POINT_X</code>.</p>
 <h2 id="strategic-enums">Strategic Enums</h2>
 <h3 id="urgencylevel">UrgencyLevel</h3>
 <table>

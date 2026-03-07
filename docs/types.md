@@ -110,7 +110,7 @@ Returned by `GetObjectsByType`, `GetObjectsByTypes`, `GetObjectsByClass`, and `G
 | `IsAlive()` | `boolean` | Returns whether the object is alive. |
 | `GetUnitObjectType()` | `UnitObjectType` | Returns the unit or building type id. |
 | `GetClass()` | `UnitClass` | Returns the unit class id. |
-| `GetAttribute(attribute, damageType)` | `number` | Returns a unit attribute value. |
+| `GetAttribute(attribute, damageType)` | `number` | Returns an `ObjectAttribute` value for this object. |
 | `GetObjectData(objectData)` | `number` | Returns an object data field. |
 | `IsIdle()` | `boolean` | Returns whether the object is idle. |
 | `IsMoving()` | `boolean` | Returns whether the object is moving. |
@@ -126,12 +126,12 @@ Returned by `GetMapTile`, `GetAllMapTiles`, and `Object:GetCurrentMapTile()`.
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `GetPosX()` | `number` | Returns the tile x coordinate. |
-| `GetPosY()` | `number` | Returns the tile y coordinate. |
+| `GetPos()` | `Vector2` | Returns the tile position as `Vector2(x, y)`. |
 | `GetTerrain()` | `Terrain` | Returns the tile terrain id. Returns `Terrain.UNKNOWN` for unexplored tiles. |
 | `GetElevation()` | `number` | Returns the tile elevation. Returns `0` for unexplored tiles. |
 | `GetTileVisibility()` | `TileVisibility` | Returns the assigned player's visibility state for the tile. |
 | `IsWalkable()` | `boolean` | Returns whether the tile is walkable. Unexplored tiles return `false`. |
+| `IsNavigatable()` | `boolean` | Returns whether the tile is navigatable for pathing. Unexplored tiles return `false`. |
 | `GetObjectCount()` | `number` | Returns the count of currently visible objects on the tile. Only populated for visible tiles. |
 | `GetObjects()` | `Object[]` | Returns currently visible objects on the tile. Returns an empty list unless the tile is visible. |
 
@@ -188,8 +188,10 @@ function Render()
         return
     end
 
-    local label = "Tile " .. tostring(tile:GetPosX()) .. "," .. tostring(tile:GetPosY())
+    local tilePos = tile:GetPos()
+    local label = "Tile " .. tostring(tilePos.x) .. "," .. tostring(tilePos.y)
         .. " terrain=" .. tostring(tile:GetTerrain())
+        .. " nav=" .. tostring(tile:IsNavigatable())
     RenderWorldText(label, selected:GetPosition(), 14.0, Color(255, 255, 255), true, true)
 end
 ```
@@ -268,4 +270,5 @@ end
 - `ConstructionPlacement:TryBuildStructureAtTown()` and `ConstructionPlacement:RenderDebug()` exist in C++ but are not exposed to Lua.
 - Cached `Object` references can become invalid for method calls when the object becomes invisible in fog-aware mode. Re-fetch objects in the current frame or enable **Modules See Everything** if you need persistent access.
 - `Object:IsVisible()` is the safe visibility check for cached objects and now uses map-tile visibility instead of the old object visibility field.
+- `MapTile:GetPos()` replaced the older `GetPosX()` / `GetPosY()` pair.
 - `MapTile:GetObjectCount()` and `MapTile:GetObjects()` only expose data for tiles that are currently `TileVisibility.VISIBLE`.
