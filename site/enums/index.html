@@ -2383,8 +2383,8 @@
 </tbody>
 </table>
 <h3 id="objectattribute">ObjectAttribute</h3>
-<p>Used by <code>Object:GetAttribute()</code> and <code>GetObjectAttribute()</code>.</p>
-<p>This enum was renamed from <code>UnitAttribute</code> to <code>ObjectAttribute</code> and now mirrors the full game reference list exposed by the binding.</p>
+<p>Used by <code>Object:GetAttribute()</code> and <code>GetObjectTypeAttribute()</code>.</p>
+<p>Use <code>ObjectAttribute</code> for object instance attributes and static object-type attribute lookups.</p>
 <p>Common examples:</p>
 <table>
 <thead>
@@ -2518,7 +2518,7 @@
 </code></pre></div>
 <h3 id="objectdata">ObjectData</h3>
 <p>See the <a href="https://airef.github.io/parameters/parameters-details.html#ObjectData">community Parameter Details (ObjectData)</a> for the full list of object data field IDs.</p>
-<p>The enum entries no longer include the old <code>OBJECT_DATA_</code> prefix. For example, use <code>ObjectData.POINT_X</code> instead of <code>ObjectData.OBJECT_DATA_POINT_X</code>.</p>
+<p>ObjectData entries use names without the <code>OBJECT_DATA_</code> prefix. For example, use <code>ObjectData.POINT_X</code> instead of <code>ObjectData.OBJECT_DATA_POINT_X</code>.</p>
 <h2 id="strategic-enums">Strategic Enums</h2>
 <h3 id="urgencylevel">UrgencyLevel</h3>
 <table>

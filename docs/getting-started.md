@@ -47,7 +47,7 @@ function Load(playerId)
 end
 
 function Init()
-    ChatMessage("Hello from player " .. tostring(GetAssignedPlayerId()))
+    Log("Match ready for player " .. tostring(GetAssignedPlayerId()))
 end
 
 function Update()

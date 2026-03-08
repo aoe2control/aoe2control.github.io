@@ -9,6 +9,7 @@ The IPC API connects Lua modules to external processes through Windows named pip
 | `IPC.StartServer` | `(pipeName)` | `boolean` | Starts or joins a named pipe server. |
 | `IPC.StopServer` | `()` | `nil` | Stops the current module instance's server endpoint. |
 | `IPC.Send` | `(message)` | `boolean` | Sends a string or Lua value to all connected pipe clients. Non-string values are serialized to JSON automatically. |
+| `IPC.HasMessages` | `()` | `boolean` | Returns whether queued messages are waiting for this module instance. |
 | `IPC.GetMessages` | `()` | `string[]` | Returns queued messages for this module instance. |
 
 ## JSON Helpers
@@ -20,7 +21,7 @@ The IPC API connects Lua modules to external processes through Windows named pip
 
 ## Routing Model
 
-Multiple module instances can now share one pipe name. Incoming messages can target specific module instances.
+Multiple module instances can share one pipe name. Incoming messages can target specific module instances.
 
 Accepted routing fields:
 
@@ -178,10 +179,14 @@ local pipeName = "AoE_ML_Pipe"
 
 function Init()
     IPC.StartServer(pipeName)
-    ChatMessage("IPC online for player " .. tostring(GetAssignedPlayerId()))
+    Log("IPC online for player " .. tostring(GetAssignedPlayerId()))
 end
 
 function Update()
+    if not IPC.HasMessages() then
+        return
+    end
+
     for _, raw in ipairs(IPC.GetMessages()) do
         local msg = ParseJSON(raw)
         if msg and msg.action == "ping" then
@@ -251,7 +256,8 @@ print(data.decode("utf-8"))
 
 - Pipe names are normalized automatically. Passing `"AoE_ML_Pipe"` is enough.
 - `IPC.Send` returns `false` if no client is connected.
-- `IPC.GetMessages()` still returns strings. Use `ParseJSON()` when you expect JSON payloads.
-- `IPC.Send()` and `IPC.GetMessages()` are safe to poll continuously; they no longer wait for the pipe to close before returning data.
+- `IPC.HasMessages()` is useful when polling every update and you want to skip empty queue drains.
+- `IPC.GetMessages()` returns strings. Use `ParseJSON()` when you expect JSON payloads.
+- `IPC.Send()` and `IPC.GetMessages()` are safe to poll continuously; they return without waiting for a pipe close event.
 - `GetMapTilesPtr()` and `GetObjectsPtr()` are intended for high-throughput IPC / ML workflows, not normal in-Lua iteration.
 - Explicit `IPC.StopServer()` in `Unload()` is optional in practice because CONTROL also stops the server automatically after module unload.

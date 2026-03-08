@@ -1,6 +1,6 @@
 # Interface Options
 
-The CONTROL overlay now groups module configuration by player. Each `Player 1` to `Player 8` section exposes that player's module slot and runtime status.
+The CONTROL overlay groups module configuration by player. Each `Player 1` to `Player 8` section exposes that player's module slot and runtime status.
 
 ![CONTROL Interface — AI Settings](images/ControlUI.png)
 
@@ -20,12 +20,15 @@ CONTROL scans `modules/` recursively for:
 | **Enabled** | On | Master toggle for all configured module instances. |
 | **Update Interval** | `1.0` | Seconds between `Update()` calls. |
 | **Sequential Actions** | On | Allows only one successful command per update tick. |
+| **Tournament Mode** | Off | Blocks Lua game commands outside `Update()`. Read-only APIs such as facts remain available. |
 | **Auto Move Camera** | On | Auto-centers the camera on executed command targets. |
 | **Command Visualization** | On | Draws command feedback overlays. |
 | **Player Perspective** | `Default` | Fog-of-war perspective override: `Default`, `Player 1` to `Player 8`, `All Players`, or `Gaia`. |
 | **Modules See Everything** | Off | If enabled, Lua modules ignore fog-of-war when reading map tiles and objects. |
 
 The update interval is clamped to `0.1` seconds in the UI and `0.01` seconds if edited directly in `settings.ini`.
+
+When **Tournament Mode** is off, using a game command outside `Update()` logs a warning once per module load. When it is on, the command is rejected.
 
 ## Player Module Slots
 
@@ -48,6 +51,19 @@ Open a player section to configure that player's module slot. If no module is as
 - Module-created settings panels appear per configured settings group while AI is enabled.
 - **Open Folder** opens the modules directory.
 
+## Debug Menu
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| **Module Telemetry** | Off | Shows sampled `Update()` and `Render()` cost for active modules in the Debug menu. |
+
+When **Module Telemetry** is enabled, the Debug menu shows:
+
+- Active modules only.
+- A sampled **Baseline Frame** value, which represents host frame cost after subtracting sampled module time.
+- Per-module `Upd` and `Rnd` entries with both sampled milliseconds and relative `x base` values.
+- Samples spread across multiple frames each second rather than every frame.
+
 ## Misc Settings
 
 | Setting | Default | Description |
@@ -62,4 +78,4 @@ Open a player section to configure that player's module slot. If no module is as
 
 ## Log Window
 
-Use `Log("message")` from Lua to write script messages to the log window. Runtime Lua errors are also displayed and logged through the interface now.
+Use `Log("message")` from Lua to write script messages to the log window. Runtime Lua errors are also displayed and logged through the interface.

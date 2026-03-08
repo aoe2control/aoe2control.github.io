@@ -1,6 +1,6 @@
 # CONTROL Lua Engine — AI Agent Reference
 
-**Purpose:** Provide this file to coding agents that need an up-to-date description of CONTROL's Lua API and runtime behavior.
+**Purpose:** Provide this file to coding agents that need an accurate description of CONTROL's Lua API and runtime behavior.
 
 **Rule:** Treat the signatures below as strict Lua signatures. A C++ default argument is not optional in Lua unless a separate overload is explicitly listed.
 
@@ -53,7 +53,7 @@ All callbacks are optional.
 | `End(hasWon)` | Once when the match ends | `hasWon` refers to the assigned player. |
 | `Unload()` | Instance unload, disable, replace, or engine eject | Cleanup that should run even without normal match end. |
 
-Game API calls are valid only during `Init`, `Update`, or `Render`.
+Read-only game API calls are valid during `Init`, `Update`, or `Render`. Game commands belong in `Update()`.
 
 ---
 
@@ -89,9 +89,13 @@ Command functions usually filter input objects to ones owned by the assigned pla
 | `SetUnitStanceSeekShelter` | `(units)` | `nil` | Send owned units to shelter. |
 | `SetUnitCombatStance` | `(units, stance)` | `nil` | Set combat stance on owned units. |
 
-Notes:
+Rules:
 
-- `ChatLocal` was renamed to `ChatMessage`.
+- Most unit and building commands filter inputs to objects owned by the assigned player.
+- `SetGameSpeedMultiplier`, `SetCameraPosition`, and `ChatMessage` are game commands, but they are not ownership-filtered.
+- Calling a game command outside `Update()` logs a warning once per module load.
+- If **Tournament Mode** is enabled, game commands outside `Update()` are blocked.
+- `Log()` is not a game command and can be used from any callback.
 - If `Sequential Actions` is enabled, only the first successful command per tick executes.
 
 ---
@@ -123,7 +127,7 @@ Notes:
 | `GetObjectsInArea` | `(pos1, pos2)` | `Object[]` | Alive objects inside the rectangle defined by two `Vector2` positions. |
 | `GetObjectsPtr` | `()` | `number, number` | Returns `(ptr, count)` for an engine-owned packed object snapshot buffer. Intended for IPC / RPM readers. |
 | `GetObjectTypeData` | `(objectTypeId, objectData)` | `number` | Static object-type data lookup for a `UnitObjectType`. |
-| `GetObjectAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number` | Static object-type attribute lookup for a `UnitObjectType`. |
+| `GetObjectTypeAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number` | Static object-type attribute lookup for a `UnitObjectType`. |
 | `IsEnemyPlayer` | `(player)` | `boolean` | Whether `player` is an enemy of the assigned player. |
 | `GetObjectById` | `(id)` | `Object` | Object by id. |
 | `GetVictoryCondition` | `()` | `VictoryCondition` | Current victory condition. |
@@ -131,7 +135,7 @@ Notes:
 
 Notes:
 
-- `GetLocalPlayer` was renamed to `GetAssignedPlayer`.
+- Use `GetAssignedPlayer()`, not `GetLocalPlayer()`.
 - `GetAssignedPlayerId()` is available before the match starts and can be used from `Load(playerId)`.
 - `GetMapTile(position)` floors `position.x` and `position.y`.
 - `GetObjectsInArea(pos1, pos2)` only returns alive objects and still respects fog-aware visibility.
@@ -139,7 +143,7 @@ Notes:
 - `GetAllMapTiles()` returns the full grid, but each `MapTile` only exposes data allowed by the current fog state.
 - `GetMapTilesPtr()` and `GetObjectsPtr()` return `(ptr, count)`, where `count` is an element count, not a byte count.
 - `GetObjectsPtr()` is dead-inclusive.
-- `CanAfford(unitId, isBuilding)` currently accepts both parameters, but the binding does not distinguish the flag internally yet.
+- `CanAfford(unitId, isBuilding)` accepts both parameters, but the binding does not distinguish the flag internally.
 
 ---
 
@@ -209,6 +213,7 @@ Module settings may be per-player or profile-shared depending on whether **Sync 
 | `IPC.StartServer` | `(pipeName)` | `boolean` |
 | `IPC.StopServer` | `()` | `nil` |
 | `IPC.Send` | `(message)` | `boolean` |
+| `IPC.HasMessages` | `()` | `boolean` |
 | `IPC.GetMessages` | `()` | `string[]` |
 | `ParseJSON` | `(str)` | `table` |
 | `ToJSON` | `(obj)` | `string` |
@@ -221,8 +226,9 @@ Behavior:
 - Routing fields can appear at the root or under a root `target` object
 - `IPC.Send` accepts strings or Lua values; non-string values are serialized to JSON automatically
 - `IPC.Send` wraps payloads in an envelope with source metadata
+- `IPC.HasMessages()` reports whether this module instance has queued messages
 - `IPC.GetMessages` returns strings; use `ParseJSON` when expecting JSON
-- `IPC.Send` and `IPC.GetMessages` no longer block waiting for the pipe to close
+- `IPC.Send` and `IPC.GetMessages` can be polled continuously without waiting for a pipe close event
 - `GetMapTilesPtr()` and `GetObjectsPtr()` are meant for high-throughput IPC / ML readers
 - Snapshot buffers are engine-owned, rebuilt on demand, and should be copied immediately
 - Snapshot byte size is `count * sizeof(Tile)` or `count * sizeof(Object)`
@@ -353,8 +359,8 @@ Enum notes:
 - `TileVisibility.UNEXPLORED = 0`
 - `TileVisibility.VISIBLE = 15`
 - `TileVisibility.EXPLORED = 128`
-- `ObjectAttribute` replaced the older `UnitAttribute` enum name
-- `ObjectData` entries no longer use the `OBJECT_DATA_` prefix
+- Use `ObjectAttribute` instead of `UnitAttribute`
+- `ObjectData` entries use names without the `OBJECT_DATA_` prefix
 
 ### Player
 
@@ -452,6 +458,8 @@ Not exposed to Lua:
 - Each player group exposes one module slot for that player
 - Player perspective options: `Default`, `Player 1` to `Player 8`, `All Players`, `Gaia`
 - `Modules See Everything` defaults to `false` and affects both map-tile and object reads from Lua
+- `Tournament Mode` blocks game commands outside `Update()`
+- The Debug menu's **Module Telemetry** view shows sampled `Update()` and `Render()` timing for active modules, plus a sampled baseline frame cost
 - `Spectator Mode` replaced the old `Reveal Map` misc option
 - Runtime Lua errors are displayed and logged through the UI
 
@@ -460,6 +468,8 @@ Not exposed to Lua:
 ## 11. Minimal Example
 
 ```lua
+local announced = false
+
 function Load(playerId)
     Settings.AddBool("Highlight Villagers", true)
     Settings.AddColor("Villager Color", Color(0, 255, 0, 90))
@@ -467,7 +477,15 @@ function Load(playerId)
 end
 
 function Init()
-    ChatMessage("Hello from player " .. tostring(GetAssignedPlayerId()))
+    announced = false
+    Log("Match ready for player " .. tostring(GetAssignedPlayerId()))
+end
+
+function Update()
+    if not announced then
+        ChatMessage("Hello from player " .. tostring(GetAssignedPlayerId()))
+        announced = true
+    end
 end
 
 function Render()

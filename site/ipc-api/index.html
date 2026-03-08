@@ -1577,6 +1577,12 @@
 <td>Sends a string or Lua value to all connected pipe clients. Non-string values are serialized to JSON automatically.</td>
 </tr>
 <tr>
+<td><code>IPC.HasMessages</code></td>
+<td><code>()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether queued messages are waiting for this module instance.</td>
+</tr>
+<tr>
 <td><code>IPC.GetMessages</code></td>
 <td><code>()</code></td>
 <td><code>string[]</code></td>
@@ -1610,7 +1616,7 @@
 </tbody>
 </table>
 <h2 id="routing-model">Routing Model</h2>
-<p>Multiple module instances can now share one pipe name. Incoming messages can target specific module instances.</p>
+<p>Multiple module instances can share one pipe name. Incoming messages can target specific module instances.</p>
 <p>Accepted routing fields:</p>
 <ul>
 <li><code>instanceId</code> or <code>assignedInstanceId</code></li>
@@ -1745,10 +1751,14 @@
 
 <span class="kr">function</span><span class="w"> </span><span class="nf">Init</span><span class="p">()</span>
 <span class="w">    </span><span class="nv">IPC</span><span class="p">.</span><span class="nf">StartServer</span><span class="p">(</span><span class="nv">pipeName</span><span class="p">)</span>
-<span class="w">    </span><span class="nf">ChatMessage</span><span class="p">(</span><span class="s2">&quot;IPC online for player &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nf">GetAssignedPlayerId</span><span class="p">()))</span>
+<span class="w">    </span><span class="nf">Log</span><span class="p">(</span><span class="s2">&quot;IPC online for player &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nf">GetAssignedPlayerId</span><span class="p">()))</span>
 <span class="kr">end</span>
 
 <span class="kr">function</span><span class="w"> </span><span class="nf">Update</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">IPC</span><span class="p">.</span><span class="nf">HasMessages</span><span class="p">()</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span>
+<span class="w">    </span><span class="kr">end</span>
+
 <span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">raw</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nv">IPC</span><span class="p">.</span><span class="nf">GetMessages</span><span class="p">())</span><span class="w"> </span><span class="kr">do</span>
 <span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">ParseJSON</span><span class="p">(</span><span class="nv">raw</span><span class="p">)</span>
 <span class="w">        </span><span class="kr">if</span><span class="w"> </span><span class="nv">msg</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nv">msg</span><span class="p">.</span><span class="py">action</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;ping&quot;</span><span class="w"> </span><span class="kr">then</span>
@@ -1814,8 +1824,9 @@
 <ul>
 <li>Pipe names are normalized automatically. Passing <code>"AoE_ML_Pipe"</code> is enough.</li>
 <li><code>IPC.Send</code> returns <code>false</code> if no client is connected.</li>
-<li><code>IPC.GetMessages()</code> still returns strings. Use <code>ParseJSON()</code> when you expect JSON payloads.</li>
-<li><code>IPC.Send()</code> and <code>IPC.GetMessages()</code> are safe to poll continuously; they no longer wait for the pipe to close before returning data.</li>
+<li><code>IPC.HasMessages()</code> is useful when polling every update and you want to skip empty queue drains.</li>
+<li><code>IPC.GetMessages()</code> returns strings. Use <code>ParseJSON()</code> when you expect JSON payloads.</li>
+<li><code>IPC.Send()</code> and <code>IPC.GetMessages()</code> are safe to poll continuously; they return without waiting for a pipe close event.</li>
 <li><code>GetMapTilesPtr()</code> and <code>GetObjectsPtr()</code> are intended for high-throughput IPC / ML workflows, not normal in-Lua iteration.</li>
 <li>Explicit <code>IPC.StopServer()</code> in <code>Unload()</code> is optional in practice because CONTROL also stops the server automatically after module unload.</li>
 </ul>

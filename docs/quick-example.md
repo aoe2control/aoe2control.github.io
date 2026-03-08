@@ -4,7 +4,7 @@ description: Build a working AoE2Control Lua module example with settings, rende
 
 # Quick Example
 
-This example shows a small but current CONTROL module. It uses the renamed APIs, explicit setting defaults, and the assigned-player model.
+This example shows a small CONTROL module with explicit setting defaults, assigned-player access, and a command issued from `Update()`.
 
 ## Module Structure
 
@@ -20,6 +20,7 @@ modules/
 
 ```lua
 local logger = require("utils.logger")
+local announced = false
 
 function Load(playerId)
     Settings.AddBool("Highlight Villagers", true)
@@ -31,10 +32,16 @@ function Load(playerId)
 end
 
 function Init()
-    ChatMessage("Module active for player " .. tostring(GetAssignedPlayerId()))
+    announced = false
+    logger.info("Match initialized for player " .. tostring(GetAssignedPlayerId()))
 end
 
 function Update()
+    if not announced then
+        ChatMessage("Module active for player " .. tostring(GetAssignedPlayerId()))
+        announced = true
+    end
+
     local fastKey = Settings.GetKeybind("Fast Speed Key", Key.Add)
     if IsKeyPressed(fastKey) then
         SetGameSpeedMultiplier(3.0)
@@ -88,7 +95,7 @@ return logger
 | `Settings.Get*` | Reads setting values with explicit fallback arguments. |
 | `GetAssignedPlayer()` | Uses the player assigned to this module instance. |
 | `GetAssignedPlayerId()` | Reads the controlled player id directly, including in `Load`. |
-| `ChatMessage()` | Uses the renamed chat API. |
+| `ChatMessage()` | Shows a game command used from `Update()`. |
 | `RenderObjectBoundsFilled()` | Draws an overlay on owned villagers. |
 
 ## Map API Add-On
@@ -119,7 +126,7 @@ function Render()
 end
 ```
 
-This add-on uses the newer `GetMapTile(Vector2)` overload and stays safe in fog-aware mode by checking `selected:IsVisible()` before reading other object methods.
+This add-on uses the `GetMapTile(Vector2)` overload and stays safe in fog-aware mode by checking `selected:IsVisible()` before reading other object methods.
 
 ## Folder Convention
 

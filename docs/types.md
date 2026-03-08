@@ -269,6 +269,6 @@ end
 - `ResourceTracker:Update()` exists in C++ but is not exposed to Lua.
 - `ConstructionPlacement:TryBuildStructureAtTown()` and `ConstructionPlacement:RenderDebug()` exist in C++ but are not exposed to Lua.
 - Cached `Object` references can become invalid for method calls when the object becomes invisible in fog-aware mode. Re-fetch objects in the current frame or enable **Modules See Everything** if you need persistent access.
-- `Object:IsVisible()` is the safe visibility check for cached objects and now uses map-tile visibility instead of the old object visibility field.
-- `MapTile:GetPos()` replaced the older `GetPosX()` / `GetPosY()` pair.
+- `Object:IsVisible()` is the safe visibility check for cached objects and uses map-tile visibility.
+- Use `MapTile:GetPos()` instead of `GetPosX()` / `GetPosY()`.
 - `MapTile:GetObjectCount()` and `MapTile:GetObjects()` only expose data for tiles that are currently `TileVisibility.VISIBLE`.

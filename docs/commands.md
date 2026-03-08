@@ -4,7 +4,7 @@ description: Reference for AoE2Control game commands in Lua, including training 
 
 # Game API — Commands
 
-Commands perform actions in the game. Call them from `Init`, `Update`, or `Render` while a match is running.
+Commands perform actions in the game. Use game commands from `Update()` while a match is running.
 
 !!! warning "Game must be running"
     Calling game API before the game starts logs an error.
@@ -15,8 +15,10 @@ Commands perform actions in the game. Call them from `Init`, `Update`, or `Rende
 ## Command Rules
 
 - Most unit and building commands silently filter the input list down to objects owned by the assigned player.
-- Global commands such as `Log`, `SetGameSpeedMultiplier`, `SetCameraPosition`, and `ChatMessage` are not ownership-filtered.
-- `ChatLocal` was renamed to `ChatMessage`.
+- `SetGameSpeedMultiplier`, `SetCameraPosition`, and `ChatMessage` are game commands, but they are not ownership-filtered.
+- Calling a game command outside `Update()` logs a warning once per module load.
+- If **Tournament Mode** is enabled, game commands outside `Update()` are blocked.
+- `Log()` is not a game command and can be used from any callback.
 
 ## Reference
 

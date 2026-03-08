@@ -1502,7 +1502,7 @@
 
 
 <h1 id="game-api-commands">Game API — Commands</h1>
-<p>Commands perform actions in the game. Call them from <code>Init</code>, <code>Update</code>, or <code>Render</code> while a match is running.</p>
+<p>Commands perform actions in the game. Use game commands from <code>Update()</code> while a match is running.</p>
 <div class="admonition warning">
 <p class="admonition-title">Game must be running</p>
 <p>Calling game API before the game starts logs an error.</p>
@@ -1514,8 +1514,10 @@
 <h2 id="command-rules">Command Rules</h2>
 <ul>
 <li>Most unit and building commands silently filter the input list down to objects owned by the assigned player.</li>
-<li>Global commands such as <code>Log</code>, <code>SetGameSpeedMultiplier</code>, <code>SetCameraPosition</code>, and <code>ChatMessage</code> are not ownership-filtered.</li>
-<li><code>ChatLocal</code> was renamed to <code>ChatMessage</code>.</li>
+<li><code>SetGameSpeedMultiplier</code>, <code>SetCameraPosition</code>, and <code>ChatMessage</code> are game commands, but they are not ownership-filtered.</li>
+<li>Calling a game command outside <code>Update()</code> logs a warning once per module load.</li>
+<li>If <strong>Tournament Mode</strong> is enabled, game commands outside <code>Update()</code> are blocked.</li>
+<li><code>Log()</code> is not a game command and can be used from any callback.</li>
 </ul>
 <h2 id="reference">Reference</h2>
 <table>

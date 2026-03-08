@@ -188,9 +188,9 @@ Used by `MapTile:GetTileVisibility()`.
 
 ### ObjectAttribute
 
-Used by `Object:GetAttribute()` and `GetObjectAttribute()`.
+Used by `Object:GetAttribute()` and `GetObjectTypeAttribute()`.
 
-This enum was renamed from `UnitAttribute` to `ObjectAttribute` and now mirrors the full game reference list exposed by the binding.
+Use `ObjectAttribute` for object instance attributes and static object-type attribute lookups.
 
 Common examples:
 
@@ -259,7 +259,7 @@ GetFact(FactId.FOOD_AMOUNT, 0)
 
 See the [community Parameter Details (ObjectData)](https://airef.github.io/parameters/parameters-details.html#ObjectData) for the full list of object data field IDs.
 
-The enum entries no longer include the old `OBJECT_DATA_` prefix. For example, use `ObjectData.POINT_X` instead of `ObjectData.OBJECT_DATA_POINT_X`.
+ObjectData entries use names without the `OBJECT_DATA_` prefix. For example, use `ObjectData.POINT_X` instead of `ObjectData.OBJECT_DATA_POINT_X`.
 
 ## Strategic Enums
 

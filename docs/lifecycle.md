@@ -20,7 +20,7 @@ Each configured module instance can implement up to six callbacks. All of them a
 
 **When:** When the game becomes ready, the world changes, the module is reloaded, or the instance becomes active again.
 
-**Use for:** One-time per-match setup such as `IPC.StartServer()` or `ChatMessage()`.
+**Use for:** One-time per-match setup such as `IPC.StartServer()`, cache resets, and other read-only initialization.
 
 ### Update
 
@@ -32,7 +32,7 @@ Each configured module instance can implement up to six callbacks. All of them a
 
 **When:** Every rendered frame while the match is running.
 
-**Use for:** Overlays and debug drawing.
+**Use for:** Overlays, debug drawing, and read-only inspection.
 
 ### End
 
@@ -63,4 +63,5 @@ flowchart LR
 
 - `Load` may run again when an instance is reloaded.
 - `Init` runs per module instance, not globally.
+- `Update` is the callback intended for game commands. Calling commands from other callbacks logs a warning, and **Tournament Mode** blocks them.
 - `Unload` can run without `End` if the user disables AI, removes the instance, switches modules, or ejects CONTROL.

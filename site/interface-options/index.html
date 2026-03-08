@@ -728,6 +728,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#debug-menu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Debug Menu
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#misc-settings" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1535,7 +1546,7 @@
 
 
 <h1 id="interface-options">Interface Options</h1>
-<p>The CONTROL overlay now groups module configuration by player. Each <code>Player 1</code> to <code>Player 8</code> section exposes that player's module slot and runtime status.</p>
+<p>The CONTROL overlay groups module configuration by player. Each <code>Player 1</code> to <code>Player 8</code> section exposes that player's module slot and runtime status.</p>
 <p><img alt="CONTROL Interface — AI Settings" src="../images/ControlUI.png" /></p>
 <h2 id="module-discovery">Module Discovery</h2>
 <p>CONTROL scans <code>modules/</code> recursively for:</p>
@@ -1570,6 +1581,11 @@
 <td>Allows only one successful command per update tick.</td>
 </tr>
 <tr>
+<td><strong>Tournament Mode</strong></td>
+<td>Off</td>
+<td>Blocks Lua game commands outside <code>Update()</code>. Read-only APIs such as facts remain available.</td>
+</tr>
+<tr>
 <td><strong>Auto Move Camera</strong></td>
 <td>On</td>
 <td>Auto-centers the camera on executed command targets.</td>
@@ -1592,6 +1608,7 @@
 </tbody>
 </table>
 <p>The update interval is clamped to <code>0.1</code> seconds in the UI and <code>0.01</code> seconds if edited directly in <code>settings.ini</code>.</p>
+<p>When <strong>Tournament Mode</strong> is off, using a game command outside <code>Update()</code> logs a warning once per module load. When it is on, the command is rejected.</p>
 <h2 id="player-module-slots">Player Module Slots</h2>
 <p>Open a player section to configure that player's module slot. If no module is assigned yet, the section shows <code>No modules assigned.</code>.</p>
 <table>
@@ -1636,6 +1653,30 @@
 <li>Module-created settings panels appear per configured settings group while AI is enabled.</li>
 <li><strong>Open Folder</strong> opens the modules directory.</li>
 </ul>
+<h2 id="debug-menu">Debug Menu</h2>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Module Telemetry</strong></td>
+<td>Off</td>
+<td>Shows sampled <code>Update()</code> and <code>Render()</code> cost for active modules in the Debug menu.</td>
+</tr>
+</tbody>
+</table>
+<p>When <strong>Module Telemetry</strong> is enabled, the Debug menu shows:</p>
+<ul>
+<li>Active modules only.</li>
+<li>A sampled <strong>Baseline Frame</strong> value, which represents host frame cost after subtracting sampled module time.</li>
+<li>Per-module <code>Upd</code> and <code>Rnd</code> entries with both sampled milliseconds and relative <code>x base</code> values.</li>
+<li>Samples spread across multiple frames each second rather than every frame.</li>
+</ul>
 <h2 id="misc-settings">Misc Settings</h2>
 <table>
 <thead>
@@ -1666,7 +1707,7 @@
 <h2 id="perspective-warning">Perspective Warning</h2>
 <p><code>Player Perspective</code> changes the rendered fog view. <code>Modules See Everything</code> only changes what Lua can read. When <strong>Modules See Everything</strong> is off, map tiles and objects follow the assigned player's fog-of-war.</p>
 <h2 id="log-window">Log Window</h2>
-<p>Use <code>Log("message")</code> from Lua to write script messages to the log window. Runtime Lua errors are also displayed and logged through the interface now.</p>
+<p>Use <code>Log("message")</code> from Lua to write script messages to the log window. Runtime Lua errors are also displayed and logged through the interface.</p>
 
 
 

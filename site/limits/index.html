@@ -1525,6 +1525,7 @@
 <ul>
 <li>Large projects may need optimization. The Lua interpreter handles scripts of varying size; scripters are responsible for performance.</li>
 <li>Avoid heavy work in <code>Render()</code> — it runs every frame.</li>
+<li>The Debug menu's <strong>Module Telemetry</strong> view samples <code>Update()</code> and <code>Render()</code> cost against a sampled baseline frame cost.</li>
 </ul>
 <h2 id="sandbox">Sandbox</h2>
 <p>The following Lua functions are <strong>removed</strong> from the environment:</p>
@@ -1541,6 +1542,7 @@
 <p>Lua error: Game API function called before the game started. Move this logic to Init() or Update().</p>
 </blockquote>
 <p>Move game logic to <code>Init</code>, <code>Update</code>, or <code>Render</code>.</p>
+<p>Game commands belong in <code>Update()</code>. Using them from other callbacks logs a warning, and <strong>Tournament Mode</strong> blocks them.</p>
 
 
 

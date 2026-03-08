@@ -1573,13 +1573,13 @@
 <p><strong>Do not:</strong> Call in-game state APIs here. <code>GetAssignedPlayer()</code> still requires a running match.</p>
 <h3 id="init">Init</h3>
 <p><strong>When:</strong> When the game becomes ready, the world changes, the module is reloaded, or the instance becomes active again.</p>
-<p><strong>Use for:</strong> One-time per-match setup such as <code>IPC.StartServer()</code> or <code>ChatMessage()</code>.</p>
+<p><strong>Use for:</strong> One-time per-match setup such as <code>IPC.StartServer()</code>, cache resets, and other read-only initialization.</p>
 <h3 id="update">Update</h3>
 <p><strong>When:</strong> At the configured update interval while the match is running.</p>
 <p><strong>Use for:</strong> Decision-making, commands, and state updates.</p>
 <h3 id="render">Render</h3>
 <p><strong>When:</strong> Every rendered frame while the match is running.</p>
-<p><strong>Use for:</strong> Overlays and debug drawing.</p>
+<p><strong>Use for:</strong> Overlays, debug drawing, and read-only inspection.</p>
 <h3 id="end">End</h3>
 <p><strong>When:</strong> Once after the match ends.</p>
 <p><strong>Parameters:</strong> <code>hasWon</code> tells you whether the assigned player won.</p>
@@ -1599,6 +1599,7 @@
 <ul>
 <li><code>Load</code> may run again when an instance is reloaded.</li>
 <li><code>Init</code> runs per module instance, not globally.</li>
+<li><code>Update</code> is the callback intended for game commands. Calling commands from other callbacks logs a warning, and <strong>Tournament Mode</strong> blocks them.</li>
 <li><code>Unload</code> can run without <code>End</code> if the user disables AI, removes the instance, switches modules, or ejects CONTROL.</li>
 </ul>
 

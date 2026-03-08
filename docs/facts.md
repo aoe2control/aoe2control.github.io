@@ -1,6 +1,6 @@
 # Game API — Facts
 
-Most facts read game state and should be called from `Init`, `Update`, or `Render` while a match is running.
+Most facts read game state and should be called from `Init`, `Update`, or `Render` while a match is running. **Tournament Mode** applies to game commands, not these read-only APIs.
 
 !!! warning "Game must be running"
     Calling game API before the game starts logs an error, except for `GetAssignedPlayerId()`, which is also available in `Load`.
@@ -35,7 +35,7 @@ Most facts read game state and should be called from `Init`, `Update`, or `Rende
 | `GetObjectsInArea` | `(pos1, pos2)` | `Object[]` | Returns alive objects whose current tile lies inside the rectangular area between two `Vector2` positions. |
 | `GetObjectsPtr` | `()` | `number, number` | Returns `(ptr, count)` for an engine-owned packed object snapshot buffer. Intended for IPC / RPM readers. |
 | `GetObjectTypeData` | `(objectTypeId, objectData)` | `number` | Returns static object-type data for a `UnitObjectType` and `ObjectData` field. |
-| `GetObjectAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number` | Returns a static object-type attribute value for a `UnitObjectType`. |
+| `GetObjectTypeAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number` | Returns a static object-type attribute value for a `UnitObjectType`. |
 | `IsEnemyPlayer` | `(player)` | `boolean` | Returns whether the given player is an enemy of the assigned player. |
 | `GetObjectById` | `(id)` | `Object` | Returns a world object by id. |
 | `GetVictoryCondition` | `()` | `VictoryCondition` | Returns the current victory condition. |
@@ -91,7 +91,7 @@ end
 
 ```lua
 function Init()
-    local villagerHp = GetObjectAttribute(UnitObjectType.VILLAGER_MALE, ObjectAttribute.HITPOINTS, 0)
+    local villagerHp = GetObjectTypeAttribute(UnitObjectType.VILLAGER_MALE, ObjectAttribute.HITPOINTS, 0)
     local villagerTrainTime = GetObjectTypeData(UnitObjectType.VILLAGER_MALE, ObjectData.CREATION_TIME)
 
     Log("Villager HP=" .. tostring(villagerHp) .. ", train time=" .. tostring(villagerTrainTime))
@@ -100,9 +100,9 @@ end
 
 ## Notes
 
-- `GetLocalPlayer` was renamed to `GetAssignedPlayer`.
+- Use `GetAssignedPlayer()`, not `GetLocalPlayer()`.
 - `GetAssignedPlayerId()` is intentionally available in `Load(playerId)` before the match is running.
-- `GetObjectsByType`, `GetObjectsByTypes`, and `GetObjectsByClass` now scan world objects instead of only the assigned player's objects.
+- `GetObjectsByType`, `GetObjectsByTypes`, and `GetObjectsByClass` scan alive world objects, not only the assigned player's objects.
 - `GetMapTile(position)` floors `position.x` and `position.y` to integer tile coordinates before resolving the tile.
 - `GetObjectsInArea(pos1, pos2)` only returns alive objects and follows the same fog-aware visibility checks as the rest of the object API.
 - When **Modules See Everything** is disabled, object retrieval functions filter by the assigned player's current fog-of-war. This includes `GetObjectById()`.
@@ -110,4 +110,4 @@ end
 - `GetMapTilesPtr()` and `GetObjectsPtr()` return engine-owned buffers rebuilt on demand. The second return value is an element count, not a byte count.
 - `GetObjectsPtr()` is dead-inclusive. Read the alive state from the snapshot flags instead of assuming every entry is alive.
 - The snapshot helpers are primarily intended for IPC / external ML readers that want to transfer compact RPM-friendly buffers. See the IPC page for the exact packed C++ layouts.
-- `CanAfford(unitId, isBuilding)` accepts both parameters in Lua, but the current binding does not distinguish the second flag internally yet.
+- `CanAfford(unitId, isBuilding)` accepts both parameters in Lua, but the binding does not distinguish the second flag internally.
