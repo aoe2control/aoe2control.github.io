@@ -1603,7 +1603,7 @@
 <tr>
 <td><strong>Modules See Everything</strong></td>
 <td>Off</td>
-<td>If enabled, Lua modules ignore fog-of-war when reading map tiles and objects.</td>
+<td>If enabled, Lua modules ignore fog-of-war and cross-player data restrictions when reading map tiles, objects, and player state.</td>
 </tr>
 </tbody>
 </table>
@@ -1649,6 +1649,7 @@
 <ul>
 <li>The UI is grouped by player, not by a flat <code>Add Module</code> list.</li>
 <li>Each player section represents one module slot for that player id.</li>
+<li>Assigning a module to a bot player's slot suppresses that player's native decision AI while the module remains assigned.</li>
 <li>Module runtime warnings and Lua errors are shown directly inside the player section.</li>
 <li>Module-created settings panels appear per configured settings group while AI is enabled.</li>
 <li><strong>Open Folder</strong> opens the modules directory.</li>
@@ -1705,7 +1706,7 @@
 </tbody>
 </table>
 <h2 id="perspective-warning">Perspective Warning</h2>
-<p><code>Player Perspective</code> changes the rendered fog view. <code>Modules See Everything</code> only changes what Lua can read. When <strong>Modules See Everything</strong> is off, map tiles and objects follow the assigned player's fog-of-war.</p>
+<p><code>Player Perspective</code> changes the rendered fog view. <code>Modules See Everything</code> changes what Lua can read. When <strong>Modules See Everything</strong> is off, map tiles, objects, and restricted player-state methods follow the assigned player's visibility and ownership limits.</p>
 <h2 id="log-window">Log Window</h2>
 <p>Use <code>Log("message")</code> from Lua to write script messages to the log window. Runtime Lua errors are also displayed and logged through the interface.</p>
 

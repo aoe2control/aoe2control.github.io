@@ -119,6 +119,8 @@ Returned by `GetObjectsByType`, `GetObjectsByTypes`, `GetObjectsByClass`, and `G
 | `GetMaxHitpoints()` | `number` | Returns max hitpoints. |
 | `GetPosition()` | `Vector3` | Returns the world position. |
 | `GetCurrentMapTile()` | `MapTile` | Returns the map tile the object is currently standing on. |
+| `GetPath()` | `Vector3[]` | Returns the object's current native path waypoints. |
+| `CalculatePath(targetPos)` | `Vector3[]` | Calculates a native path from the object's current position to a `Vector2` target using its collision radius when available. |
 
 ### MapTile
 
@@ -130,7 +132,7 @@ Returned by `GetMapTile`, `GetAllMapTiles`, and `Object:GetCurrentMapTile()`.
 | `GetTerrain()` | `Terrain` | Returns the tile terrain id. Returns `Terrain.UNKNOWN` for unexplored tiles. |
 | `GetElevation()` | `number` | Returns the tile elevation. Returns `0` for unexplored tiles. |
 | `GetTileVisibility()` | `TileVisibility` | Returns the assigned player's visibility state for the tile. |
-| `IsWalkable()` | `boolean` | Returns whether the tile is walkable. Unexplored tiles return `false`. |
+| `IsWalkable()` | `boolean` | Returns whether the tile is walkable. The result is collision-aware, and unexplored tiles return `false`. |
 | `IsNavigatable()` | `boolean` | Returns whether the tile is navigatable for pathing. Unexplored tiles return `false`. |
 | `GetObjectCount()` | `number` | Returns the count of currently visible objects on the tile. Only populated for visible tiles. |
 | `GetObjects()` | `Object[]` | Returns currently visible objects on the tile. Returns an empty list unless the tile is visible. |
@@ -157,7 +159,8 @@ Returned by `GetAssignedPlayer`, `GetPlayerById`, and `GetVictoryPlayer`.
 | `GetColor()` | `Color` | Returns the player's UI color. |
 | `GetAttribute(attribute)` | `number` | Returns a `PlayerAttribute` value. |
 | `GetUnitTypeCount(id)` | `number` | Returns the count for a unit type id. |
-| `GetFact(factId, parameter)` | `number` | Returns a fact value for this player. |
+| `GetFact(fact, parameter)` | `number` | Returns a fact value for this player. |
+| `IsObjectTypeAvailable(unitObjectType)` | `boolean` | Returns whether this player currently has access to a unit or building type. |
 | `CanAfford(id, isBuilding)` | `boolean` | Returns whether this player can afford an item. |
 | `GetResearchState(technology)` | `ResearchState` | Returns the research state of a technology. |
 | `CanAffordResearch(technology)` | `boolean` | Returns whether this player can pay for a technology. |
@@ -168,6 +171,11 @@ Returned by `GetAssignedPlayer`, `GetPlayerById`, and `GetVictoryPlayer`.
 | `GetObjectsByClass(unitClass)` | `Object[]` | Returns owned objects in a class. |
 | `GetObjectsByClassDeadInclusive(unitClass)` | `Object[]` | Returns owned objects in a class, including dead objects. |
 | `GetTownCenters()` | `Object[]` | Returns owned town centers. |
+
+Player-state access follows the same visibility restrictions as the rest of the API:
+
+- With **Modules See Everything** off, resource, fact, tech, and object-availability methods only expose the assigned player's data.
+- Reading another player's object lists still depends on object visibility. Hidden objects are filtered out.
 
 ## Visibility Example
 
@@ -271,4 +279,5 @@ end
 - Cached `Object` references can become invalid for method calls when the object becomes invisible in fog-aware mode. Re-fetch objects in the current frame or enable **Modules See Everything** if you need persistent access.
 - `Object:IsVisible()` is the safe visibility check for cached objects and uses map-tile visibility.
 - Use `MapTile:GetPos()` instead of `GetPosX()` / `GetPosY()`.
+- `MapTile:IsWalkable()` reads the collision grid, so moving units and other blockers can affect the result.
 - `MapTile:GetObjectCount()` and `MapTile:GetObjects()` only expose data for tiles that are currently `TileVisibility.VISIBLE`.

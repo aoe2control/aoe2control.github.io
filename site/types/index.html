@@ -2017,6 +2017,16 @@
 <td><code>MapTile</code></td>
 <td>Returns the map tile the object is currently standing on.</td>
 </tr>
+<tr>
+<td><code>GetPath()</code></td>
+<td><code>Vector3[]</code></td>
+<td>Returns the object's current native path waypoints.</td>
+</tr>
+<tr>
+<td><code>CalculatePath(targetPos)</code></td>
+<td><code>Vector3[]</code></td>
+<td>Calculates a native path from the object's current position to a <code>Vector2</code> target using its collision radius when available.</td>
+</tr>
 </tbody>
 </table>
 <h3 id="maptile">MapTile</h3>
@@ -2053,7 +2063,7 @@
 <tr>
 <td><code>IsWalkable()</code></td>
 <td><code>boolean</code></td>
-<td>Returns whether the tile is walkable. Unexplored tiles return <code>false</code>.</td>
+<td>Returns whether the tile is walkable. The result is collision-aware, and unexplored tiles return <code>false</code>.</td>
 </tr>
 <tr>
 <td><code>IsNavigatable()</code></td>
@@ -2164,9 +2174,14 @@
 <td>Returns the count for a unit type id.</td>
 </tr>
 <tr>
-<td><code>GetFact(factId, parameter)</code></td>
+<td><code>GetFact(fact, parameter)</code></td>
 <td><code>number</code></td>
 <td>Returns a fact value for this player.</td>
+</tr>
+<tr>
+<td><code>IsObjectTypeAvailable(unitObjectType)</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether this player currently has access to a unit or building type.</td>
 </tr>
 <tr>
 <td><code>CanAfford(id, isBuilding)</code></td>
@@ -2220,6 +2235,11 @@
 </tr>
 </tbody>
 </table>
+<p>Player-state access follows the same visibility restrictions as the rest of the API:</p>
+<ul>
+<li>With <strong>Modules See Everything</strong> off, resource, fact, tech, and object-availability methods only expose the assigned player's data.</li>
+<li>Reading another player's object lists still depends on object visibility. Hidden objects are filtered out.</li>
+</ul>
 <h2 id="visibility-example">Visibility Example</h2>
 <div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Render</span><span class="p">()</span>
 <span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">player</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetAssignedPlayer</span><span class="p">()</span>
@@ -2443,8 +2463,9 @@
 <li><code>ResourceTracker:Update()</code> exists in C++ but is not exposed to Lua.</li>
 <li><code>ConstructionPlacement:TryBuildStructureAtTown()</code> and <code>ConstructionPlacement:RenderDebug()</code> exist in C++ but are not exposed to Lua.</li>
 <li>Cached <code>Object</code> references can become invalid for method calls when the object becomes invisible in fog-aware mode. Re-fetch objects in the current frame or enable <strong>Modules See Everything</strong> if you need persistent access.</li>
-<li><code>Object:IsVisible()</code> is the safe visibility check for cached objects and now uses map-tile visibility instead of the old object visibility field.</li>
-<li><code>MapTile:GetPos()</code> replaced the older <code>GetPosX()</code> / <code>GetPosY()</code> pair.</li>
+<li><code>Object:IsVisible()</code> is the safe visibility check for cached objects and uses map-tile visibility.</li>
+<li>Use <code>MapTile:GetPos()</code> instead of <code>GetPosX()</code> / <code>GetPosY()</code>.</li>
+<li><code>MapTile:IsWalkable()</code> reads the collision grid, so moving units and other blockers can affect the result.</li>
 <li><code>MapTile:GetObjectCount()</code> and <code>MapTile:GetObjects()</code> only expose data for tiles that are currently <code>TileVisibility.VISIBLE</code>.</li>
 </ul>
 

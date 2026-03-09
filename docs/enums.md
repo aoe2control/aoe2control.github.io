@@ -234,9 +234,9 @@ See the [community Technologies Table](https://airef.github.io/tables/techs.html
 | NO_ATTACK | 2 |
 | STAND_GROUND | 3 |
 
-### FactId
+### Fact
 
-Fact IDs for `GetFact`. Examples:
+Fact ids for `GetFact`. Examples:
 
 | Value | Description |
 |-------|-------------|
@@ -251,8 +251,8 @@ Fact IDs for `GetFact`. Examples:
 | ... | (see game data for full list) |
 
 ```lua
-GetFact(FactId.POPULATION, 0)
-GetFact(FactId.FOOD_AMOUNT, 0)
+GetFact(Fact.POPULATION, 0)
+GetFact(Fact.FOOD_AMOUNT, 0)
 ```
 
 ### ObjectData

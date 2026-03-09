@@ -1,6 +1,6 @@
 # Render API Implementation
 
-This page shows small, current examples of the render helpers in practice.
+This page shows small examples of the render helpers in practice.
 
 ## Screen-Space HUD
 
