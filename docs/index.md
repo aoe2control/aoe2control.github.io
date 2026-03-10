@@ -8,6 +8,8 @@ description: "AoE2Control is a Lua scripting engine for Age of Empires II: Defin
 
 **AoE2Control** is a Lua scripting engine and documentation hub for Age of Empires II: Definitive Edition. It reads live game state and sends commands directly without pixel scanning or mouse/keyboard simulation, making it suitable for automation, overlays, bots, and external AI agents.
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/YhyglFFNfdc?si=Mc6_CORczJLKe36J" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 [![Join Discord](https://img.shields.io/badge/Discord-Join%20Community-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/DENDVuWq5t)
 
 [Download Latest Release](https://github.com/aoe2control/AoE2Control/releases)
