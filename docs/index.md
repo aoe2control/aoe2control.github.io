@@ -25,8 +25,8 @@ AoE2Control talks directly to the game, allowing developers to:
 
 | Feature | Description |
 |---------|-------------|
-| **CONTROL Launcher** | Attaches the engine to the game |
-| **Extensive API** | Commands, facts, render functions, and strategic components |
+| **AoE2Control - Launcher** | Attaches the engine to the game |
+| **Extensive API** | 100+ Commands, facts, render functions, and strategic components |
 | **Per-Player Modules** | Configure one module slot for each player and run different modules in the same session |
 | **Custom Rendering** | Draw shapes and text in screen, world, or minimap space |
 | **Menu Settings** | Add checkboxes, sliders, dropdowns, keybinds, and color pickers |
@@ -34,6 +34,7 @@ AoE2Control talks directly to the game, allowing developers to:
 | **IPC for ML** | Named pipes + JSON with module routing for external agents |
 | **Encrypted Modules** | Precompiled `.module` files for code protection |
 | **VS Code Plugin** | [Available on Marketplace](https://marketplace.visualstudio.com/items?itemName=BigJohn.aoe2-control-lua) — IntelliSense, snippets, and API definitions |
+| **AI Reference Script** | [Copy or Download here](ai-agent-reference.md) — Provides formatted information about CONTROL, ready to be pasted into a Coding Agent Prompt |
 
 ## Who This Documentation Is For
 
@@ -43,7 +44,7 @@ AoE2Control talks directly to the game, allowing developers to:
 
 ## Prerequisites
 
-- **Age of Empires II: Definitive Edition** (Xbox version not tested)
+- **Age of Empires II: Definitive Edition**
 - Basic Lua familiarity is helpful but not required
 - Windows (64-bit)
 

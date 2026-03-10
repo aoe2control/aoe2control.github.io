@@ -119,10 +119,9 @@ function Render()
 
     local tilePos = tile:GetPos()
     local text = "Tile " .. tostring(tilePos.x) .. "," .. tostring(tilePos.y)
-        .. " vis=" .. tostring(tile:GetTileVisibility())
         .. " terrain=" .. tostring(tile:GetTerrain())
-        .. " nav=" .. tostring(tile:IsNavigatable())
-    RenderWorldText(text, selected:GetPosition(), 14.0, Color(255, 255, 255), true, true)
+        .. " moving=" .. tostring(selected:IsMoving())
+    RenderWorldText(text, selected:GetPosition(), 24.0, Color(0, 255, 0), true, true)
 end
 ```
 
