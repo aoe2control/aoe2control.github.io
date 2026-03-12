@@ -65,6 +65,8 @@ end
 
 All callbacks are **optional**.
 
+`End(hasWon)` also runs when a running match is manually exited. In that case, `hasWon` is `false`.
+
 ## Attach The Module
 
 1. Open the CONTROL overlay.

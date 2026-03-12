@@ -1584,6 +1584,30 @@
 <td>Returns the current match time in seconds.</td>
 </tr>
 <tr>
+<td><code>IsMenuOpen</code></td>
+<td><code>()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether the game UI is currently in a menu state.</td>
+</tr>
+<tr>
+<td><code>GetAllChatMessages</code></td>
+<td><code>()</code></td>
+<td><code>string[]</code></td>
+<td>Returns the current chat buffer as plain message strings.</td>
+</tr>
+<tr>
+<td><code>GetNewChatMessages</code></td>
+<td><code>()</code></td>
+<td><code>string[]</code></td>
+<td>Returns chat messages that became visible since this module instance last called the function.</td>
+</tr>
+<tr>
+<td><code>GetLastChatMessage</code></td>
+<td><code>()</code></td>
+<td><code>string \| nil</code></td>
+<td>Returns the newest chat message, or <code>nil</code> if the chat buffer is empty.</td>
+</tr>
+<tr>
 <td><code>GetAssignedPlayer</code></td>
 <td><code>()</code></td>
 <td><code>Player</code></td>
@@ -1751,6 +1775,16 @@
 <span class="w">    </span><span class="nf">Log</span><span class="p">(</span><span class="s2">&quot;Path waypoint count: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="o">#</span><span class="nv">path</span><span class="p">))</span>
 <span class="kr">end</span>
 </code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Update</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nf">IsMenuOpen</span><span class="p">()</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">message</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nf">GetNewChatMessages</span><span class="p">())</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">        </span><span class="nf">Log</span><span class="p">(</span><span class="s2">&quot;New chat: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">message</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+</code></pre></div>
 <div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Init</span><span class="p">()</span>
 <span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">villagerHp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetObjectTypeAttribute</span><span class="p">(</span><span class="nv">UnitObjectType</span><span class="p">.</span><span class="py">VILLAGER_MALE</span><span class="p">,</span><span class="w"> </span><span class="nv">ObjectAttribute</span><span class="p">.</span><span class="py">HITPOINTS</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
 <span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">villagerTrainTime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetObjectTypeData</span><span class="p">(</span><span class="nv">UnitObjectType</span><span class="p">.</span><span class="py">VILLAGER_MALE</span><span class="p">,</span><span class="w"> </span><span class="nv">ObjectData</span><span class="p">.</span><span class="py">CREATION_TIME</span><span class="p">)</span>
@@ -1766,6 +1800,8 @@
 <li><code>GetMapTile(position)</code> floors <code>position.x</code> and <code>position.y</code> to integer tile coordinates before resolving the tile.</li>
 <li><code>CalculatePath()</code> uses the game's native pathfinding and returns an empty list when no path is available.</li>
 <li><code>GetObjectsInArea(pos1, pos2)</code> only returns alive objects and follows the same fog-aware visibility checks as the rest of the object API.</li>
+<li><code>GetAllChatMessages()</code> and <code>GetLastChatMessage()</code> read from the game's current chat buffer.</li>
+<li><code>GetNewChatMessages()</code> tracks unread chat state per module instance. On the first call after load or reload, it returns the currently visible buffer.</li>
 <li>When <strong>Modules See Everything</strong> is disabled, object retrieval functions filter by the assigned player's current fog-of-war. This includes <code>GetObjectById()</code>.</li>
 <li>When <strong>Modules See Everything</strong> is disabled, player-state access through <code>GetPlayerById()</code> is limited. Resource, fact, tech, and object-availability methods only expose the assigned player's data.</li>
 <li><code>GetAllMapTiles()</code> returns the full map grid, but <code>MapTile</code> methods only expose what the assigned player is currently allowed to know.</li>

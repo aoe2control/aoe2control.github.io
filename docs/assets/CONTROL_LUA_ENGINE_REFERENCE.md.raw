@@ -50,7 +50,7 @@ All callbacks are optional.
 | `Init()` | Match becomes ready, world changes, or instance reloads | Per-instance setup. |
 | `Update()` | Every configured update interval while a match is running | Main logic. |
 | `Render()` | Every frame while a match is running | Overlay rendering. |
-| `End(hasWon)` | Once when the match ends | `hasWon` refers to the assigned player. |
+| `End(hasWon)` | Once when the match ends, including manual match exit | `hasWon` refers to the assigned player. Manual exit reports `false`. |
 | `Unload()` | Instance unload, disable, replace, or engine eject | Cleanup that should run even without normal match end. |
 
 Read-only game API calls are valid during `Init`, `Update`, or `Render`. Game commands belong in `Update()`.
@@ -116,6 +116,10 @@ Rules:
 | `GetObjectsByTypes` | `(unitTypes)` | `Object[]` | Scan alive world objects by any listed type. |
 | `GetObjectsByClass` | `(unitClass)` | `Object[]` | Scan alive world objects by class. Not restricted to owned objects. |
 | `GetGameTime` | `()` | `number` | Match time in seconds. |
+| `IsMenuOpen` | `()` | `boolean` | Whether the game UI is currently in a menu state. |
+| `GetAllChatMessages` | `()` | `string[]` | Current chat buffer as plain message strings. |
+| `GetNewChatMessages` | `()` | `string[]` | Chat messages that became visible since this module instance last called the function. |
+| `GetLastChatMessage` | `()` | `string \| nil` | Newest chat message, or `nil` when the chat buffer is empty. |
 | `GetAssignedPlayer` | `()` | `Player` | Player currently assigned to this module instance. |
 | `GetAssignedPlayerId` | `()` | `number` | Assigned player id for this module instance. Available in `Load`. |
 | `GetPlayerById` | `(id)` | `Player` | Player by list index. Gaia is usually `0`. |
@@ -144,6 +148,8 @@ Notes:
 - `GetMapTile(position)` floors `position.x` and `position.y`.
 - `CalculatePath()` uses the game's native pathfinding and returns an empty list when no path is available.
 - `GetObjectsInArea(pos1, pos2)` only returns alive objects and still respects fog-aware visibility.
+- `GetAllChatMessages()` and `GetLastChatMessage()` read from the game's current chat buffer.
+- `GetNewChatMessages()` tracks unread chat state per module instance; the first call after load or reload returns the currently visible buffer.
 - Object retrieval respects the assigned player's fog-of-war when **Modules See Everything** is disabled. This includes `GetObjectById()`.
 - With **Modules See Everything** disabled, player-state methods on other `Player` objects return neutral values for resources, facts, tech state, and object availability.
 - `GetAllMapTiles()` returns the full grid, but each `MapTile` only exposes data allowed by the current fog state.
@@ -475,7 +481,7 @@ Not exposed to Lua:
 - `Tournament Mode` blocks game commands outside `Update()`
 - Assigning a module to a bot player's slot suppresses that player's native decision AI while the module remains assigned
 - The Debug menu's **Module Telemetry** view shows sampled `Update()` and `Render()` timing for active modules, plus a sampled baseline frame cost
-- `Spectator Mode` replaced the old `Reveal Map` misc option
+- `Spectator Mode` replaced the old `Reveal Map` misc option and keeps controls enabled while spectating
 - Runtime Lua errors are displayed and logged through the UI
 
 ---

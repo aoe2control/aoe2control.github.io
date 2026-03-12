@@ -69,7 +69,7 @@ function Render()
 end
 
 function End(hasWon)
-    logger.info(hasWon and "Assigned player won." or "Assigned player lost.")
+    logger.info(hasWon and "Assigned player won." or "Assigned player lost or the match was stopped.")
 end
 ```
 

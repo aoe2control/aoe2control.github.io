@@ -69,7 +69,7 @@ When **Module Telemetry** is enabled, the Debug menu shows:
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| **Spectator Mode** | Off | Enables the spectator-style reveal behavior that replaced the old `Reveal Map` option. |
+| **Spectator Mode** | Off | Enables the spectator-style reveal behavior that replaced the old `Reveal Map` option and keeps controls enabled while spectating. |
 | **Unlock Zoom** | Off | Removes the normal zoom limit. Release note: may cause rendering issues or crashes. |
 | **Chat Welcome Message** | On | Enables CONTROL's startup chat message behavior. |
 

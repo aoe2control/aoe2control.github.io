@@ -24,6 +24,10 @@ Most facts read game state and should be called from `Init`, `Update`, or `Rende
 | `GetObjectsByTypes` | `(unitTypes)` | `Object[]` | Returns alive world objects matching any type in the list. |
 | `GetObjectsByClass` | `(unitClass)` | `Object[]` | Returns alive world objects of a class, not just owned objects. |
 | `GetGameTime` | `()` | `number` | Returns the current match time in seconds. |
+| `IsMenuOpen` | `()` | `boolean` | Returns whether the game UI is currently in a menu state. |
+| `GetAllChatMessages` | `()` | `string[]` | Returns the current chat buffer as plain message strings. |
+| `GetNewChatMessages` | `()` | `string[]` | Returns chat messages that became visible since this module instance last called the function. |
+| `GetLastChatMessage` | `()` | `string \| nil` | Returns the newest chat message, or `nil` if the chat buffer is empty. |
 | `GetAssignedPlayer` | `()` | `Player` | Returns the player currently assigned to this module instance. |
 | `GetAssignedPlayerId` | `()` | `number` | Returns the player id currently assigned to this module instance. Available in `Load`. |
 | `GetPlayerById` | `(id)` | `Player` | Returns a player by index. Gaia is typically `0`, regular players are typically `1` to `8`. |
@@ -101,6 +105,18 @@ end
 ```
 
 ```lua
+function Update()
+    if IsMenuOpen() then
+        return
+    end
+
+    for _, message in ipairs(GetNewChatMessages()) do
+        Log("New chat: " .. message)
+    end
+end
+```
+
+```lua
 function Init()
     local villagerHp = GetObjectTypeAttribute(UnitObjectType.VILLAGER_MALE, ObjectAttribute.HITPOINTS, 0)
     local villagerTrainTime = GetObjectTypeData(UnitObjectType.VILLAGER_MALE, ObjectData.CREATION_TIME)
@@ -117,6 +133,8 @@ end
 - `GetMapTile(position)` floors `position.x` and `position.y` to integer tile coordinates before resolving the tile.
 - `CalculatePath()` uses the game's native pathfinding and returns an empty list when no path is available.
 - `GetObjectsInArea(pos1, pos2)` only returns alive objects and follows the same fog-aware visibility checks as the rest of the object API.
+- `GetAllChatMessages()` and `GetLastChatMessage()` read from the game's current chat buffer.
+- `GetNewChatMessages()` tracks unread chat state per module instance. On the first call after load or reload, it returns the currently visible buffer.
 - When **Modules See Everything** is disabled, object retrieval functions filter by the assigned player's current fog-of-war. This includes `GetObjectById()`.
 - When **Modules See Everything** is disabled, player-state access through `GetPlayerById()` is limited. Resource, fact, tech, and object-availability methods only expose the assigned player's data.
 - `GetAllMapTiles()` returns the full map grid, but `MapTile` methods only expose what the assigned player is currently allowed to know.

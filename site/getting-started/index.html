@@ -1518,7 +1518,7 @@
 <p>Download the latest packaged build from the <a href="https://github.com/aoe2control/AoE2Control/releases">GitHub Releases page</a>.</p>
 <ol>
 <li>Start Age of Empires II: Definitive Edition.</li>
-<li>Run the CONTROL launcher.</li>
+<li>Run the AoE2Control Launcher.</li>
 <li>Press <strong>START</strong> to attach CONTROL to the game.</li>
 </ol>
 <p>Once attached, the overlay appears and the config folder is created.</p>
@@ -1554,8 +1554,12 @@
 
 <span class="kr">function</span><span class="w"> </span><span class="nf">End</span><span class="p">(</span><span class="nv">hasWon</span><span class="p">)</span>
 <span class="kr">end</span>
+
+<span class="kr">function</span><span class="w"> </span><span class="nf">Unload</span><span class="p">()</span>
+<span class="kr">end</span>
 </code></pre></div>
-<p>All callbacks are optional.</p>
+<p>All callbacks are <strong>optional</strong>.</p>
+<p><code>End(hasWon)</code> also runs when a running match is manually exited. In that case, <code>hasWon</code> is <code>false</code>.</p>
 <h2 id="attach-the-module">Attach The Module</h2>
 <ol>
 <li>Open the CONTROL overlay.</li>
