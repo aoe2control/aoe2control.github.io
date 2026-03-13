@@ -1548,6 +1548,24 @@
 <td>Returns whether the assigned player can afford an item.</td>
 </tr>
 <tr>
+<td><code>GetTechCost</code></td>
+<td><code>(technology)</code></td>
+<td><code>{ resourceId = ResourceType, amount = number }[]</code></td>
+<td>Returns the assigned player's current technology cost entries.</td>
+</tr>
+<tr>
+<td><code>GetObjectCost</code></td>
+<td><code>(unitObjectType)</code></td>
+<td><code>{ resourceId = ResourceType, amount = number }[]</code></td>
+<td>Returns the assigned player's current object cost entries with multiplier <code>1.0</code>.</td>
+</tr>
+<tr>
+<td><code>GetObjectCost</code></td>
+<td><code>(unitObjectType, costMultiplier)</code></td>
+<td><code>{ resourceId = ResourceType, amount = number }[]</code></td>
+<td>Returns the assigned player's current object cost entries with the given multiplier applied.</td>
+</tr>
+<tr>
 <td><code>CanResearch</code></td>
 <td><code>(technology)</code></td>
 <td><code>boolean</code></td>
@@ -1775,6 +1793,14 @@
 <span class="w">    </span><span class="nf">Log</span><span class="p">(</span><span class="s2">&quot;Path waypoint count: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="o">#</span><span class="nv">path</span><span class="p">))</span>
 <span class="kr">end</span>
 </code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Init</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">entry</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nf">GetTechCost</span><span class="p">(</span><span class="nv">Technology</span><span class="p">.</span><span class="py">LOOM</span><span class="p">))</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">        </span><span class="kr">if</span><span class="w"> </span><span class="nv">entry</span><span class="p">.</span><span class="py">resourceId</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nv">ResourceType</span><span class="p">.</span><span class="py">GOLD</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">            </span><span class="nf">Log</span><span class="p">(</span><span class="s2">&quot;Loom gold cost: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nv">entry</span><span class="p">.</span><span class="py">amount</span><span class="p">))</span>
+<span class="w">        </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+</code></pre></div>
 <div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Update</span><span class="p">()</span>
 <span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nf">IsMenuOpen</span><span class="p">()</span><span class="w"> </span><span class="kr">then</span>
 <span class="w">        </span><span class="kr">return</span>
@@ -1800,6 +1826,7 @@
 <li><code>GetMapTile(position)</code> floors <code>position.x</code> and <code>position.y</code> to integer tile coordinates before resolving the tile.</li>
 <li><code>CalculatePath()</code> uses the game's native pathfinding and returns an empty list when no path is available.</li>
 <li><code>GetObjectsInArea(pos1, pos2)</code> only returns alive objects and follows the same fog-aware visibility checks as the rest of the object API.</li>
+<li><code>GetTechCost()</code> and <code>GetObjectCost()</code> return arrays of resource-cost entries. Use <code>entry.resourceId</code> and <code>entry.amount</code>; numeric indexes <code>entry[1]</code> and <code>entry[2]</code> mirror the same values.</li>
 <li><code>GetAllChatMessages()</code> and <code>GetLastChatMessage()</code> read from the game's current chat buffer.</li>
 <li><code>GetNewChatMessages()</code> tracks unread chat state per module instance. On the first call after load or reload, it returns the currently visible buffer.</li>
 <li>When <strong>Modules See Everything</strong> is disabled, object retrieval functions filter by the assigned player's current fog-of-war. This includes <code>GetObjectById()</code>.</li>

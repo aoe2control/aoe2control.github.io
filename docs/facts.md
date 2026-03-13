@@ -18,6 +18,9 @@ Most facts read game state and should be called from `Init`, `Update`, or `Rende
 | `GetUnitTypeCount` | `(unitId)` | `number` | Returns the assigned player's count for a unit type. |
 | `GetAttribute` | `(attribute)` | `number` | Returns a `PlayerAttribute` value for the assigned player. |
 | `CanAfford` | `(unitId, isBuilding)` | `boolean` | Returns whether the assigned player can afford an item. |
+| `GetTechCost` | `(technology)` | `{ resourceId = ResourceType, amount = number }[]` | Returns the assigned player's current technology cost entries. |
+| `GetObjectCost` | `(unitObjectType)` | `{ resourceId = ResourceType, amount = number }[]` | Returns the assigned player's current object cost entries with multiplier `1.0`. |
+| `GetObjectCost` | `(unitObjectType, costMultiplier)` | `{ resourceId = ResourceType, amount = number }[]` | Returns the assigned player's current object cost entries with the given multiplier applied. |
 | `CanResearch` | `(technology)` | `boolean` | Returns whether the assigned player can currently research a technology. |
 | `IsTechnologyResearched` | `(technology)` | `boolean` | Returns whether the assigned player has researched a technology. |
 | `GetObjectsByType` | `(unitType)` | `Object[]` | Returns matching alive world objects, not just owned objects. |
@@ -105,6 +108,16 @@ end
 ```
 
 ```lua
+function Init()
+    for _, entry in ipairs(GetTechCost(Technology.LOOM)) do
+        if entry.resourceId == ResourceType.GOLD then
+            Log("Loom gold cost: " .. tostring(entry.amount))
+        end
+    end
+end
+```
+
+```lua
 function Update()
     if IsMenuOpen() then
         return
@@ -133,6 +146,7 @@ end
 - `GetMapTile(position)` floors `position.x` and `position.y` to integer tile coordinates before resolving the tile.
 - `CalculatePath()` uses the game's native pathfinding and returns an empty list when no path is available.
 - `GetObjectsInArea(pos1, pos2)` only returns alive objects and follows the same fog-aware visibility checks as the rest of the object API.
+- `GetTechCost()` and `GetObjectCost()` return arrays of resource-cost entries. Use `entry.resourceId` and `entry.amount`; numeric indexes `entry[1]` and `entry[2]` mirror the same values.
 - `GetAllChatMessages()` and `GetLastChatMessage()` read from the game's current chat buffer.
 - `GetNewChatMessages()` tracks unread chat state per module instance. On the first call after load or reload, it returns the currently visible buffer.
 - When **Modules See Everything** is disabled, object retrieval functions filter by the assigned player's current fog-of-war. This includes `GetObjectById()`.

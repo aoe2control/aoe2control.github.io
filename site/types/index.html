@@ -2194,6 +2194,21 @@
 <td>Returns the research state of a technology.</td>
 </tr>
 <tr>
+<td><code>GetTechCost(technology)</code></td>
+<td><code>{ resourceId = ResourceType, amount = number }[]</code></td>
+<td>Returns this player's current technology cost entries.</td>
+</tr>
+<tr>
+<td><code>GetObjectCost(unitObjectType)</code></td>
+<td><code>{ resourceId = ResourceType, amount = number }[]</code></td>
+<td>Returns this player's current object cost entries with multiplier <code>1.0</code>.</td>
+</tr>
+<tr>
+<td><code>GetObjectCost(unitObjectType, costMultiplier)</code></td>
+<td><code>{ resourceId = ResourceType, amount = number }[]</code></td>
+<td>Returns this player's current object cost entries with the given multiplier applied.</td>
+</tr>
+<tr>
 <td><code>CanAffordResearch(technology)</code></td>
 <td><code>boolean</code></td>
 <td>Returns whether this player can pay for a technology.</td>
@@ -2239,6 +2254,7 @@
 <ul>
 <li>With <strong>Modules See Everything</strong> off, resource, fact, tech, and object-availability methods only expose the assigned player's data.</li>
 <li>Reading another player's object lists still depends on object visibility. Hidden objects are filtered out.</li>
+<li>Cost lookup methods return resource-cost entry tables with <code>resourceId</code> and <code>amount</code> fields.</li>
 </ul>
 <h2 id="visibility-example">Visibility Example</h2>
 <div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Render</span><span class="p">()</span>

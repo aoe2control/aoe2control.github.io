@@ -33,6 +33,18 @@ CONTROL exposes game and engine enums as Lua tables. Use them as `EnumName.VALUE
 | RESEARCHING | 2 |
 | RESEARCHED | 3 |
 
+### ResourceType
+
+Used by `GetTechCost()`, `GetObjectCost()`, `Player:GetTechCost()`, and `Player:GetObjectCost()`.
+
+| Value | Description |
+|-------|-------------|
+| FOOD | 0 |
+| WOOD | 1 |
+| STONE | 2 |
+| GOLD | 3 |
+| POPULATION | 4 |
+
 ### PlayerAttribute
 
 | Value | Description |

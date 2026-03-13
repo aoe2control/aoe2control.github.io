@@ -163,6 +163,9 @@ Returned by `GetAssignedPlayer`, `GetPlayerById`, and `GetVictoryPlayer`.
 | `IsObjectTypeAvailable(unitObjectType)` | `boolean` | Returns whether this player currently has access to a unit or building type. |
 | `CanAfford(id, isBuilding)` | `boolean` | Returns whether this player can afford an item. |
 | `GetResearchState(technology)` | `ResearchState` | Returns the research state of a technology. |
+| `GetTechCost(technology)` | `{ resourceId = ResourceType, amount = number }[]` | Returns this player's current technology cost entries. |
+| `GetObjectCost(unitObjectType)` | `{ resourceId = ResourceType, amount = number }[]` | Returns this player's current object cost entries with multiplier `1.0`. |
+| `GetObjectCost(unitObjectType, costMultiplier)` | `{ resourceId = ResourceType, amount = number }[]` | Returns this player's current object cost entries with the given multiplier applied. |
 | `CanAffordResearch(technology)` | `boolean` | Returns whether this player can pay for a technology. |
 | `CanResearch(technology)` | `boolean` | Returns whether this player can currently research a technology. |
 | `IsTechnologyResearched(technology)` | `boolean` | Returns whether this player has researched a technology. |
@@ -176,6 +179,7 @@ Player-state access follows the same visibility restrictions as the rest of the 
 
 - With **Modules See Everything** off, resource, fact, tech, and object-availability methods only expose the assigned player's data.
 - Reading another player's object lists still depends on object visibility. Hidden objects are filtered out.
+- Cost lookup methods return resource-cost entry tables with `resourceId` and `amount` fields.
 
 ## Visibility Example
 

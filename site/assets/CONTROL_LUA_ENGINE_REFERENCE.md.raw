@@ -110,6 +110,9 @@ Rules:
 | `GetUnitTypeCount` | `(unitId)` | `number` | Count a unit type for the assigned player. |
 | `GetAttribute` | `(attribute)` | `number` | Read a `PlayerAttribute` for the assigned player. |
 | `CanAfford` | `(unitId, isBuilding)` | `boolean` | Check whether the assigned player can afford an item. |
+| `GetTechCost` | `(technology)` | `{ resourceId = ResourceType, amount = number }[]` | Current technology cost entries for the assigned player. |
+| `GetObjectCost` | `(unitObjectType)` | `{ resourceId = ResourceType, amount = number }[]` | Current object cost entries for the assigned player with multiplier `1.0`. |
+| `GetObjectCost` | `(unitObjectType, costMultiplier)` | `{ resourceId = ResourceType, amount = number }[]` | Current object cost entries for the assigned player with the given multiplier applied. |
 | `CanResearch` | `(technology)` | `boolean` | Check whether the assigned player can research a technology. |
 | `IsTechnologyResearched` | `(technology)` | `boolean` | Check whether the assigned player has researched a technology. |
 | `GetObjectsByType` | `(unitType)` | `Object[]` | Scan alive world objects by type. Not restricted to owned objects. |
@@ -148,6 +151,7 @@ Notes:
 - `GetMapTile(position)` floors `position.x` and `position.y`.
 - `CalculatePath()` uses the game's native pathfinding and returns an empty list when no path is available.
 - `GetObjectsInArea(pos1, pos2)` only returns alive objects and still respects fog-aware visibility.
+- `GetTechCost()` and `GetObjectCost()` return arrays of resource-cost entries. Use `entry.resourceId` and `entry.amount`; numeric indexes `entry[1]` and `entry[2]` mirror the same values.
 - `GetAllChatMessages()` and `GetLastChatMessage()` read from the game's current chat buffer.
 - `GetNewChatMessages()` tracks unread chat state per module instance; the first call after load or reload returns the currently visible buffer.
 - Object retrieval respects the assigned player's fog-of-war when **Modules See Everything** is disabled. This includes `GetObjectById()`.
@@ -369,6 +373,7 @@ Behavior:
 
 Enum notes:
 
+- `ResourceType` values: `FOOD`, `WOOD`, `STONE`, `GOLD`, `POPULATION`
 - `Terrain.UNKNOWN = -1`
 - `TileVisibility.UNEXPLORED = 0`
 - `TileVisibility.VISIBLE = 15`
@@ -400,6 +405,9 @@ Methods:
 - `IsObjectTypeAvailable(unitObjectType)`
 - `CanAfford(id, isBuilding)`
 - `GetResearchState(technology)`
+- `GetTechCost(technology)`
+- `GetObjectCost(unitObjectType)`
+- `GetObjectCost(unitObjectType, costMultiplier)`
 - `CanAffordResearch(technology)`
 - `CanResearch(technology)`
 - `IsTechnologyResearched(technology)`
