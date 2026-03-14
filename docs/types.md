@@ -100,6 +100,9 @@ Returned by `GetObjectsByType`, `GetObjectsByTypes`, `GetObjectsByClass`, and `G
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `GetId()` | `number` | Returns the object's id. |
+| `GetName()` | `string` | Returns the object's display name. |
+| `GetInternalName()` | `string` | Returns the object's internal engine name. |
+| `GetMasterName()` | `string` | Returns the name of the object's master/static definition. |
 | `GetObjectType()` | `ObjectType` | Returns the high-level object type. |
 | `GetOwningPlayer()` | `Player` | Returns the owning player. |
 | `GetGarrisonObject()` | `Object` | Returns the current garrison container. |
@@ -120,7 +123,7 @@ Returned by `GetObjectsByType`, `GetObjectsByTypes`, `GetObjectsByClass`, and `G
 | `GetPosition()` | `Vector3` | Returns the world position. |
 | `GetCurrentMapTile()` | `MapTile` | Returns the map tile the object is currently standing on. |
 | `GetPath()` | `Vector3[]` | Returns the object's current native path waypoints. |
-| `CalculatePath(targetPos)` | `Vector3[]` | Calculates a native path from the object's current position to a `Vector2` target using its collision radius when available. |
+| `CalculatePath(targetPos)` | `Vector3[]` | Calculates a native path from the object's current position to a `Vector3` target using its collision radius when available. |
 
 ### MapTile
 
@@ -282,6 +285,7 @@ end
 - `ConstructionPlacement:TryBuildStructureAtTown()` and `ConstructionPlacement:RenderDebug()` exist in C++ but are not exposed to Lua.
 - Cached `Object` references can become invalid for method calls when the object becomes invisible in fog-aware mode. Re-fetch objects in the current frame or enable **Modules See Everything** if you need persistent access.
 - `Object:IsVisible()` is the safe visibility check for cached objects and uses map-tile visibility.
+- `Object:GetName()`, `Object:GetInternalName()`, and `Object:GetMasterName()` return empty strings when the underlying name data is unavailable.
 - Use `MapTile:GetPos()` instead of `GetPosX()` / `GetPosY()`.
 - `MapTile:IsWalkable()` reads the collision grid, so moving units and other blockers can affect the result.
 - `MapTile:GetObjectCount()` and `MapTile:GetObjects()` only expose data for tiles that are currently `TileVisibility.VISIBLE`.

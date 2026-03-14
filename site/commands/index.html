@@ -1556,9 +1556,27 @@
 </tr>
 <tr>
 <td><code>TrainUnit</code></td>
+<td><code>(unitId)</code></td>
+<td><code>boolean</code></td>
+<td>Trains one unit by automatically selecting a matching production source for the assigned player.</td>
+</tr>
+<tr>
+<td><code>TrainUnit</code></td>
+<td><code>(unitId, amount)</code></td>
+<td><code>boolean</code></td>
+<td>Trains <code>amount</code> units by automatically selecting a matching production source for the assigned player.</td>
+</tr>
+<tr>
+<td><code>TrainUnit</code></td>
+<td><code>(trainSources, unitId)</code></td>
+<td><code>boolean</code></td>
+<td>Trains one unit using the assigned player's most common matching source from the provided source types.</td>
+</tr>
+<tr>
+<td><code>TrainUnit</code></td>
 <td><code>(trainSources, unitId, amount)</code></td>
 <td><code>boolean</code></td>
-<td>Trains <code>amount</code> units by selecting the assigned player's most common matching production source.</td>
+<td>Trains <code>amount</code> units using the assigned player's most common matching source from the provided source types.</td>
 </tr>
 <tr>
 <td><code>UnitsTargetObject</code></td>
@@ -1695,13 +1713,15 @@
 <span class="w">    </span><span class="kr">end</span>
 
 <span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nf">CanAfford</span><span class="p">(</span><span class="nv">UnitObjectType</span><span class="p">.</span><span class="py">VILLAGER_MALE</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">        </span><span class="nf">TrainUnit</span><span class="p">({</span><span class="w"> </span><span class="nv">UnitObjectType</span><span class="p">.</span><span class="py">TOWN_CENTER_FEUDAL_AGE</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="nv">UnitObjectType</span><span class="p">.</span><span class="py">VILLAGER_MALE</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">        </span><span class="nf">TrainUnit</span><span class="p">(</span><span class="nv">UnitObjectType</span><span class="p">.</span><span class="py">VILLAGER_MALE</span><span class="p">)</span>
 <span class="w">    </span><span class="kr">end</span>
 <span class="kr">end</span>
 </code></pre></div>
 <h2 id="notes">Notes</h2>
 <ul>
-<li><code>TrainUnit</code> and <code>ResearchTechnology</code> require all arguments in Lua. Pass <code>amount</code> explicitly.</li>
+<li><code>TrainUnit</code> has overloads with and without explicit <code>trainSources</code>.</li>
+<li><code>TrainUnit(unitId)</code> and <code>TrainUnit(unitId, amount)</code> look up eligible source object types automatically.</li>
+<li><code>ResearchTechnology</code> still requires all shown arguments in Lua.</li>
 <li><code>DeleteUnit</code>, <code>DestroyBuilding</code>, and stance commands do not return success flags.</li>
 <li>If <code>Sequential Actions</code> is enabled, only the first command that executes in a tick succeeds.</li>
 </ul>

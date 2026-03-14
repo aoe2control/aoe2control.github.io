@@ -28,7 +28,10 @@ Commands perform actions in the game. Use game commands from `Update()` while a 
 | `SetGameSpeedMultiplier` | `(multiplier)` | `nil` | Sets the game speed multiplier. |
 | `SetCameraPosition` | `(position)` | `nil` | Moves the camera to a `Vector2` world position. |
 | `ChatMessage` | `(message)` | `nil` | Sends chat text as the assigned player. |
-| `TrainUnit` | `(trainSources, unitId, amount)` | `boolean` | Trains `amount` units by selecting the assigned player's most common matching production source. |
+| `TrainUnit` | `(unitId)` | `boolean` | Trains one unit by automatically selecting a matching production source for the assigned player. |
+| `TrainUnit` | `(unitId, amount)` | `boolean` | Trains `amount` units by automatically selecting a matching production source for the assigned player. |
+| `TrainUnit` | `(trainSources, unitId)` | `boolean` | Trains one unit using the assigned player's most common matching source from the provided source types. |
+| `TrainUnit` | `(trainSources, unitId, amount)` | `boolean` | Trains `amount` units using the assigned player's most common matching source from the provided source types. |
 | `UnitsTargetObject` | `(units, target)` | `boolean` | Orders owned units to attack, interact with, or target an object. |
 | `UnitsBuildStructure` | `(builders, structureId, position)` | `boolean` | Orders owned builders to place a structure at a `Vector3` world position. |
 | `UnitsMove` | `(units, position)` | `boolean` | Orders owned units to move to a `Vector3` world position. |
@@ -65,13 +68,15 @@ function Update()
     end
 
     if CanAfford(UnitObjectType.VILLAGER_MALE, false) then
-        TrainUnit({ UnitObjectType.TOWN_CENTER_FEUDAL_AGE }, UnitObjectType.VILLAGER_MALE, 1)
+        TrainUnit(UnitObjectType.VILLAGER_MALE)
     end
 end
 ```
 
 ## Notes
 
-- `TrainUnit` and `ResearchTechnology` require all arguments in Lua. Pass `amount` explicitly.
+- `TrainUnit` has overloads with and without explicit `trainSources`.
+- `TrainUnit(unitId)` and `TrainUnit(unitId, amount)` look up eligible source object types automatically.
+- `ResearchTechnology` still requires all shown arguments in Lua.
 - `DeleteUnit`, `DestroyBuilding`, and stance commands do not return success flags.
 - If `Sequential Actions` is enabled, only the first command that executes in a tick succeeds.

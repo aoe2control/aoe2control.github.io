@@ -66,6 +66,14 @@ Used by `GetTechCost()`, `GetObjectCost()`, `Player:GetTechCost()`, and `Player:
 | CASTLE_AGE | 2 |
 | IMPERIAL_AGE | 3 |
 
+### ProjectileType
+
+Used by `GetProjectileByType()`.
+
+`ProjectileType` is exposed to Lua as `ProjectileType.VALUE`.
+
+The current checked-out source tree does not yet include the enum member list, so the exact values are intentionally not enumerated here yet.
+
 ### Terrain
 
 Used by `MapTile:GetTerrain()`. The values mirror the game's terrain ids. `Terrain.UNKNOWN` is returned for unexplored tiles when fog-aware mode is active.

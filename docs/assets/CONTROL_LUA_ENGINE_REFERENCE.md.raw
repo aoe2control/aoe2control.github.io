@@ -67,7 +67,10 @@ Command functions usually filter input objects to ones owned by the assigned pla
 | `SetGameSpeedMultiplier` | `(multiplier)` | `nil` | Change game speed multiplier. |
 | `SetCameraPosition` | `(position)` | `nil` | Move the camera to a `Vector2` world position. |
 | `ChatMessage` | `(message)` | `nil` | Send chat text as the assigned player. |
-| `TrainUnit` | `(trainSources, unitId, amount)` | `boolean` | Train units from the assigned player's most common matching source type. |
+| `TrainUnit` | `(unitId)` | `boolean` | Train one unit by automatically selecting a matching source type for the assigned player. |
+| `TrainUnit` | `(unitId, amount)` | `boolean` | Train units by automatically selecting a matching source type for the assigned player. |
+| `TrainUnit` | `(trainSources, unitId)` | `boolean` | Train one unit from the assigned player's most common matching source type from the provided source list. |
+| `TrainUnit` | `(trainSources, unitId, amount)` | `boolean` | Train units from the assigned player's most common matching source type from the provided source list. |
 | `UnitsTargetObject` | `(units, target)` | `boolean` | Order owned units to target an object. |
 | `UnitsBuildStructure` | `(builders, structureId, position)` | `boolean` | Order owned builders to construct a building. |
 | `UnitsMove` | `(units, position)` | `boolean` | Order owned units to move. |
@@ -133,14 +136,17 @@ Rules:
 | `GetMapTile` | `(x, y)` | `MapTile` | Overload: tile at integer map coordinates, or `nil` if out of bounds. |
 | `GetMapTile` | `(position)` | `MapTile` | Overload: floors a `Vector2` position to a tile lookup. |
 | `GetAllMapTiles` | `()` | `MapTile[]` | Full map tile list. Tile methods still respect fog-aware visibility. |
-| `CalculatePath` | `(startPos, targetPos)` | `Vector3[]` | Calculate a native path between two `Vector2` positions. |
-| `CalculatePath` | `(startPos, targetPos, collisionRadius)` | `Vector3[]` | Calculate a native path with an explicit collision radius. |
+| `CalculatePath` | `(startPos, targetPos)` | `Vector3[]` | Calculate a native path between two `Vector3` positions. |
+| `CalculatePath` | `(startPos, targetPos, collisionRadius)` | `Vector3[]` | Calculate a native path between two `Vector3` positions with an explicit collision radius. |
 | `GetObjectsInArea` | `(pos1, pos2)` | `Object[]` | Alive objects inside the rectangle defined by two `Vector2` positions. |
 | `GetObjectsPtr` | `()` | `number, number` | Returns `(ptr, count)` for an engine-owned packed object snapshot buffer. Intended for IPC / RPM readers. |
 | `GetObjectTypeData` | `(objectTypeId, objectData)` | `number` | Static object-type data lookup for a `UnitObjectType`. |
 | `GetObjectTypeAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number` | Static object-type attribute lookup for a `UnitObjectType`. |
 | `IsEnemyPlayer` | `(player)` | `boolean` | Whether `player` is an enemy of the assigned player. |
 | `GetObjectById` | `(id)` | `Object` | Object by id. |
+| `GetProjectileById` | `(id)` | `Object` | Projectile object by id. |
+| `GetAllProjectiles` | `()` | `Object[]` | Visible projectile objects. |
+| `GetProjectileByType` | `(projectileType)` | `Object[]` | Projectile objects matching a `ProjectileType`. |
 | `GetVictoryCondition` | `()` | `VictoryCondition` | Current victory condition. |
 | `GetVictoryPlayer` | `()` | `Player` | Winning player after game end, else `nil`. |
 
@@ -149,11 +155,12 @@ Notes:
 - Use `GetAssignedPlayer()`, not `GetLocalPlayer()`.
 - `GetAssignedPlayerId()` is available before the match starts and can be used from `Load(playerId)`.
 - `GetMapTile(position)` floors `position.x` and `position.y`.
-- `CalculatePath()` uses the game's native pathfinding and returns an empty list when no path is available.
+- `CalculatePath()` uses the game's native pathfinding, now accepts `Vector3` start and target positions, and returns an empty list when no path is available.
 - `GetObjectsInArea(pos1, pos2)` only returns alive objects and still respects fog-aware visibility.
 - `GetTechCost()` and `GetObjectCost()` return arrays of resource-cost entries. Use `entry.resourceId` and `entry.amount`; numeric indexes `entry[1]` and `entry[2]` mirror the same values.
 - `GetAllChatMessages()` and `GetLastChatMessage()` read from the game's current chat buffer.
 - `GetNewChatMessages()` tracks unread chat state per module instance; the first call after load or reload returns the currently visible buffer.
+- Projectile lookup functions return normal `Object` references whose `ObjectType` is `ObjectType.PROJECTILE` and follow the same visibility restrictions as other object queries.
 - Object retrieval respects the assigned player's fog-of-war when **Modules See Everything** is disabled. This includes `GetObjectById()`.
 - With **Modules See Everything** disabled, player-state methods on other `Player` objects return neutral values for resources, facts, tech state, and object availability.
 - `GetAllMapTiles()` returns the full grid, but each `MapTile` only exposes data allowed by the current fog state.
@@ -343,12 +350,16 @@ Methods:
 - `GetPosition()`
 - `GetCurrentMapTile()`
 - `GetPath()`
+- `GetName()`
+- `GetInternalName()`
+- `GetMasterName()`
 - `CalculatePath(targetPos)`
 
 Behavior:
 
 - `IsVisible()` uses map-tile visibility
 - Cached objects can throw a Lua error on most method calls after they become invisible
+- `GetName()`, `GetInternalName()`, and `GetMasterName()` return empty strings when name data is unavailable
 - Re-fetch object references in the current frame when fog-aware mode is active
 
 ### MapTile
@@ -373,6 +384,7 @@ Behavior:
 
 Enum notes:
 
+- `ProjectileType` is exposed to Lua for `GetProjectileByType()` filtering; the exact member list is not reflected in this checkout yet
 - `ResourceType` values: `FOOD`, `WOOD`, `STONE`, `GOLD`, `POPULATION`
 - `Terrain.UNKNOWN = -1`
 - `TileVisibility.UNEXPLORED = 0`

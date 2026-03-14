@@ -41,14 +41,17 @@ Most facts read game state and should be called from `Init`, `Update`, or `Rende
 | `GetMapTile` | `(x, y)` | `MapTile` | Overload: returns the tile at integer map coordinates, or `nil` if out of bounds. |
 | `GetMapTile` | `(position)` | `MapTile` | Overload: floors a `Vector2` world/tile position to a map tile lookup. |
 | `GetAllMapTiles` | `()` | `MapTile[]` | Returns all map tiles. Individual tile methods still respect fog-aware visibility. |
-| `CalculatePath` | `(startPos, targetPos)` | `Vector3[]` | Calculates a native path between two `Vector2` positions. |
-| `CalculatePath` | `(startPos, targetPos, collisionRadius)` | `Vector3[]` | Overload: calculates a native path with an explicit collision radius. |
+| `CalculatePath` | `(startPos, targetPos)` | `Vector3[]` | Calculates a native path between two `Vector3` positions. |
+| `CalculatePath` | `(startPos, targetPos, collisionRadius)` | `Vector3[]` | Overload: calculates a native path between two `Vector3` positions with an explicit collision radius. |
 | `GetObjectsInArea` | `(pos1, pos2)` | `Object[]` | Returns alive objects whose current tile lies inside the rectangular area between two `Vector2` positions. |
 | `GetObjectsPtr` | `()` | `number, number` | Returns `(ptr, count)` for an engine-owned packed object snapshot buffer. Intended for IPC / RPM readers. |
 | `GetObjectTypeData` | `(objectTypeId, objectData)` | `number` | Returns static object-type data for a `UnitObjectType` and `ObjectData` field. |
 | `GetObjectTypeAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number` | Returns a static object-type attribute value for a `UnitObjectType`. |
 | `IsEnemyPlayer` | `(player)` | `boolean` | Returns whether the given player is an enemy of the assigned player. |
 | `GetObjectById` | `(id)` | `Object` | Returns a world object by id. |
+| `GetProjectileById` | `(id)` | `Object` | Returns a projectile object by id. |
+| `GetAllProjectiles` | `()` | `Object[]` | Returns visible projectile objects. |
+| `GetProjectileByType` | `(projectileType)` | `Object[]` | Returns projectile objects matching a `ProjectileType`. |
 | `GetVictoryCondition` | `()` | `VictoryCondition` | Returns the current victory condition. |
 | `GetVictoryPlayer` | `()` | `Player` | Returns the winner when the game has ended, otherwise `nil`. |
 
@@ -102,8 +105,16 @@ end
 
 ```lua
 function Update()
-    local path = CalculatePath(Vector2(20, 20), Vector2(60, 60), 0.5)
+    local path = CalculatePath(Vector3(20, 20, 0), Vector3(60, 60, 0), 0.5)
     Log("Path waypoint count: " .. tostring(#path))
+end
+```
+
+```lua
+function Render()
+    for _, projectile in ipairs(GetAllProjectiles()) do
+        RenderObjectBounds(projectile, Color(255, 160, 64, 255), 1.0)
+    end
 end
 ```
 
@@ -144,11 +155,12 @@ end
 - `GetAssignedPlayerId()` is intentionally available in `Load(playerId)` before the match is running.
 - `GetObjectsByType`, `GetObjectsByTypes`, and `GetObjectsByClass` scan alive world objects, not only the assigned player's objects.
 - `GetMapTile(position)` floors `position.x` and `position.y` to integer tile coordinates before resolving the tile.
-- `CalculatePath()` uses the game's native pathfinding and returns an empty list when no path is available.
+- `CalculatePath()` uses the game's native pathfinding, now accepts `Vector3` start and target positions, and returns an empty list when no path is available.
 - `GetObjectsInArea(pos1, pos2)` only returns alive objects and follows the same fog-aware visibility checks as the rest of the object API.
 - `GetTechCost()` and `GetObjectCost()` return arrays of resource-cost entries. Use `entry.resourceId` and `entry.amount`; numeric indexes `entry[1]` and `entry[2]` mirror the same values.
 - `GetAllChatMessages()` and `GetLastChatMessage()` read from the game's current chat buffer.
 - `GetNewChatMessages()` tracks unread chat state per module instance. On the first call after load or reload, it returns the currently visible buffer.
+- Projectile lookup functions return normal `Object` references whose `ObjectType` is `ObjectType.PROJECTILE` and follow the same visibility restrictions as other object queries.
 - When **Modules See Everything** is disabled, object retrieval functions filter by the assigned player's current fog-of-war. This includes `GetObjectById()`.
 - When **Modules See Everything** is disabled, player-state access through `GetPlayerById()` is limited. Resource, fact, tech, and object-availability methods only expose the assigned player's data.
 - `GetAllMapTiles()` returns the full map grid, but `MapTile` methods only expose what the assigned player is currently allowed to know.

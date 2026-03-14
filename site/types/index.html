@@ -1923,6 +1923,21 @@
 <td>Returns the object's id.</td>
 </tr>
 <tr>
+<td><code>GetName()</code></td>
+<td><code>string</code></td>
+<td>Returns the object's display name.</td>
+</tr>
+<tr>
+<td><code>GetInternalName()</code></td>
+<td><code>string</code></td>
+<td>Returns the object's internal engine name.</td>
+</tr>
+<tr>
+<td><code>GetMasterName()</code></td>
+<td><code>string</code></td>
+<td>Returns the name of the object's master/static definition.</td>
+</tr>
+<tr>
 <td><code>GetObjectType()</code></td>
 <td><code>ObjectType</code></td>
 <td>Returns the high-level object type.</td>
@@ -2025,7 +2040,7 @@
 <tr>
 <td><code>CalculatePath(targetPos)</code></td>
 <td><code>Vector3[]</code></td>
-<td>Calculates a native path from the object's current position to a <code>Vector2</code> target using its collision radius when available.</td>
+<td>Calculates a native path from the object's current position to a <code>Vector3</code> target using its collision radius when available.</td>
 </tr>
 </tbody>
 </table>
@@ -2480,6 +2495,7 @@
 <li><code>ConstructionPlacement:TryBuildStructureAtTown()</code> and <code>ConstructionPlacement:RenderDebug()</code> exist in C++ but are not exposed to Lua.</li>
 <li>Cached <code>Object</code> references can become invalid for method calls when the object becomes invisible in fog-aware mode. Re-fetch objects in the current frame or enable <strong>Modules See Everything</strong> if you need persistent access.</li>
 <li><code>Object:IsVisible()</code> is the safe visibility check for cached objects and uses map-tile visibility.</li>
+<li><code>Object:GetName()</code>, <code>Object:GetInternalName()</code>, and <code>Object:GetMasterName()</code> return empty strings when the underlying name data is unavailable.</li>
 <li>Use <code>MapTile:GetPos()</code> instead of <code>GetPosX()</code> / <code>GetPosY()</code>.</li>
 <li><code>MapTile:IsWalkable()</code> reads the collision grid, so moving units and other blockers can affect the result.</li>
 <li><code>MapTile:GetObjectCount()</code> and <code>MapTile:GetObjects()</code> only expose data for tiles that are currently <code>TileVisibility.VISIBLE</code>.</li>
