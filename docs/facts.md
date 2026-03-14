@@ -51,7 +51,7 @@ Most facts read game state and should be called from `Init`, `Update`, or `Rende
 | `GetObjectById` | `(id)` | `Object` | Returns a world object by id. |
 | `GetProjectileById` | `(id)` | `Object` | Returns a projectile object by id. |
 | `GetAllProjectiles` | `()` | `Object[]` | Returns visible projectile objects. |
-| `GetProjectileByType` | `(projectileType)` | `Object[]` | Returns projectile objects matching a `ProjectileType`. |
+| `GetProjectilesByType` | `(projectileType)` | `Object[]` | Returns projectile objects matching a `ProjectileType`. |
 | `GetVictoryCondition` | `()` | `VictoryCondition` | Returns the current victory condition. |
 | `GetVictoryPlayer` | `()` | `Player` | Returns the winner when the game has ended, otherwise `nil`. |
 

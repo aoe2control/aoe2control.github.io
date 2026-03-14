@@ -146,7 +146,7 @@ Rules:
 | `GetObjectById` | `(id)` | `Object` | Object by id. |
 | `GetProjectileById` | `(id)` | `Object` | Projectile object by id. |
 | `GetAllProjectiles` | `()` | `Object[]` | Visible projectile objects. |
-| `GetProjectileByType` | `(projectileType)` | `Object[]` | Projectile objects matching a `ProjectileType`. |
+| `GetProjectilesByType` | `(projectileType)` | `Object[]` | Projectile objects matching a `ProjectileType`. |
 | `GetVictoryCondition` | `()` | `VictoryCondition` | Current victory condition. |
 | `GetVictoryPlayer` | `()` | `Player` | Winning player after game end, else `nil`. |
 
@@ -384,7 +384,7 @@ Behavior:
 
 Enum notes:
 
-- `ProjectileType` is exposed to Lua for `GetProjectileByType()` filtering; the exact member list is not reflected in this checkout yet
+- `ProjectileType` is exposed to Lua for `GetProjectilesByType()` filtering
 - `ResourceType` values: `FOOD`, `WOOD`, `STONE`, `GOLD`, `POPULATION`
 - `Terrain.UNKNOWN = -1`
 - `TileVisibility.UNEXPLORED = 0`
