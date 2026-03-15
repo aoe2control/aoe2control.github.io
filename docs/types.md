@@ -108,6 +108,7 @@ Returned by `GetObjectsByType`, `GetObjectsByTypes`, `GetObjectsByClass`, and `G
 | `GetGarrisonObject()` | `Object` | Returns the current garrison container. |
 | `GetTargetPosition()` | `Vector3` | Returns the AI target position. |
 | `GetTargetObject()` | `Object` | Returns the current AI target object. |
+| `GetActionTargetPosition()` | `Vector3` | Returns the current action target position, which can be used for projectile impact position. |
 | `GetDirection()` | `Vector3` | Returns the current facing vector. |
 | `IsVisible()` | `boolean` | Returns whether the object is visible on the assigned player's current map tile visibility. |
 | `IsAlive()` | `boolean` | Returns whether the object is alive. |

@@ -335,6 +335,7 @@ Methods:
 - `GetGarrisonObject()`
 - `GetTargetPosition()`
 - `GetTargetObject()`
+- `GetActionTargetPosition()`
 - `GetDirection()`
 - `IsVisible()`
 - `IsAlive()`
