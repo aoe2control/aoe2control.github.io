@@ -8,6 +8,10 @@
 - **Sharing** — Share your modules and scripts
 - **Encryption** — Request project encryption and packaging for `.module` distribution
 
+## YouTube
+
+[Visit the YouTube channel](https://www.youtube.com/channel/UCUW6Vl6RPbAJfej4yb7Gnuw) for AoE2Control videos, updates, and walkthroughs.
+
 ## State
 
 The community is in early stages. Contributions, feedback, and shared modules are welcome.

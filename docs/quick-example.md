@@ -38,7 +38,7 @@ end
 
 function Update()
     if not announced then
-        ChatMessage("Module active for player " .. tostring(GetAssignedPlayerId()))
+        SendChatMessage("Module active for player " .. tostring(GetAssignedPlayerId()))
         announced = true
     end
 
@@ -95,7 +95,7 @@ return logger
 | `Settings.Get*` | Reads setting values with explicit fallback arguments. |
 | `GetAssignedPlayer()` | Uses the player assigned to this module instance. |
 | `GetAssignedPlayerId()` | Reads the controlled player id directly, including in `Load`. |
-| `ChatMessage()` | Shows a game command used from `Update()`. |
+| `SendChatMessage()` | Shows a game command used from `Update()`. |
 | `RenderObjectBoundsFilled()` | Draws an overlay on owned villagers. |
 
 ## Map API Add-On

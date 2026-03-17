@@ -66,7 +66,7 @@ Command functions usually filter input objects to ones owned by the assigned pla
 | `Log` | `(message)` | `nil` | Write to CONTROL's log window. |
 | `SetGameSpeedMultiplier` | `(multiplier)` | `nil` | Change game speed multiplier. |
 | `SetCameraPosition` | `(position)` | `nil` | Move the camera to a `Vector2` world position. |
-| `ChatMessage` | `(message)` | `nil` | Send chat text as the assigned player. |
+| `SendChatMessage` | `(message)` | `nil` | Send chat text as the assigned player. |
 | `TrainUnit` | `(unitId)` | `boolean` | Train one unit by automatically selecting a matching source type for the assigned player. |
 | `TrainUnit` | `(unitId, amount)` | `boolean` | Train units by automatically selecting a matching source type for the assigned player. |
 | `TrainUnit` | `(trainSources, unitId)` | `boolean` | Train one unit from the assigned player's most common matching source type from the provided source list. |
@@ -95,7 +95,7 @@ Command functions usually filter input objects to ones owned by the assigned pla
 Rules:
 
 - Most unit and building commands filter inputs to objects owned by the assigned player.
-- `SetGameSpeedMultiplier`, `SetCameraPosition`, and `ChatMessage` are game commands, but they are not ownership-filtered.
+- `SetGameSpeedMultiplier`, `SetCameraPosition`, and `SendChatMessage` are game commands, but they are not ownership-filtered.
 - Calling a game command outside `Update()` logs a warning once per module load.
 - If **Tournament Mode** is enabled, game commands outside `Update()` are blocked.
 - `Log()` is not a game command and can be used from any callback.
@@ -525,7 +525,7 @@ end
 
 function Update()
     if not announced then
-        ChatMessage("Hello from player " .. tostring(GetAssignedPlayerId()))
+        SendChatMessage("Hello from player " .. tostring(GetAssignedPlayerId()))
         announced = true
     end
 end

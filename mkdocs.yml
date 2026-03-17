@@ -1,6 +1,7 @@
 site_name: AoE2Control Documentation
 site_url: https://aoe2control.github.io/
 site_description: "Documentation for AoE2Control, a Lua scripting engine for Age of Empires II: Definitive Edition with game-state access, commands, rendering, and IPC."
+copyright: Copyright © Big John
 theme:
   name: material
   custom_dir: overrides
@@ -35,6 +36,14 @@ markdown_extensions:
 extra:
   discord: "https://discord.gg/DENDVuWq5t"
   version: "1.0"
+  generator: false
+  social:
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/DENDVuWq5t
+      name: Discord
+    - icon: fontawesome/brands/youtube
+      link: https://www.youtube.com/channel/UCUW6Vl6RPbAJfej4yb7Gnuw
+      name: YouTube
 
 extra_css:
   - stylesheets/extra.css
@@ -66,4 +75,5 @@ nav:
     - limits.md
     - distribution.md
     - community.md
+    - YouTube Channel: https://www.youtube.com/channel/UCUW6Vl6RPbAJfej4yb7Gnuw
   - Discord: https://discord.gg/DENDVuWq5t

@@ -15,7 +15,7 @@ Commands perform actions in the game. Use game commands from `Update()` while a 
 ## Command Rules
 
 - Most unit and building commands silently filter the input list down to objects owned by the assigned player.
-- `SetGameSpeedMultiplier`, `SetCameraPosition`, and `ChatMessage` are game commands, but they are not ownership-filtered.
+- `SetGameSpeedMultiplier`, `SetCameraPosition`, and `SendChatMessage` are game commands, but they are not ownership-filtered.
 - Calling a game command outside `Update()` logs a warning once per module load.
 - If **Tournament Mode** is enabled, game commands outside `Update()` are blocked.
 - `Log()` is not a game command and can be used from any callback.
@@ -27,7 +27,7 @@ Commands perform actions in the game. Use game commands from `Update()` while a 
 | `Log` | `(message)` | `nil` | Writes a message to CONTROL's log window. |
 | `SetGameSpeedMultiplier` | `(multiplier)` | `nil` | Sets the game speed multiplier. |
 | `SetCameraPosition` | `(position)` | `nil` | Moves the camera to a `Vector2` world position. |
-| `ChatMessage` | `(message)` | `nil` | Sends chat text as the assigned player. |
+| `SendChatMessage` | `(message)` | `nil` | Sends chat text as the assigned player. |
 | `TrainUnit` | `(unitId)` | `boolean` | Trains one unit by automatically selecting a matching production source for the assigned player. |
 | `TrainUnit` | `(unitId, amount)` | `boolean` | Trains `amount` units by automatically selecting a matching production source for the assigned player. |
 | `TrainUnit` | `(trainSources, unitId)` | `boolean` | Trains one unit using the assigned player's most common matching source from the provided source types. |
