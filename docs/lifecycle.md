@@ -6,7 +6,7 @@ Each configured module instance can implement up to six callbacks. All of them a
 
 ### Load
 
-**When:** When the module instance is loaded or when AI becomes active for that instance.
+**When:** When the module instance is loaded or when that instance becomes active again.
 
 **Signature:** `Load(playerId)`
 
@@ -65,4 +65,4 @@ flowchart LR
 - `Init` runs per module instance, not globally.
 - `Update` is the callback intended for game commands. Calling commands from other callbacks logs a warning, and **Tournament Mode** blocks them.
 - Manually exiting a running match triggers `End(false)`.
-- `Unload` can run without `End` if the user disables AI, removes the instance, switches modules, or ejects CONTROL.
+- `Unload` can run without `End` if the user disables the instance, removes it, switches modules, or ejects CONTROL.

@@ -2,7 +2,7 @@
 
 The CONTROL overlay groups module configuration by player. Each `Player 1` to `Player 8` section exposes that player's module slot and runtime status.
 
-![CONTROL Interface — AI Settings](images/ControlUI.png)
+![CONTROL Interface - Modules Settings](images/ControlUI.png)
 
 ## Module Discovery
 
@@ -13,7 +13,11 @@ CONTROL scans `modules/` recursively for:
 
 **Depth limit:** 3 levels below `modules/`.
 
-## Global AI Settings
+## Modules Menu
+
+The old **AI** submenu was renamed to **MODULES**.
+
+If you are upgrading from an older build and want to remove stale submenu state, delete `%appdata%\CONTROL\AoE2Control\settings.ini` once and let CONTROL recreate it on the next launch.
 
 | Setting | Default | Description |
 |---------|---------|-------------|
@@ -23,12 +27,20 @@ CONTROL scans `modules/` recursively for:
 | **Tournament Mode** | Off | Blocks Lua game commands outside `Update()`. Read-only APIs such as facts remain available. |
 | **Auto Move Camera** | On | Auto-centers the camera on executed command targets. |
 | **Command Visualization** | On | Draws command feedback overlays. |
-| **Player Perspective** | `Default` | Fog-of-war perspective override: `Default`, `Player 1` to `Player 8`, `All Players`, or `Gaia`. |
+| **Disable AI Suppression** | Off | If enabled, assigning a module to a bot player no longer suppresses that player's native decision AI. |
 | **Modules See Everything** | Off | If enabled, Lua modules ignore fog-of-war and cross-player data restrictions when reading map tiles, objects, and player state. |
 
 The update interval is clamped to `0.1` seconds in the UI and `0.01` seconds if edited directly in `settings.ini`.
 
 When **Tournament Mode** is off, using a game command outside `Update()` logs a warning once per module load. When it is on, the command is rejected.
+
+## Experimental Menu
+
+`Player Perspective` was moved to the new **EXPERIMENTAL** submenu.
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| **Player Perspective** | `Default` | Fog-of-war perspective override: `Default`, `Player 1` to `Player 8`, `All Players`, or `Gaia`. |
 
 ## Player Module Slots
 
@@ -47,9 +59,10 @@ Open a player section to configure that player's module slot. If no module is as
 
 - The UI is grouped by player, not by a flat `Add Module` list.
 - Each player section represents one module slot for that player id.
-- Assigning a module to a bot player's slot suppresses that player's native decision AI while the module remains assigned.
+- By default, assigning a module to a bot player's slot suppresses that player's native decision AI while the module remains assigned.
+- Enable **Disable AI Suppression** in **MODULES** if you want the native bot AI to keep running alongside the module assignment.
 - Module runtime warnings and Lua errors are shown directly inside the player section.
-- Module-created settings panels appear per configured settings group while AI is enabled.
+- Module-created settings panels appear per configured settings group while modules are enabled.
 - **Open Folder** opens the modules directory.
 
 ## Debug Menu

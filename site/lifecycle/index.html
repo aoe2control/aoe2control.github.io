@@ -1594,7 +1594,7 @@
 <p>Each configured module instance can implement up to six callbacks. All of them are optional.</p>
 <h2 id="callbacks">Callbacks</h2>
 <h3 id="load">Load</h3>
-<p><strong>When:</strong> When the module instance is loaded or when AI becomes active for that instance.</p>
+<p><strong>When:</strong> When the module instance is loaded or when that instance becomes active again.</p>
 <p><strong>Signature:</strong> <code>Load(playerId)</code></p>
 <p><strong>Use for:</strong> <code>Settings.Add*</code> and other setup that only needs the assigned player id.</p>
 <p><strong>Notes:</strong> <code>playerId</code> is the assigned player id for this instance. <code>GetAssignedPlayerId()</code> is also available here.</p>
@@ -1629,7 +1629,7 @@
 <li><code>Init</code> runs per module instance, not globally.</li>
 <li><code>Update</code> is the callback intended for game commands. Calling commands from other callbacks logs a warning, and <strong>Tournament Mode</strong> blocks them.</li>
 <li>Manually exiting a running match triggers <code>End(false)</code>.</li>
-<li><code>Unload</code> can run without <code>End</code> if the user disables AI, removes the instance, switches modules, or ejects CONTROL.</li>
+<li><code>Unload</code> can run without <code>End</code> if the user disables the instance, removes it, switches modules, or ejects CONTROL.</li>
 </ul>
 
 

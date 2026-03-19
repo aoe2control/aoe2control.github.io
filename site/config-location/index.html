@@ -744,6 +744,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#upgrade-note" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Upgrade Note
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1533,7 +1544,7 @@
 <tbody>
 <tr>
 <td><code>settings.ini</code></td>
-<td>Global AI settings, module instance configs, profiles, misc options, and module settings.</td>
+<td>Global module settings, experimental options, module instance configs, profiles, misc options, and module settings.</td>
 </tr>
 <tr>
 <td><code>imgui.ini</code></td>
@@ -1559,6 +1570,8 @@
 <li>Module discovery depth: 3</li>
 <li><code>require()</code> depth: 3</li>
 </ul>
+<h2 id="upgrade-note">Upgrade Note</h2>
+<p>After the old <strong>AI</strong> submenu was renamed to <strong>MODULES</strong>, you can delete <code>settings.ini</code> once to clean up stale saved UI state from older builds. CONTROL recreates the file automatically on next launch.</p>
 
 
 

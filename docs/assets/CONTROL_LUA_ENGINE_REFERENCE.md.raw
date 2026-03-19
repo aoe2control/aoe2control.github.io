@@ -494,13 +494,15 @@ Not exposed to Lua:
 
 ## 10. Important UI Behavior
 
-- Global AI toggle defaults to enabled
+- Global module toggle defaults to enabled
 - Module configuration is grouped by `Player 1` to `Player 8`
 - Each player group exposes one module slot for that player
-- Player perspective options: `Default`, `Player 1` to `Player 8`, `All Players`, `Gaia`
+- The old **AI** submenu was renamed to **MODULES**
+- `Disable AI Suppression` defaults to `false`; when enabled, assigned bot players keep their native decision AI
 - `Modules See Everything` defaults to `false` and affects map-tile reads, object visibility, and restricted cross-player data access
+- Player perspective options live under the **EXPERIMENTAL** submenu: `Default`, `Player 1` to `Player 8`, `All Players`, `Gaia`
 - `Tournament Mode` blocks game commands outside `Update()`
-- Assigning a module to a bot player's slot suppresses that player's native decision AI while the module remains assigned
+- By default, assigning a module to a bot player's slot suppresses that player's native decision AI while the module remains assigned
 - The Debug menu's **Module Telemetry** view shows sampled `Update()` and `Render()` timing for active modules, plus a sampled baseline frame cost
 - `Spectator Mode` replaced the old `Reveal Map` misc option and keeps controls enabled while spectating
 - Runtime Lua errors are displayed and logged through the UI

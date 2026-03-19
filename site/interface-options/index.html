@@ -695,10 +695,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#global-ai-settings" class="md-nav__link">
+  <a href="#modules-menu" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Global AI Settings
+        Modules Menu
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#experimental-menu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Experimental Menu
       
     </span>
   </a>
@@ -1575,7 +1586,7 @@
 
 <h1 id="interface-options">Interface Options</h1>
 <p>The CONTROL overlay groups module configuration by player. Each <code>Player 1</code> to <code>Player 8</code> section exposes that player's module slot and runtime status.</p>
-<p><img alt="CONTROL Interface — AI Settings" src="../images/ControlUI.png" /></p>
+<p><img alt="CONTROL Interface - Modules Settings" src="../images/ControlUI.png" /></p>
 <h2 id="module-discovery">Module Discovery</h2>
 <p>CONTROL scans <code>modules/</code> recursively for:</p>
 <ul>
@@ -1583,7 +1594,9 @@
 <li><code>*.main.module</code></li>
 </ul>
 <p><strong>Depth limit:</strong> 3 levels below <code>modules/</code>.</p>
-<h2 id="global-ai-settings">Global AI Settings</h2>
+<h2 id="modules-menu">Modules Menu</h2>
+<p>The old <strong>AI</strong> submenu was renamed to <strong>MODULES</strong>.</p>
+<p>If you are upgrading from an older build and want to remove stale submenu state, delete <code>%appdata%\CONTROL\AoE2Control\settings.ini</code> once and let CONTROL recreate it on the next launch.</p>
 <table>
 <thead>
 <tr>
@@ -1624,9 +1637,9 @@
 <td>Draws command feedback overlays.</td>
 </tr>
 <tr>
-<td><strong>Player Perspective</strong></td>
-<td><code>Default</code></td>
-<td>Fog-of-war perspective override: <code>Default</code>, <code>Player 1</code> to <code>Player 8</code>, <code>All Players</code>, or <code>Gaia</code>.</td>
+<td><strong>Disable AI Suppression</strong></td>
+<td>Off</td>
+<td>If enabled, assigning a module to a bot player no longer suppresses that player's native decision AI.</td>
 </tr>
 <tr>
 <td><strong>Modules See Everything</strong></td>
@@ -1637,6 +1650,24 @@
 </table>
 <p>The update interval is clamped to <code>0.1</code> seconds in the UI and <code>0.01</code> seconds if edited directly in <code>settings.ini</code>.</p>
 <p>When <strong>Tournament Mode</strong> is off, using a game command outside <code>Update()</code> logs a warning once per module load. When it is on, the command is rejected.</p>
+<h2 id="experimental-menu">Experimental Menu</h2>
+<p><code>Player Perspective</code> was moved to the new <strong>EXPERIMENTAL</strong> submenu.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Player Perspective</strong></td>
+<td><code>Default</code></td>
+<td>Fog-of-war perspective override: <code>Default</code>, <code>Player 1</code> to <code>Player 8</code>, <code>All Players</code>, or <code>Gaia</code>.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="player-module-slots">Player Module Slots</h2>
 <p>Open a player section to configure that player's module slot. If no module is assigned yet, the section shows <code>No modules assigned.</code>.</p>
 <table>
@@ -1677,9 +1708,10 @@
 <ul>
 <li>The UI is grouped by player, not by a flat <code>Add Module</code> list.</li>
 <li>Each player section represents one module slot for that player id.</li>
-<li>Assigning a module to a bot player's slot suppresses that player's native decision AI while the module remains assigned.</li>
+<li>By default, assigning a module to a bot player's slot suppresses that player's native decision AI while the module remains assigned.</li>
+<li>Enable <strong>Disable AI Suppression</strong> in <strong>MODULES</strong> if you want the native bot AI to keep running alongside the module assignment.</li>
 <li>Module runtime warnings and Lua errors are shown directly inside the player section.</li>
-<li>Module-created settings panels appear per configured settings group while AI is enabled.</li>
+<li>Module-created settings panels appear per configured settings group while modules are enabled.</li>
 <li><strong>Open Folder</strong> opens the modules directory.</li>
 </ul>
 <h2 id="debug-menu">Debug Menu</h2>
