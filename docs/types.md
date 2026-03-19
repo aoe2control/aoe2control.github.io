@@ -265,17 +265,34 @@ end
 
 ## Example
 
+Initialize strategic components in `Init()` instead of at file scope. Global-scope initialization can fail before the engine is ready.
+
 ```lua
-local resources = ResourceTracker()
-local villagers = VillagerOccupation(resources)
-local planner = ConstructionPlacement(villagers)
+---@type ResourceTracker
+local resources
+
+---@type VillagerOccupation
+local villagers
+
+local trackedProfessions = {
+    { "Food", VillagerProfession.FOOD },
+    { "Gold", VillagerProfession.GOLD },
+    { "Stone", VillagerProfession.STONE },
+    { "Wood", VillagerProfession.WOOD },
+}
+
+function Init()
+    resources = ResourceTracker:new()
+    villagers = VillagerOccupation:new(resources)
+end
 
 function Update()
     villagers:Update()
-    planner:Update()
 
-    if villagers:GetVillagerCount(VillagerProfession.WOOD) < 8 then
-        villagers:SetPriorityPercentage(VillagerProfession.WOOD, 0.40)
+    for _, entry in ipairs(trackedProfessions) do
+        local label = entry[1]
+        local profession = entry[2]
+        Log(label .. ": " .. villagers:GetVillagerCount(profession))
     end
 end
 ```
