@@ -253,15 +253,23 @@ end
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `Update()` | `nil` | Rebuilds placement data for the current frame. |
-| `TryBuildStructure(structureId, builderUnitId, buildingSize, targetPos, direction, padding, bypassTownCenterPadding)` | `boolean` | Overload: tries to build relative to a `PlacementDirection`. |
-| `TryBuildStructure(structureId, builderUnitId, buildingSize, targetPos, directionPos, padding, bypassTownCenterPadding)` | `boolean` | Overload: tries to build using a directional world position. |
-| `FindBestPosition(buildingSize, targetPos, direction, padding, bypassTownCenterPadding)` | `Vector3` | Finds a placement candidate. |
-| `QueueBuildingRequest(structureId, buildingSize, targetPosition, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)` | `nil` | Queues a building request at a target position. |
-| `QueueBuildingRequestAtTown(structureId, buildingSize, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)` | `nil` | Queues a town-centered building request. |
+| `Update()` | `nil` | Rebuilds placement data for the current frame. Map tile state is cached internally to reduce repeated placement work. |
+| `BuildStructure(structureType, builderUnitId, targetPos, direction, padding, bypassTownCenterPadding)` | `boolean` | Overload: builds relative to a `PlacementDirection` using a `UnitObjectType` and derives placement size internally. |
+| `BuildStructure(structureType, builderUnitId, targetPos, directionPos, padding, bypassTownCenterPadding)` | `boolean` | Overload: builds using a directional world position. Placement size is derived from the `UnitObjectType`. |
+| `BuildStructure(structureType, targetPos, direction, padding, bypassTownCenterPadding)` | `boolean` | Convenience overload: auto-selects a builder villager, finds a valid position, and issues the build command. |
+| `BuildStructure(structureType, targetPos, directionPos, padding, bypassTownCenterPadding)` | `boolean` | Convenience overload: auto-selects a builder villager, finds a valid position, and issues the build command using a directional world position. |
+| `BuildStructureAtTown(structureType, targetPos, padding, bypassTownCenterPadding)` | `boolean` | Town-center-oriented helper that auto-selects a builder and places relative to the town center. |
+| `BuildStructureAtTown(structureType, padding, bypassTownCenterPadding)` | `boolean` | Simplest town build helper. No target position is required. |
+| `FindBestPosition(structureType, targetPos, direction, padding, bypassTownCenterPadding)` | `Vector3` | Finds a placement candidate and derives placement size from the `UnitObjectType`. |
+| `QueueBuildingRequest(structureType, targetPosition, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)` | `nil` | Queues a building request at a target position using a `UnitObjectType`. |
+| `QueueBuildingRequestAtTown(structureType, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)` | `nil` | Queues a town-centered building request using a `UnitObjectType`. |
 | `ProcessBuildingRequests()` | `nil` | Processes queued requests. |
-| `IsStructureTypeQueued(structureId)` | `boolean` | Returns whether a structure type is already queued. |
+| `IsStructureTypeQueued(structureType)` | `boolean` | Returns whether a `UnitObjectType` is already queued. |
 | `IsUnitAssignedToBuilding(unitId)` | `boolean` | Returns whether a builder is already reserved for a request. |
+
+`TryBuildStructure(...)` was removed. Use `BuildStructure(...)` instead.
+
+`TryBuildStructureAtTown(...)` was removed. Use `BuildStructureAtTown(...)` instead.
 
 ## Example
 
@@ -300,7 +308,7 @@ end
 ## Binding Notes
 
 - `ResourceTracker:Update()` exists in C++ but is not exposed to Lua.
-- `ConstructionPlacement:TryBuildStructureAtTown()` and `ConstructionPlacement:RenderDebug()` exist in C++ but are not exposed to Lua.
+- `ConstructionPlacement:RenderDebug()` exists in C++ but is not exposed to Lua.
 - Cached `Object` references can become invalid for method calls when the object becomes invisible in fog-aware mode. Re-fetch objects in the current frame or enable **Modules See Everything** if you need persistent access.
 - `Object:IsVisible()` is the safe visibility check for cached objects and uses map-tile visibility.
 - `Object:GetName()`, `Object:GetInternalName()`, and `Object:GetMasterName()` return empty strings when the underlying name data is unavailable.

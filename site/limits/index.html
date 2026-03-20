@@ -1548,12 +1548,17 @@
 <li><strong>Module discovery:</strong> Recursive search for <code>*.main.lua</code> / <code>*.main.module</code> up to 3 levels inside <code>modules/</code>.</li>
 </ul>
 <h2 id="multiplayer">Multiplayer</h2>
-<p><strong>Multiplayer is disabled.</strong> The engine does not support multiplayer. Use only in single-player.</p>
+<p>Multiplayer is allowed when cheats are enabled.</p>
+<ul>
+<li>Single-player remains supported as before.</li>
+<li>In multiplayer, enable cheats before using CONTROL.</li>
+</ul>
 <h2 id="performance">Performance</h2>
 <ul>
 <li>Large projects may need optimization. The Lua interpreter handles scripts of varying size; scripters are responsible for performance.</li>
 <li>Avoid heavy work in <code>Render()</code> — it runs every frame.</li>
 <li>The Debug menu's <strong>Module Telemetry</strong> view samples <code>Update()</code> and <code>Render()</code> cost against a sampled baseline frame cost.</li>
+<li><code>ConstructionPlacement</code> now caches map tile state internally to reduce repeated placement overhead.</li>
 </ul>
 <h2 id="sandbox">Sandbox</h2>
 <p>The following Lua functions are <strong>removed</strong> from the environment:</p>

@@ -9,13 +9,17 @@ This page documents the engine's limits and constraints.
 
 ## Multiplayer
 
-**Multiplayer is disabled.** The engine does not support multiplayer. Use only in single-player.
+Multiplayer is allowed when cheats are enabled.
+
+- Single-player remains supported as before.
+- In multiplayer, enable cheats before using CONTROL.
 
 ## Performance
 
 - Large projects may need optimization. The Lua interpreter handles scripts of varying size; scripters are responsible for performance.
 - Avoid heavy work in `Render()` — it runs every frame.
 - The Debug menu's **Module Telemetry** view samples `Update()` and `Render()` cost against a sampled baseline frame cost.
+- `ConstructionPlacement` now caches map tile state internally to reduce repeated placement overhead.
 
 ## Sandbox
 

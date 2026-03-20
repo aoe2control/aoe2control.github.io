@@ -2464,32 +2464,52 @@
 <tr>
 <td><code>Update()</code></td>
 <td><code>nil</code></td>
-<td>Rebuilds placement data for the current frame.</td>
+<td>Rebuilds placement data for the current frame. Map tile state is cached internally to reduce repeated placement work.</td>
 </tr>
 <tr>
-<td><code>TryBuildStructure(structureId, builderUnitId, buildingSize, targetPos, direction, padding, bypassTownCenterPadding)</code></td>
+<td><code>BuildStructure(structureType, builderUnitId, targetPos, direction, padding, bypassTownCenterPadding)</code></td>
 <td><code>boolean</code></td>
-<td>Overload: tries to build relative to a <code>PlacementDirection</code>.</td>
+<td>Overload: builds relative to a <code>PlacementDirection</code> using a <code>UnitObjectType</code> and derives placement size internally.</td>
 </tr>
 <tr>
-<td><code>TryBuildStructure(structureId, builderUnitId, buildingSize, targetPos, directionPos, padding, bypassTownCenterPadding)</code></td>
+<td><code>BuildStructure(structureType, builderUnitId, targetPos, directionPos, padding, bypassTownCenterPadding)</code></td>
 <td><code>boolean</code></td>
-<td>Overload: tries to build using a directional world position.</td>
+<td>Overload: builds using a directional world position. Placement size is derived from the <code>UnitObjectType</code>.</td>
 </tr>
 <tr>
-<td><code>FindBestPosition(buildingSize, targetPos, direction, padding, bypassTownCenterPadding)</code></td>
+<td><code>BuildStructure(structureType, targetPos, direction, padding, bypassTownCenterPadding)</code></td>
+<td><code>boolean</code></td>
+<td>Convenience overload: auto-selects a builder villager, finds a valid position, and issues the build command.</td>
+</tr>
+<tr>
+<td><code>BuildStructure(structureType, targetPos, directionPos, padding, bypassTownCenterPadding)</code></td>
+<td><code>boolean</code></td>
+<td>Convenience overload: auto-selects a builder villager, finds a valid position, and issues the build command using a directional world position.</td>
+</tr>
+<tr>
+<td><code>BuildStructureAtTown(structureType, targetPos, padding, bypassTownCenterPadding)</code></td>
+<td><code>boolean</code></td>
+<td>Town-center-oriented helper that auto-selects a builder and places relative to the town center.</td>
+</tr>
+<tr>
+<td><code>BuildStructureAtTown(structureType, padding, bypassTownCenterPadding)</code></td>
+<td><code>boolean</code></td>
+<td>Simplest town build helper. No target position is required.</td>
+</tr>
+<tr>
+<td><code>FindBestPosition(structureType, targetPos, direction, padding, bypassTownCenterPadding)</code></td>
 <td><code>Vector3</code></td>
-<td>Finds a placement candidate.</td>
+<td>Finds a placement candidate and derives placement size from the <code>UnitObjectType</code>.</td>
 </tr>
 <tr>
-<td><code>QueueBuildingRequest(structureId, buildingSize, targetPosition, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)</code></td>
+<td><code>QueueBuildingRequest(structureType, targetPosition, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)</code></td>
 <td><code>nil</code></td>
-<td>Queues a building request at a target position.</td>
+<td>Queues a building request at a target position using a <code>UnitObjectType</code>.</td>
 </tr>
 <tr>
-<td><code>QueueBuildingRequestAtTown(structureId, buildingSize, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)</code></td>
+<td><code>QueueBuildingRequestAtTown(structureType, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)</code></td>
 <td><code>nil</code></td>
-<td>Queues a town-centered building request.</td>
+<td>Queues a town-centered building request using a <code>UnitObjectType</code>.</td>
 </tr>
 <tr>
 <td><code>ProcessBuildingRequests()</code></td>
@@ -2497,9 +2517,9 @@
 <td>Processes queued requests.</td>
 </tr>
 <tr>
-<td><code>IsStructureTypeQueued(structureId)</code></td>
+<td><code>IsStructureTypeQueued(structureType)</code></td>
 <td><code>boolean</code></td>
-<td>Returns whether a structure type is already queued.</td>
+<td>Returns whether a <code>UnitObjectType</code> is already queued.</td>
 </tr>
 <tr>
 <td><code>IsUnitAssignedToBuilding(unitId)</code></td>
@@ -2508,6 +2528,8 @@
 </tr>
 </tbody>
 </table>
+<p><code>TryBuildStructure(...)</code> was removed. Use <code>BuildStructure(...)</code> instead.</p>
+<p><code>TryBuildStructureAtTown(...)</code> was removed. Use <code>BuildStructureAtTown(...)</code> instead.</p>
 <h2 id="example">Example</h2>
 <p>Initialize strategic components in <code>Init()</code> instead of at file scope. Global-scope initialization can fail before the engine is ready.</p>
 <div class="highlight"><pre><span></span><code><span class="c1">---@type ResourceTracker</span>
@@ -2541,7 +2563,7 @@
 <h2 id="binding-notes">Binding Notes</h2>
 <ul>
 <li><code>ResourceTracker:Update()</code> exists in C++ but is not exposed to Lua.</li>
-<li><code>ConstructionPlacement:TryBuildStructureAtTown()</code> and <code>ConstructionPlacement:RenderDebug()</code> exist in C++ but are not exposed to Lua.</li>
+<li><code>ConstructionPlacement:RenderDebug()</code> exists in C++ but is not exposed to Lua.</li>
 <li>Cached <code>Object</code> references can become invalid for method calls when the object becomes invisible in fog-aware mode. Re-fetch objects in the current frame or enable <strong>Modules See Everything</strong> if you need persistent access.</li>
 <li><code>Object:IsVisible()</code> is the safe visibility check for cached objects and uses map-tile visibility.</li>
 <li><code>Object:GetName()</code>, <code>Object:GetInternalName()</code>, and <code>Object:GetMasterName()</code> return empty strings when the underlying name data is unavailable.</li>

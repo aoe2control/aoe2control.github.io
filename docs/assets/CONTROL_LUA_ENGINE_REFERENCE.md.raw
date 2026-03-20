@@ -9,7 +9,7 @@
 ## 1. Overview
 
 - Windows only
-- Intended for single-player use
+- Intended primarily for single-player use; multiplayer is allowed when cheats are enabled
 - Config root: `%appdata%\CONTROL\AoE2Control\`
 - Modules root: `%appdata%\CONTROL\AoE2Control\modules\`
 - Module entries: `{moduleName}.main.lua` or `{moduleName}.main.module`
@@ -475,19 +475,31 @@ Constructor: `ConstructionPlacement(villagerOccupation)`
 Methods:
 
 - `Update()`
-- `TryBuildStructure(structureId, builderUnitId, buildingSize, targetPos, direction, padding, bypassTownCenterPadding)`
-- `TryBuildStructure(structureId, builderUnitId, buildingSize, targetPos, directionPos, padding, bypassTownCenterPadding)`
-- `FindBestPosition(buildingSize, targetPos, direction, padding, bypassTownCenterPadding)`
-- `QueueBuildingRequest(structureId, buildingSize, targetPosition, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)`
-- `QueueBuildingRequestAtTown(structureId, buildingSize, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)`
+- `BuildStructure(structureType, builderUnitId, targetPos, direction, padding, bypassTownCenterPadding)`
+- `BuildStructure(structureType, builderUnitId, targetPos, directionPos, padding, bypassTownCenterPadding)`
+- `BuildStructure(structureType, targetPos, direction, padding, bypassTownCenterPadding)`
+- `BuildStructure(structureType, targetPos, directionPos, padding, bypassTownCenterPadding)`
+- `BuildStructureAtTown(structureType, targetPos, padding, bypassTownCenterPadding)`
+- `BuildStructureAtTown(structureType, padding, bypassTownCenterPadding)`
+- `FindBestPosition(structureType, targetPos, direction, padding, bypassTownCenterPadding)`
+- `QueueBuildingRequest(structureType, targetPosition, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)`
+- `QueueBuildingRequestAtTown(structureType, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)`
 - `ProcessBuildingRequests()`
-- `IsStructureTypeQueued(structureId)`
+- `IsStructureTypeQueued(structureType)`
 - `IsUnitAssignedToBuilding(unitId)`
+
+Notes:
+
+- `BuildStructure(...)`, `FindBestPosition(...)`, and queue helpers now take `UnitObjectType` and derive placement size internally
+- Convenience `BuildStructure(...)` overloads can auto-select a builder villager and issue the build command directly
+- `BuildStructureAtTown(...)` adds town-center-oriented placement helpers
+- Map tile state is cached internally to improve repeated placement work
+- `TryBuildStructure(...)` was removed; use `BuildStructure(...)`
+- `TryBuildStructureAtTown(...)` was removed; use `BuildStructureAtTown(...)`
 
 Not exposed to Lua:
 
 - `ResourceTracker.Update`
-- `ConstructionPlacement.TryBuildStructureAtTown`
 - `ConstructionPlacement.RenderDebug`
 
 ---

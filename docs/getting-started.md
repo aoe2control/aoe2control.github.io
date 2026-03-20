@@ -75,7 +75,7 @@ All callbacks are **optional**.
 2. Expand the player section you want to configure, for example **Player 1**.
 3. Choose your module in the **Module** dropdown.
 4. Leave **Enabled** on.
-5. Start or load a single-player match.
+5. Start or load a single-player match, or a multiplayer match with cheats enabled.
 
 ## Next Steps
 
