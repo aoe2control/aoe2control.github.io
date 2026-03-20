@@ -14,6 +14,8 @@ description: "AoE2Control is a Lua scripting engine for Age of Empires II: Defin
 
 [Download Latest Release](https://github.com/aoe2control/AoE2Control/releases)
 
+<small>(extraction password: <code>control</code>)</small>
+
 ## What Is AoE2Control?
 
 AoE2Control talks directly to the game, allowing developers to:
@@ -52,7 +54,8 @@ AoE2Control talks directly to the game, allowing developers to:
 
 ## Quick Links
 
-- [Download Latest Release](https://github.com/aoe2control/AoE2Control/releases) — Launcher and packaged builds
+- [Download Latest Release](https://github.com/aoe2control/AoE2Control/releases) — Launcher and packaged builds  
+  <small>(extraction password: <code>control</code>)</small>
 - [Getting Started](getting-started.md) — Installation and first script
 - [Quick Example](quick-example.md) — Minimal working module
 - [Game API](commands.md) — Commands and facts reference

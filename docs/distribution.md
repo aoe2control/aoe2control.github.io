@@ -2,6 +2,8 @@
 
 Download CONTROL from the [GitHub Releases page](https://github.com/aoe2control/AoE2Control/releases).
 
+<small>(extraction password: <code>control</code>)</small>
+
 ## What Is Distributed
 
 - **CONTROL Launcher** (EXE) — Loads the engine into the game
@@ -9,6 +11,8 @@ Download CONTROL from the [GitHub Releases page](https://github.com/aoe2control/
 ## Installation
 
 Use the latest release package from [GitHub Releases](https://github.com/aoe2control/AoE2Control/releases).
+
+<small>(extraction password: <code>control</code>)</small>
 
 1. Start Age of Empires II: Definitive Edition
 2. Run the CONTROL launcher
