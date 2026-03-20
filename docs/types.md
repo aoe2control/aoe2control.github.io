@@ -271,7 +271,7 @@ end
 
 `TryBuildStructureAtTown(...)` was removed. Use `BuildStructureAtTown(...)` instead.
 
-## Example
+## Examples
 
 Initialize strategic components in `Init()` instead of at file scope. Global-scope initialization can fail before the engine is ready.
 
@@ -302,6 +302,45 @@ function Update()
         local profession = entry[2]
         Log(label .. ": " .. villagers:GetVillagerCount(profession))
     end
+end
+```
+
+### Autonomous AI Base
+
+This is a good starting point for an autonomous economy script. The priority setup is done in `Init()` so the strategic components already exist before the call runs.
+
+```lua
+local tracker = nil
+local villagerOcc = nil
+local placement = nil
+
+local isScoutingEnabled = false
+
+function Init()
+    tracker = ResourceTracker:new()
+    villagerOcc = VillagerOccupation:new(tracker)
+    placement = ConstructionPlacement:new(villagerOcc)
+
+    villagerOcc:SetPriorityPercentage(VillagerProfession.FOOD, 1.0)
+end
+
+function Update()
+    if not isScoutingEnabled then
+        isScoutingEnabled = EnableScouting()
+    end
+
+    villagerOcc:Update()
+    placement:Update()
+
+    if GetFact(Fact.HOUSING_HEADROOM) <= 2 then
+        placement:BuildStructureAtTown(
+            UnitObjectType.HOUSE_DARK_AGE,
+            1,
+            false
+        )
+    end
+
+    TrainUnit(UnitObjectType.VILLAGER_MALE)
 end
 ```
 

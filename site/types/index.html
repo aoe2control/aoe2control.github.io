@@ -1228,13 +1228,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Example
+        Examples
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#autonomous-ai-base" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Autonomous AI Base
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2530,7 +2547,7 @@
 </table>
 <p><code>TryBuildStructure(...)</code> was removed. Use <code>BuildStructure(...)</code> instead.</p>
 <p><code>TryBuildStructureAtTown(...)</code> was removed. Use <code>BuildStructureAtTown(...)</code> instead.</p>
-<h2 id="example">Example</h2>
+<h2 id="examples">Examples</h2>
 <p>Initialize strategic components in <code>Init()</code> instead of at file scope. Global-scope initialization can fail before the engine is ready.</p>
 <div class="highlight"><pre><span></span><code><span class="c1">---@type ResourceTracker</span>
 <span class="kd">local</span><span class="w"> </span><span class="nv">resources</span>
@@ -2558,6 +2575,41 @@
 <span class="w">        </span><span class="kd">local</span><span class="w"> </span><span class="nv">profession</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">entry</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 <span class="w">        </span><span class="nf">Log</span><span class="p">(</span><span class="nv">label</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="s2">&quot;: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">villagers</span><span class="p">:</span><span class="nf">GetVillagerCount</span><span class="p">(</span><span class="nv">profession</span><span class="p">))</span>
 <span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+</code></pre></div>
+<h3 id="autonomous-ai-base">Autonomous AI Base</h3>
+<p>This is a good starting point for an autonomous economy script. The priority setup is done in <code>Init()</code> so the strategic components already exist before the call runs.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">tracker</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">villagerOcc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">placement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span>
+
+<span class="kd">local</span><span class="w"> </span><span class="nv">isScoutingEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+
+<span class="kr">function</span><span class="w"> </span><span class="nf">Init</span><span class="p">()</span>
+<span class="w">    </span><span class="nv">tracker</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">ResourceTracker</span><span class="p">:</span><span class="nf">new</span><span class="p">()</span>
+<span class="w">    </span><span class="nv">villagerOcc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">VillagerOccupation</span><span class="p">:</span><span class="nf">new</span><span class="p">(</span><span class="nv">tracker</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">placement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">ConstructionPlacement</span><span class="p">:</span><span class="nf">new</span><span class="p">(</span><span class="nv">villagerOcc</span><span class="p">)</span>
+
+<span class="w">    </span><span class="nv">villagerOcc</span><span class="p">:</span><span class="nf">SetPriorityPercentage</span><span class="p">(</span><span class="nv">VillagerProfession</span><span class="p">.</span><span class="py">FOOD</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">)</span>
+<span class="kr">end</span>
+
+<span class="kr">function</span><span class="w"> </span><span class="nf">Update</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">isScoutingEnabled</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="nv">isScoutingEnabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">EnableScouting</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="nv">villagerOcc</span><span class="p">:</span><span class="nf">Update</span><span class="p">()</span>
+<span class="w">    </span><span class="nv">placement</span><span class="p">:</span><span class="nf">Update</span><span class="p">()</span>
+
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nf">GetFact</span><span class="p">(</span><span class="nv">Fact</span><span class="p">.</span><span class="py">HOUSING_HEADROOM</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="nv">placement</span><span class="p">:</span><span class="nf">BuildStructureAtTown</span><span class="p">(</span>
+<span class="w">            </span><span class="nv">UnitObjectType</span><span class="p">.</span><span class="py">HOUSE_DARK_AGE</span><span class="p">,</span>
+<span class="w">            </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">            </span><span class="kc">false</span>
+<span class="w">        </span><span class="p">)</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="nf">TrainUnit</span><span class="p">(</span><span class="nv">UnitObjectType</span><span class="p">.</span><span class="py">VILLAGER_MALE</span><span class="p">)</span>
 <span class="kr">end</span>
 </code></pre></div>
 <h2 id="binding-notes">Binding Notes</h2>
