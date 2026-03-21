@@ -341,7 +341,6 @@ end
 
 ## Binding Notes
 
-- `ResourceTracker:Update()` exists in C++ but is not exposed to Lua.
 - `ResourceTracker:Cleanup()` removes cached resources that are visibly gone.
 - `ConstructionPlacement:RenderDebug()` exists in C++ but is not exposed to Lua.
 - Cached `Object` references can become invalid for method calls when the object becomes invisible in fog-aware mode. Re-fetch objects in the current frame or enable **Modules See Everything** if you need persistent access.
