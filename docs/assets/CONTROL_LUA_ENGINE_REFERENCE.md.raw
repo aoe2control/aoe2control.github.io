@@ -338,6 +338,7 @@ Methods:
 - `GetActionTargetPosition()`
 - `GetDirection()`
 - `IsVisible()`
+- `IsExplored()`
 - `IsAlive()`
 - `GetUnitObjectType()`
 - `GetClass()`
@@ -359,6 +360,7 @@ Methods:
 Behavior:
 
 - `IsVisible()` uses map-tile visibility
+- `IsExplored()` lets you distinguish explored fog from unexplored areas
 - Cached objects can throw a Lua error on most method calls after they become invisible
 - `GetName()`, `GetInternalName()`, and `GetMasterName()` return empty strings when name data is unavailable
 - Re-fetch object references in the current frame when fog-aware mode is active
@@ -449,6 +451,11 @@ Methods:
 - `GetTrees()`
 - `GetGold()`
 - `GetStone()`
+- `Cleanup()`
+
+Behavior:
+
+- `Cleanup()` removes cached resources that are visibly gone
 
 ### VillagerOccupation
 

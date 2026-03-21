@@ -111,6 +111,7 @@ Returned by `GetObjectsByType`, `GetObjectsByTypes`, `GetObjectsByClass`, and `G
 | `GetActionTargetPosition()` | `Vector3` | Returns the current action target position, which can be used for projectile impact position. |
 | `GetDirection()` | `Vector3` | Returns the current facing vector. |
 | `IsVisible()` | `boolean` | Returns whether the object is visible on the assigned player's current map tile visibility. |
+| `IsExplored()` | `boolean` | Returns whether the object's current area has been explored by the assigned player. |
 | `IsAlive()` | `boolean` | Returns whether the object is alive. |
 | `GetUnitObjectType()` | `UnitObjectType` | Returns the unit or building type id. |
 | `GetClass()` | `UnitClass` | Returns the unit class id. |
@@ -228,6 +229,7 @@ end
 | `GetTrees()` | `Object[]` | Returns tree objects. |
 | `GetGold()` | `Object[]` | Returns gold mine objects. |
 | `GetStone()` | `Object[]` | Returns stone mine objects. |
+| `Cleanup()` | `nil` | Removes cached resources that are visibly gone. |
 
 ### VillagerOccupation
 
@@ -321,7 +323,7 @@ end
 function Update()
     EnableScouting()
 
-    tracker:Update()
+    tracker:Cleanup()
     villagerOcc:Update()
     placement:Update()
 
@@ -340,6 +342,7 @@ end
 ## Binding Notes
 
 - `ResourceTracker:Update()` exists in C++ but is not exposed to Lua.
+- `ResourceTracker:Cleanup()` removes cached resources that are visibly gone.
 - `ConstructionPlacement:RenderDebug()` exists in C++ but is not exposed to Lua.
 - Cached `Object` references can become invalid for method calls when the object becomes invisible in fog-aware mode. Re-fetch objects in the current frame or enable **Modules See Everything** if you need persistent access.
 - `Object:IsVisible()` is the safe visibility check for cached objects and uses map-tile visibility.
