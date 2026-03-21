@@ -323,7 +323,7 @@ end
 function Update()
     EnableScouting()
 
-    tracker:Cleanup()
+    tracker:Update()
     villagerOcc:Update()
     placement:Update()
 
