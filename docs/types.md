@@ -267,10 +267,6 @@ end
 | `IsStructureTypeQueued(structureType)` | `boolean` | Returns whether a `UnitObjectType` is already queued. |
 | `IsUnitAssignedToBuilding(unitId)` | `boolean` | Returns whether a builder is already reserved for a request. |
 
-`TryBuildStructure(...)` was removed. Use `BuildStructure(...)` instead.
-
-`TryBuildStructureAtTown(...)` was removed. Use `BuildStructureAtTown(...)` instead.
-
 ## Examples
 
 Initialize strategic components in `Init()` instead of at file scope. Global-scope initialization can fail before the engine is ready.
@@ -314,8 +310,6 @@ local tracker = nil
 local villagerOcc = nil
 local placement = nil
 
-local isScoutingEnabled = false
-
 function Init()
     tracker = ResourceTracker:new()
     villagerOcc = VillagerOccupation:new(tracker)
@@ -325,10 +319,9 @@ function Init()
 end
 
 function Update()
-    if not isScoutingEnabled then
-        isScoutingEnabled = EnableScouting()
-    end
+    EnableScouting()
 
+    tracker:Update()
     villagerOcc:Update()
     placement:Update()
 
