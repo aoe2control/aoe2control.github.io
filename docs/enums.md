@@ -33,6 +33,17 @@ CONTROL exposes game and engine enums as Lua tables. Use them as `EnumName.VALUE
 | RESEARCHING | 2 |
 | RESEARCHED | 3 |
 
+### ReplaySpeed
+
+Used by `SetReplaySpeed()`.
+
+| Value | Description |
+|-------|-------------|
+| SLOW | Slower replay playback. |
+| NORMAL | Normal replay playback. |
+| FAST | Faster replay playback. |
+| FASTEST | Fastest replay playback. |
+
 ### ResourceType
 
 Used by `GetTechCost()`, `GetObjectCost()`, `Player:GetTechCost()`, and `Player:GetObjectCost()`.

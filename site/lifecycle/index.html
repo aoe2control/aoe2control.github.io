@@ -1013,7 +1013,7 @@
   <span class="md-ellipsis">
     
   
-    Game API — Commands
+    Game API — Control &amp; Commands
   
 
     
@@ -1609,7 +1609,7 @@
 <p><strong>When:</strong> Every rendered frame while the match is running.</p>
 <p><strong>Use for:</strong> Overlays, debug drawing, and read-only inspection.</p>
 <h3 id="end">End</h3>
-<p><strong>When:</strong> Once after the match ends. It also runs if a running match is manually exited.</p>
+<p><strong>When:</strong> Once after the match or replay ends. It also runs if a running match is manually exited.</p>
 <p><strong>Parameters:</strong> <code>hasWon</code> tells you whether the assigned player won. When the match is stopped by manually exiting, <code>hasWon</code> is <code>false</code>.</p>
 <h3 id="unload">Unload</h3>
 <p><strong>When:</strong> When the module instance is unloaded, disabled, replaced, or the engine is detached.</p>
@@ -1629,6 +1629,7 @@
 <li><code>Init</code> runs per module instance, not globally.</li>
 <li><code>Update</code> is the callback intended for game commands. Calling commands from other callbacks logs a warning, and <strong>Tournament Mode</strong> blocks them.</li>
 <li>Manually exiting a running match triggers <code>End(false)</code>.</li>
+<li>Replay playback reaching the end also triggers <code>End()</code>.</li>
 <li><code>Unload</code> can run without <code>End</code> if the user disables the instance, removes it, switches modules, or ejects CONTROL.</li>
 </ul>
 

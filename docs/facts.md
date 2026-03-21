@@ -1,9 +1,9 @@
 # Game API — Facts
 
-Most facts read game state and should be called from `Init`, `Update`, or `Render` while a match is running. **Tournament Mode** applies to game commands, not these read-only APIs.
+This page mirrors the `Facts` block in `ai_bindings.cpp`. Most facts read game state and should be called from `Init`, `Update`, or `Render` while a match is running. **Tournament Mode** applies to game commands, not these read-only APIs.
 
 !!! warning "Game must be running"
-    Calling game API before the game starts logs an error, except for `GetAssignedPlayerId()`, which is also available in `Load`.
+    Calling these APIs before the game starts logs an error.
 
 !!! note "Lua signatures are strict"
     Pass every argument shown below. A C++ default value does not make the parameter optional in Lua unless a separate overload is bound.
@@ -27,12 +27,10 @@ Most facts read game state and should be called from `Init`, `Update`, or `Rende
 | `GetObjectsByTypes` | `(unitTypes)` | `Object[]` | Returns alive world objects matching any type in the list. |
 | `GetObjectsByClass` | `(unitClass)` | `Object[]` | Returns alive world objects of a class, not just owned objects. |
 | `GetGameTime` | `()` | `number` | Returns the current match time in seconds. |
-| `IsMenuOpen` | `()` | `boolean` | Returns whether the game UI is currently in a menu state. |
 | `GetAllChatMessages` | `()` | `string[]` | Returns the current chat buffer as plain message strings. |
 | `GetNewChatMessages` | `()` | `string[]` | Returns chat messages that became visible since this module instance last called the function. |
 | `GetLastChatMessage` | `()` | `string \| nil` | Returns the newest chat message, or `nil` if the chat buffer is empty. |
 | `GetAssignedPlayer` | `()` | `Player` | Returns the player currently assigned to this module instance. |
-| `GetAssignedPlayerId` | `()` | `number` | Returns the player id currently assigned to this module instance. Available in `Load`. |
 | `GetPlayerById` | `(id)` | `Player` | Returns a player by index. Gaia is typically `0`, regular players are typically `1` to `8`. |
 | `GetPlayerCount` | `()` | `number` | Returns the size of the world player list. |
 | `GetMapTilesPtr` | `()` | `number, number` | Returns `(ptr, count)` for an engine-owned packed tile snapshot buffer. Intended for IPC / RPM readers. |
@@ -68,7 +66,7 @@ function Update()
     local wood = GetAttribute(PlayerAttribute.WOOD)
 
     if population < 60 and CanAfford(UnitObjectType.HOUSE, true) then
-        Log("Player " .. tostring(GetAssignedPlayerId()) .. " has " .. tostring(wood) .. " wood.")
+        Log("Player " .. tostring(assigned:GetId()) .. " has " .. tostring(wood) .. " wood.")
     end
 end
 ```
@@ -129,18 +127,6 @@ end
 ```
 
 ```lua
-function Update()
-    if IsMenuOpen() then
-        return
-    end
-
-    for _, message in ipairs(GetNewChatMessages()) do
-        Log("New chat: " .. message)
-    end
-end
-```
-
-```lua
 function Init()
     local villagerHp = GetObjectTypeAttribute(UnitObjectType.VILLAGER_MALE, ObjectAttribute.HITPOINTS, 0)
     local villagerTrainTime = GetObjectTypeData(UnitObjectType.VILLAGER_MALE, ObjectData.CREATION_TIME)
@@ -152,7 +138,7 @@ end
 ## Notes
 
 - Use `GetAssignedPlayer()`, not `GetLocalPlayer()`.
-- `GetAssignedPlayerId()` is intentionally available in `Load(playerId)` before the match is running.
+- `GetAssignedPlayerId()` is documented on the control page because it is bound under the engine section and is also available in `Load(playerId)`.
 - `GetObjectsByType`, `GetObjectsByTypes`, and `GetObjectsByClass` scan alive world objects, not only the assigned player's objects.
 - `GetMapTile(position)` floors `position.x` and `position.y` to integer tile coordinates before resolving the tile.
 - `CalculatePath()` uses the game's native pathfinding, now accepts `Vector3` start and target positions, and returns an empty list when no path is available.

@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Reference for AoE2Control game commands in Lua, including training units, moving armies, researching technologies, camera control, and chat.">
+        <meta name="description" content="Reference for AoE2Control engine control APIs and game commands in Lua, including replay control, menu state, training units, moving armies, researching technologies, camera control, and chat.">
       
       
       
@@ -27,7 +27,7 @@
     
     
       
-        <title>Game API — Commands - AoE2Control Documentation</title>
+        <title>Game API — Control & Commands - AoE2Control Documentation</title>
       
     
     
@@ -81,7 +81,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#game-api-commands" class="md-skip">
+        <a href="#game-api-control-commands" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Game API — Commands
+              Game API — Control &amp; Commands
             
           </span>
         </div>
@@ -870,7 +870,7 @@
   <span class="md-ellipsis">
     
   
-    Game API — Commands
+    Game API — Control &amp; Commands
   
 
     
@@ -888,7 +888,7 @@
   <span class="md-ellipsis">
     
   
-    Game API — Commands
+    Game API — Control &amp; Commands
   
 
     
@@ -914,10 +914,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#command-rules" class="md-nav__link">
+  <a href="#api-rules" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Command Rules
+        API Rules
       
     </span>
   </a>
@@ -925,10 +925,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#reference" class="md-nav__link">
+  <a href="#engine" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Reference
+        Engine
       
     </span>
   </a>
@@ -936,10 +936,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
+  <a href="#menu-ui" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Example
+        Menu / UI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#replays" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Replays
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commands
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
       
     </span>
   </a>
@@ -1529,25 +1562,24 @@
 
 
 
-<h1 id="game-api-commands">Game API — Commands</h1>
-<p>Commands perform actions in the game. Use game commands from <code>Update()</code> while a match is running.</p>
+<h1 id="game-api-control-commands">Game API — Control &amp; Commands</h1>
+<p>This page mirrors the same grouping used in <code>ai_bindings.cpp</code>: <code>Engine</code>, <code>Menu / UI</code>, <code>Replays</code>, and <code>Commands</code>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Game must be running</p>
-<p>Calling game API before the game starts logs an error.</p>
+<p>Calling game API before the game starts logs an error, except for <code>GetAssignedPlayerId()</code>, which is also available in <code>Load</code>.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Lua signatures are strict</p>
 <p>Lua only gets overloads that are explicitly bound. If a parameter is shown here, pass it explicitly even if the C++ function has a default value.</p>
 </div>
-<h2 id="command-rules">Command Rules</h2>
+<h2 id="api-rules">API Rules</h2>
 <ul>
+<li>Only the <strong>Commands</strong> section below is subject to the <code>Update()</code>-only warning and <strong>Tournament Mode</strong> blocking.</li>
 <li>Most unit and building commands silently filter the input list down to objects owned by the assigned player.</li>
-<li><code>SetGameSpeedMultiplier</code>, <code>SetCameraPosition</code>, and <code>SendChatMessage</code> are game commands, but they are not ownership-filtered.</li>
-<li>Calling a game command outside <code>Update()</code> logs a warning once per module load.</li>
-<li>If <strong>Tournament Mode</strong> is enabled, game commands outside <code>Update()</code> are blocked.</li>
+<li><code>SetCameraPosition</code> and <code>SendChatMessage</code> are game commands, but they are not ownership-filtered.</li>
 <li><code>Log()</code> is not a game command and can be used from any callback.</li>
 </ul>
-<h2 id="reference">Reference</h2>
+<h2 id="engine">Engine</h2>
 <table>
 <thead>
 <tr>
@@ -1565,11 +1597,86 @@
 <td>Writes a message to CONTROL's log window.</td>
 </tr>
 <tr>
+<td><code>GetAssignedPlayerId</code></td>
+<td><code>()</code></td>
+<td><code>number</code></td>
+<td>Returns the player id currently assigned to this module instance. Available in <code>Load</code>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="menu-ui">Menu / UI</h2>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Signature</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>IsGamePaused</code></td>
+<td><code>()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether the current game or replay is paused.</td>
+</tr>
+<tr>
+<td><code>IsMenuOpen</code></td>
+<td><code>()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether the game UI is currently in a menu state. Also works during replays.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="replays">Replays</h2>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Signature</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
 <td><code>SetGameSpeedMultiplier</code></td>
 <td><code>(multiplier)</code></td>
 <td><code>nil</code></td>
-<td>Sets the game speed multiplier.</td>
+<td>Sets the current game or replay speed multiplier.</td>
 </tr>
+<tr>
+<td><code>SetGamePaused</code></td>
+<td><code>(paused)</code></td>
+<td><code>nil</code></td>
+<td>Pauses or resumes the active replay.</td>
+</tr>
+<tr>
+<td><code>SetReplaySpeed</code></td>
+<td><code>(speed)</code></td>
+<td><code>nil</code></td>
+<td>Sets replay playback speed using <code>ReplaySpeed</code>.</td>
+</tr>
+<tr>
+<td><code>GetCurrentReplayFileName</code></td>
+<td><code>()</code></td>
+<td><code>string</code></td>
+<td>Returns the current replay file name while a replay is active.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="commands">Commands</h2>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Signature</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
 <tr>
 <td><code>SetCameraPosition</code></td>
 <td><code>(position)</code></td>
@@ -1728,7 +1835,19 @@
 </tr>
 </tbody>
 </table>
-<h2 id="example">Example</h2>
+<h2 id="examples">Examples</h2>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Render</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nf">IsMenuOpen</span><span class="p">()</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nf">IsGamePaused</span><span class="p">()</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="nf">RenderText</span><span class="p">(</span><span class="s2">&quot;Live gameplay&quot;</span><span class="p">,</span><span class="w"> </span><span class="nf">Vector2</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">),</span><span class="w"> </span><span class="mf">18.0</span><span class="p">,</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">),</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Update</span><span class="p">()</span>
+<span class="w">    </span><span class="nf">SetReplaySpeed</span><span class="p">(</span><span class="nv">ReplaySpeed</span><span class="p">.</span><span class="py">FAST</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
 <div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Update</span><span class="p">()</span>
 <span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">player</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetAssignedPlayer</span><span class="p">()</span>
 <span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">player</span><span class="w"> </span><span class="kr">then</span>
@@ -1747,11 +1866,14 @@
 </code></pre></div>
 <h2 id="notes">Notes</h2>
 <ul>
+<li><code>GetAssignedPlayerId()</code> is intentionally available in <code>Load(playerId)</code> before the match is running.</li>
+<li><code>IsMenuOpen()</code> now also works during replays.</li>
+<li><code>SetReplaySpeed()</code> uses <code>ReplaySpeed.SLOW</code>, <code>ReplaySpeed.NORMAL</code>, <code>ReplaySpeed.FAST</code>, and <code>ReplaySpeed.FASTEST</code>.</li>
 <li><code>TrainUnit</code> has overloads with and without explicit <code>trainSources</code>.</li>
 <li><code>TrainUnit(unitId)</code> and <code>TrainUnit(unitId, amount)</code> look up eligible source object types automatically.</li>
 <li><code>ResearchTechnology</code> still requires all shown arguments in Lua.</li>
 <li><code>DeleteUnit</code>, <code>DestroyBuilding</code>, and stance commands do not return success flags.</li>
-<li>If <code>Sequential Actions</code> is enabled, only the first command that executes in a tick succeeds.</li>
+<li>Only the <strong>Commands</strong> section is affected by <code>Sequential Actions</code>, outside-<code>Update()</code> warnings, and <strong>Tournament Mode</strong> blocking.</li>
 </ul>
 
 

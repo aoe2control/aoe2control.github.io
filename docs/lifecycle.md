@@ -36,7 +36,7 @@ Each configured module instance can implement up to six callbacks. All of them a
 
 ### End
 
-**When:** Once after the match ends. It also runs if a running match is manually exited.
+**When:** Once after the match or replay ends. It also runs if a running match is manually exited.
 
 **Parameters:** `hasWon` tells you whether the assigned player won. When the match is stopped by manually exiting, `hasWon` is `false`.
 
@@ -65,4 +65,5 @@ flowchart LR
 - `Init` runs per module instance, not globally.
 - `Update` is the callback intended for game commands. Calling commands from other callbacks logs a warning, and **Tournament Mode** blocks them.
 - Manually exiting a running match triggers `End(false)`.
+- Replay playback reaching the end also triggers `End()`.
 - `Unload` can run without `End` if the user disables the instance, removes it, switches modules, or ejects CONTROL.

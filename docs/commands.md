@@ -1,31 +1,51 @@
 ---
-description: Reference for AoE2Control game commands in Lua, including training units, moving armies, researching technologies, camera control, and chat.
+description: Reference for AoE2Control engine control APIs and game commands in Lua, including replay control, menu state, training units, moving armies, researching technologies, camera control, and chat.
 ---
 
-# Game API — Commands
+# Game API — Control & Commands
 
-Commands perform actions in the game. Use game commands from `Update()` while a match is running.
+This page mirrors the same grouping used in `ai_bindings.cpp`: `Engine`, `Menu / UI`, `Replays`, and `Commands`.
 
 !!! warning "Game must be running"
-    Calling game API before the game starts logs an error.
+    Calling game API before the game starts logs an error, except for `GetAssignedPlayerId()`, which is also available in `Load`.
 
 !!! note "Lua signatures are strict"
     Lua only gets overloads that are explicitly bound. If a parameter is shown here, pass it explicitly even if the C++ function has a default value.
 
-## Command Rules
+## API Rules
 
+- Only the **Commands** section below is subject to the `Update()`-only warning and **Tournament Mode** blocking.
 - Most unit and building commands silently filter the input list down to objects owned by the assigned player.
-- `SetGameSpeedMultiplier`, `SetCameraPosition`, and `SendChatMessage` are game commands, but they are not ownership-filtered.
-- Calling a game command outside `Update()` logs a warning once per module load.
-- If **Tournament Mode** is enabled, game commands outside `Update()` are blocked.
+- `SetCameraPosition` and `SendChatMessage` are game commands, but they are not ownership-filtered.
 - `Log()` is not a game command and can be used from any callback.
 
-## Reference
+## Engine
 
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
 | `Log` | `(message)` | `nil` | Writes a message to CONTROL's log window. |
-| `SetGameSpeedMultiplier` | `(multiplier)` | `nil` | Sets the game speed multiplier. |
+| `GetAssignedPlayerId` | `()` | `number` | Returns the player id currently assigned to this module instance. Available in `Load`. |
+
+## Menu / UI
+
+| Function | Signature | Returns | Description |
+|----------|-----------|---------|-------------|
+| `IsGamePaused` | `()` | `boolean` | Returns whether the current game or replay is paused. |
+| `IsMenuOpen` | `()` | `boolean` | Returns whether the game UI is currently in a menu state. Also works during replays. |
+
+## Replays
+
+| Function | Signature | Returns | Description |
+|----------|-----------|---------|-------------|
+| `SetGameSpeedMultiplier` | `(multiplier)` | `nil` | Sets the current game or replay speed multiplier. |
+| `SetGamePaused` | `(paused)` | `nil` | Pauses or resumes the active replay. |
+| `SetReplaySpeed` | `(speed)` | `nil` | Sets replay playback speed using `ReplaySpeed`. |
+| `GetCurrentReplayFileName` | `()` | `string` | Returns the current replay file name while a replay is active. |
+
+## Commands
+
+| Function | Signature | Returns | Description |
+|----------|-----------|---------|-------------|
 | `SetCameraPosition` | `(position)` | `nil` | Moves the camera to a `Vector2` world position. |
 | `SendChatMessage` | `(message)` | `nil` | Sends chat text as the assigned player. |
 | `TrainUnit` | `(unitId)` | `boolean` | Trains one unit by automatically selecting a matching production source for the assigned player. |
@@ -53,7 +73,23 @@ Commands perform actions in the game. Use game commands from `Update()` while a 
 | `SetUnitStanceSeekShelter` | `(units)` | `nil` | Orders owned units to seek shelter. |
 | `SetUnitCombatStance` | `(units, stance)` | `nil` | Sets the combat stance of owned units using `UnitCombatStance`. |
 
-## Example
+## Examples
+
+```lua
+function Render()
+    if IsMenuOpen() or IsGamePaused() then
+        return
+    end
+
+    RenderText("Live gameplay", Vector2(30, 30), 18.0, Color(255, 255, 255), false, true)
+end
+```
+
+```lua
+function Update()
+    SetReplaySpeed(ReplaySpeed.FAST)
+end
+```
 
 ```lua
 function Update()
@@ -75,8 +111,11 @@ end
 
 ## Notes
 
+- `GetAssignedPlayerId()` is intentionally available in `Load(playerId)` before the match is running.
+- `IsMenuOpen()` now also works during replays.
+- `SetReplaySpeed()` uses `ReplaySpeed.SLOW`, `ReplaySpeed.NORMAL`, `ReplaySpeed.FAST`, and `ReplaySpeed.FASTEST`.
 - `TrainUnit` has overloads with and without explicit `trainSources`.
 - `TrainUnit(unitId)` and `TrainUnit(unitId, amount)` look up eligible source object types automatically.
 - `ResearchTechnology` still requires all shown arguments in Lua.
 - `DeleteUnit`, `DestroyBuilding`, and stance commands do not return success flags.
-- If `Sequential Actions` is enabled, only the first command that executes in a tick succeeds.
+- Only the **Commands** section is affected by `Sequential Actions`, outside-`Update()` warnings, and **Tournament Mode** blocking.

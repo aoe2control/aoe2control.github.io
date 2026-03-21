@@ -858,7 +858,7 @@
   <span class="md-ellipsis">
     
   
-    Game API — Commands
+    Game API — Control &amp; Commands
   
 
     
@@ -2602,7 +2602,7 @@
 <span class="kr">function</span><span class="w"> </span><span class="nf">Update</span><span class="p">()</span>
 <span class="w">    </span><span class="nf">EnableScouting</span><span class="p">()</span>
 
-<span class="w">    </span><span class="nv">tracker</span><span class="p">:</span><span class="nf">Cleanup</span><span class="p">()</span>
+<span class="w">    </span><span class="nv">tracker</span><span class="p">:</span><span class="nf">Update</span><span class="p">()</span>
 <span class="w">    </span><span class="nv">villagerOcc</span><span class="p">:</span><span class="nf">Update</span><span class="p">()</span>
 <span class="w">    </span><span class="nv">placement</span><span class="p">:</span><span class="nf">Update</span><span class="p">()</span>
 
@@ -2619,7 +2619,6 @@
 </code></pre></div>
 <h2 id="binding-notes">Binding Notes</h2>
 <ul>
-<li><code>ResourceTracker:Update()</code> exists in C++ but is not exposed to Lua.</li>
 <li><code>ResourceTracker:Cleanup()</code> removes cached resources that are visibly gone.</li>
 <li><code>ConstructionPlacement:RenderDebug()</code> exists in C++ but is not exposed to Lua.</li>
 <li>Cached <code>Object</code> references can become invalid for method calls when the object becomes invisible in fog-aware mode. Re-fetch objects in the current frame or enable <strong>Modules See Everything</strong> if you need persistent access.</li>
