@@ -19,7 +19,7 @@ Multiplayer is allowed when cheats are enabled.
 - Large projects may need optimization. The Lua interpreter handles scripts of varying size; scripters are responsible for performance.
 - Avoid heavy work in `Render()` — it runs every frame.
 - The Debug menu's **Module Telemetry** view samples `Update()` and `Render()` cost against a sampled baseline frame cost.
-- `ConstructionPlacement` now caches map tile state internally to reduce repeated placement overhead.
+- `ConstructionPlacement` caches map tile state internally to reduce repeated placement overhead.
 
 ## Sandbox
 

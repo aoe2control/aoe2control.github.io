@@ -4,6 +4,8 @@ CONTROL exposes game and engine enums as Lua tables. Use them as `EnumName.VALUE
 
 ## Game Enums
 
+Game-setup enums used by `GameOptions` are documented on the [GameOptions](game-options.md) page so the type and its related enum tables stay together.
+
 ### PlayerType
 
 | Value | Description |

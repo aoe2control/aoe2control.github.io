@@ -1,6 +1,6 @@
 # Game API — Facts
 
-This page mirrors the `Facts` block in `ai_bindings.cpp`. Most facts read game state and should be called from `Init`, `Update`, or `Render` while a match is running. **Tournament Mode** applies to game commands, not these read-only APIs.
+This page mirrors the `Facts` block in `BindGameAPI()`. Most facts read game state and should be called from `Init`, `Update`, or `Render` while a match is running. **Tournament Mode** applies to game commands, not these read-only APIs.
 
 !!! warning "Game must be running"
     Calling these APIs before the game starts logs an error.
@@ -141,7 +141,7 @@ end
 - `GetAssignedPlayerId()` is documented on the control page because it is bound under the engine section and is also available in `Load(playerId)`.
 - `GetObjectsByType`, `GetObjectsByTypes`, and `GetObjectsByClass` scan alive world objects, not only the assigned player's objects.
 - `GetMapTile(position)` floors `position.x` and `position.y` to integer tile coordinates before resolving the tile.
-- `CalculatePath()` uses the game's native pathfinding, now accepts `Vector3` start and target positions, and returns an empty list when no path is available.
+- `CalculatePath()` uses the game's native pathfinding, accepts `Vector3` start and target positions, and returns an empty list when no path is available.
 - `GetObjectsInArea(pos1, pos2)` only returns alive objects and follows the same fog-aware visibility checks as the rest of the object API.
 - `GetTechCost()` and `GetObjectCost()` return arrays of resource-cost entries. Use `entry.resourceId` and `entry.amount`; numeric indexes `entry[1]` and `entry[2]` mirror the same values.
 - `GetAllChatMessages()` and `GetLastChatMessage()` read from the game's current chat buffer.

@@ -1,35 +1,46 @@
 ---
-description: Reference for AoE2Control engine control APIs and game commands in Lua, including replay control, menu state, training units, moving armies, researching technologies, camera control, and chat.
+description: Reference for AoE2Control engine control APIs, session automation helpers, replay controls, and in-match command functions in Lua.
 ---
 
 # Game API — Control & Commands
 
-This page mirrors the same grouping used in `ai_bindings.cpp`: `Engine`, `Menu / UI`, `Replays`, and `Commands`.
+This page follows the same grouping used by `BindGameAPI()` in `module_bindings.cpp`: `Engine`, `Menu / UI`, `Replays`, and `Commands`.
 
 !!! warning "Game must be running"
-    Calling game API before the game starts logs an error, except for `GetAssignedPlayerId()`, which is also available in `Load`.
+    Calling most game API functions before the game starts logs an error. The main exception is `GetAssignedPlayerId()`, which is also available in `Load`.
 
 !!! note "Lua signatures are strict"
     Lua only gets overloads that are explicitly bound. If a parameter is shown here, pass it explicitly even if the C++ function has a default value.
 
 ## API Rules
 
-- Only the **Commands** section below is subject to the `Update()`-only warning and **Tournament Mode** blocking.
+- Only the **Commands** section below is subject to replay blocking, the `Update()`-only warning, `Sequential Actions`, and **Tournament Mode** blocking.
 - Most unit and building commands silently filter the input list down to objects owned by the assigned player.
-- `SetCameraPosition` and `SendChatMessage` are game commands, but they are not ownership-filtered.
-- `Log()` is not a game command and can be used from any callback.
+- `SetCameraPosition` and `SendChatMessage` are command-style functions, but they are not ownership-filtered.
+- `Log()`, `SetEngineUIVisibility()`, and `UnloadEngine()` are not in-match game commands and can be used from any callback.
+
+For a deeper guide to match startup, save loading, and pre-game setup, see [Automation & Session Control](session-control.md) and [GameOptions](game-options.md).
 
 ## Engine
 
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
-| `Log` | `(message)` | `nil` | Writes a message to CONTROL's log window. |
+| `Log` | `(message)` | `nil` | Writes a message to the CONTROL log window. |
+| `SetEngineUIVisibility` | `(visible)` | `nil` | Shows or hides the CONTROL overlay. |
+| `UnloadEngine` | `()` | `nil` | Detaches CONTROL from the game process. |
 | `GetAssignedPlayerId` | `()` | `number` | Returns the player id currently assigned to this module instance. Available in `Load`. |
 
 ## Menu / UI
 
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
+| `DispatchStartGame` | `()` | `boolean` | Starts the currently configured session. |
+| `DispatchRestartGame` | `()` | `boolean` | Restarts the current single-player session when supported. |
+| `DispatchResignGame` | `()` | `boolean` | Resigns the current game. |
+| `DispatchQuitGame` | `()` | `boolean` | Exits the current game flow when supported. |
+| `DispatchLoadGame` | `(saveGameFileName)` | `boolean` | Loads a file from the current load-game list by file name. |
+| `GetAvailableSaveFiles` | `()` | `string[]` | Returns the file names currently exposed by the game's load-game list. |
+| `GetCurrentGameOptions` | `()` | `GameOptions \| nil` | Returns the current session setup object when available. |
 | `IsGamePaused` | `()` | `boolean` | Returns whether the current game or replay is paused. |
 | `IsMenuOpen` | `()` | `boolean` | Returns whether the game UI is currently in a menu state. Also works during replays. |
 
@@ -38,7 +49,7 @@ This page mirrors the same grouping used in `ai_bindings.cpp`: `Engine`, `Menu /
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
 | `SetGameSpeedMultiplier` | `(multiplier)` | `nil` | Sets the current game or replay speed multiplier. |
-| `SetGamePaused` | `(paused)` | `nil` | Pauses or resumes the active replay. |
+| `SetGamePaused` | `(paused)` | `nil` | Pauses or resumes the current game or replay session. |
 | `SetReplaySpeed` | `(speed)` | `nil` | Sets replay playback speed using `ReplaySpeed`. |
 | `GetCurrentReplayFileName` | `()` | `string` | Returns the current replay file name while a replay is active. |
 
@@ -112,10 +123,11 @@ end
 ## Notes
 
 - `GetAssignedPlayerId()` is intentionally available in `Load(playerId)` before the match is running.
-- `IsMenuOpen()` now also works during replays.
+- `GetCurrentGameOptions()` returns the session setup object documented on [GameOptions](game-options.md).
+- `DispatchLoadGame()` expects an exact file name from `GetAvailableSaveFiles()`.
 - `SetReplaySpeed()` uses `ReplaySpeed.SLOW`, `ReplaySpeed.NORMAL`, `ReplaySpeed.FAST`, and `ReplaySpeed.FASTEST`.
 - `TrainUnit` has overloads with and without explicit `trainSources`.
 - `TrainUnit(unitId)` and `TrainUnit(unitId, amount)` look up eligible source object types automatically.
-- `ResearchTechnology` still requires all shown arguments in Lua.
+- `ResearchTechnology` requires all shown arguments in Lua.
 - `DeleteUnit`, `DestroyBuilding`, and stance commands do not return success flags.
-- Only the **Commands** section is affected by `Sequential Actions`, outside-`Update()` warnings, and **Tournament Mode** blocking.
+- Only the **Commands** section is affected by replay blocking, `Sequential Actions`, outside-`Update()` warnings, and **Tournament Mode** blocking.

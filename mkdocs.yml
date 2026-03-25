@@ -53,6 +53,7 @@ nav:
   - Getting Started:
     - getting-started.md
     - quick-example.md
+    - headless-mode.md
   - Interface & Configuration:
     - interface-options.md
     - config-location.md
@@ -61,10 +62,12 @@ nav:
     - module-system.md
   - Game API:
     - commands.md
+    - session-control.md
     - facts.md
   - Render API: render-api.md
   - Types & Enums:
     - types.md
+    - game-options.md
     - enums.md
   - Advanced APIs:
     - settings-api.md

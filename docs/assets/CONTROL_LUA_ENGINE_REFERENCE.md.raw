@@ -59,19 +59,28 @@ Read-only game API calls are valid during `Init`, `Update`, or `Render`. Game co
 
 ## 4. Commands
 
-This section follows the same grouping as `BindGameAPI()` in `ai_bindings.cpp`.
+This section follows the same grouping as `BindGameAPI()` in `module_bindings.cpp`.
 
 ### Engine
 
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
 | `Log` | `(message)` | `nil` | Write to CONTROL's log window. |
+| `SetEngineUIVisibility` | `(visible)` | `nil` | Show or hide the CONTROL overlay. |
+| `UnloadEngine` | `()` | `nil` | Detach CONTROL from the game process. |
 | `GetAssignedPlayerId` | `()` | `number` | Assigned player id for this module instance. Available in `Load`. |
 
 ### Menu / UI
 
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
+| `DispatchStartGame` | `()` | `boolean` | Start the currently configured session. |
+| `DispatchRestartGame` | `()` | `boolean` | Restart the current single-player session when supported. |
+| `DispatchResignGame` | `()` | `boolean` | Resign the current game. |
+| `DispatchQuitGame` | `()` | `boolean` | Exit the current game flow when supported. |
+| `DispatchLoadGame` | `(saveGameFileName)` | `boolean` | Load a file from the current load-game list by file name. |
+| `GetAvailableSaveFiles` | `()` | `string[]` | File names currently exposed by the game's load-game list. |
+| `GetCurrentGameOptions` | `()` | `GameOptions \| nil` | Current session setup object when available. |
 | `IsGamePaused` | `()` | `boolean` | Whether the current game or replay is paused. |
 | `IsMenuOpen` | `()` | `boolean` | Whether the game UI is currently in a menu state. Also works during replays. |
 
@@ -119,10 +128,10 @@ Command functions usually filter input objects to ones owned by the assigned pla
 
 Rules:
 
-- Only the **Commands** subsection is subject to outside-`Update()` warnings and **Tournament Mode** blocking
+- Only the **Commands** subsection is subject to replay blocking, outside-`Update()` warnings, and **Tournament Mode** blocking
 - Most unit and building commands filter inputs to objects owned by the assigned player
 - `SetCameraPosition` and `SendChatMessage` are game commands, but they are not ownership-filtered
-- `Log()` is not a game command and can be used from any callback
+- `Log()`, `SetEngineUIVisibility()`, and `UnloadEngine()` are not in-match game commands
 - If `Sequential Actions` is enabled, only the first successful command per tick executes
 
 ---
@@ -177,7 +186,7 @@ Notes:
 - Use `GetAssignedPlayer()`, not `GetLocalPlayer()`.
 - `GetAssignedPlayerId()` is documented in the Engine subsection above because it is available before the match starts and can be used from `Load(playerId)`.
 - `GetMapTile(position)` floors `position.x` and `position.y`.
-- `CalculatePath()` uses the game's native pathfinding, now accepts `Vector3` start and target positions, and returns an empty list when no path is available.
+- `CalculatePath()` uses the game's native pathfinding, accepts `Vector3` start and target positions, and returns an empty list when no path is available.
 - `GetObjectsInArea(pos1, pos2)` only returns alive objects and still respects fog-aware visibility.
 - `GetTechCost()` and `GetObjectCost()` return arrays of resource-cost entries. Use `entry.resourceId` and `entry.amount`; numeric indexes `entry[1]` and `entry[2]` mirror the same values.
 - `GetAllChatMessages()` and `GetLastChatMessage()` read from the game's current chat buffer.
@@ -360,7 +369,6 @@ Methods:
 - `GetActionTargetPosition()`
 - `GetDirection()`
 - `IsVisible()`
-- `IsExplored()`
 - `IsAlive()`
 - `GetUnitObjectType()`
 - `GetClass()`
@@ -382,7 +390,6 @@ Methods:
 Behavior:
 
 - `IsVisible()` uses map-tile visibility
-- `IsExplored()` lets you distinguish explored fog from unexplored areas
 - Cached objects can throw a Lua error on most method calls after they become invisible
 - `GetName()`, `GetInternalName()`, and `GetMasterName()` return empty strings when name data is unavailable
 - Re-fetch object references in the current frame when fog-aware mode is active
@@ -418,6 +425,51 @@ Enum notes:
 - `TileVisibility.EXPLORED = 128`
 - Use `ObjectAttribute` instead of `UnitAttribute`
 - `ObjectData` entries use names without the `OBJECT_DATA_` prefix
+
+### GameOptions
+
+Obtained from `GetCurrentGameOptions()`.
+
+Global setup methods:
+
+- `GetAIDifficulty()` / `SetAIDifficulty(difficulty)`
+- `GetCivilizationSet()` / `SetCivilizationSet(civilizationSet)`
+- `GetGameMode()` / `SetGameMode(gameMode)`
+- `GetMapSize()` / `SetMapSize(mapSize)`
+- `GetStartingAge()` / `SetStartingAge(age)`
+- `GetEndingAge()` / `SetEndingAge(age)`
+- `GetGameSpeed()` / `SetGameSpeed(gameSpeed)`
+- `GetRevealMap()` / `SetRevealMap(revealMap)`
+- `GetVictory()` / `SetVictory(victory)`
+- `GetVictoryLimit()` / `SetVictoryLimit(victoryLimit)`
+- `GetResources()` / `SetResources(resources)`
+- `GetPopulation()` / `SetPopulation(population)`
+- `GetTeamsNotTogether()` / `SetTeamsNotTogether(teamsNotTogether)`
+- `GetRecordGame()` / `SetRecordGame(recordGame)`
+- `GetTeamPositions()` / `SetTeamPositions(teamPositions)`
+- `GetFullTechTree()` / `SetFullTechTree(fullTechTree)`
+- `GetLockTeams()` / `SetLockTeams(lockTeams)`
+- `GetLockSpeed()` / `SetLockSpeed(lockSpeed)`
+- `GetTurboMode()` / `SetTurboMode(turboMode)`
+- `GetAntiquityMode()` / `SetAntiquityMode(antiquityMode)`
+- `GetLocation()` / `SetLocation(location)`
+- `GetPlayersCount()` / `SetPlayersCount(playersCount)`
+- `GetTreatyLength()` / `SetTreatyLength(treatyLength)`
+- `GetHandicap()` / `SetHandicap(handicap)`
+
+Player-slot methods:
+
+- `GetPlayerTeam(playerIndex)` / `SetPlayerTeam(playerIndex, team)`
+- `GetPlayerHandicapPercentage(playerIndex)` / `SetPlayerHandicapPercentage(playerIndex, handicapPercentage)`
+- `GetPlayerColor(playerIndex)` / `SetPlayerColor(playerIndex, color)`
+- `GetPlayerCivilization(playerIndex)` / `SetPlayerCivilization(playerIndex, civilization)`
+
+Behavior:
+
+- `GetCurrentGameOptions()` can return `nil`
+- Setter methods return `false` while already in game
+- Player-slot methods accept indexes `0` to `7`
+- The associated enum tables are `OptionsAIDifficulty`, `OptionsCivilizationSet`, `OptionsGameMode`, `OptionsMapSize`, `OptionsAge`, `OptionsRevealMap`, `OptionsVictory`, `OptionsResources`, `OptionsLocation`, and `OptionsCivilization`
 
 ### Player
 
@@ -466,6 +518,7 @@ Constructor: `ResourceTracker()`
 
 Methods:
 
+- `Update()`
 - `GetConvertibleLivestock(position, radius)`
 - `GetOwnedLivestock()`
 - `GetDeadLivestock(position, radius)`
@@ -520,16 +573,13 @@ Methods:
 
 Notes:
 
-- `BuildStructure(...)`, `FindBestPosition(...)`, and queue helpers now take `UnitObjectType` and derive placement size internally
+- `BuildStructure(...)`, `FindBestPosition(...)`, and queue helpers take `UnitObjectType` and derive placement size internally
 - Convenience `BuildStructure(...)` overloads can auto-select a builder villager and issue the build command directly
 - `BuildStructureAtTown(...)` adds town-center-oriented placement helpers
 - Map tile state is cached internally to improve repeated placement work
-- `TryBuildStructure(...)` was removed; use `BuildStructure(...)`
-- `TryBuildStructureAtTown(...)` was removed; use `BuildStructureAtTown(...)`
 
 Not exposed to Lua:
 
-- `ResourceTracker.Update`
 - `ConstructionPlacement.RenderDebug`
 
 ---
@@ -539,14 +589,15 @@ Not exposed to Lua:
 - Global module toggle defaults to enabled
 - Module configuration is grouped by `Player 1` to `Player 8`
 - Each player group exposes one module slot for that player
-- The old **AI** submenu was renamed to **MODULES**
-- `Disable AI Suppression` defaults to `false`; when enabled, assigned bot players keep their native decision AI
+- The built-in submenus are **MODULES**, **UI**, **MISC**, **KEYBINDS**, and **DEBUG**
+- `Suppress Native AI` defaults to `true`; when enabled, assigned bot players have their native decision AI disabled while a Lua module is attached
 - `Modules See Everything` defaults to `false` and affects map-tile reads, object visibility, and restricted cross-player data access
-- Player perspective options live under the **EXPERIMENTAL** submenu: `Default`, `Player 1` to `Player 8`, `All Players`, `Gaia`
+- Player perspective options live under the **MISC** submenu: `Default`, `Player 1` to `Player 8`, `All Players`, `Gaia`
+- Menu scale and transparency live under the **UI** submenu
 - `Tournament Mode` blocks game commands outside `Update()`
 - By default, assigning a module to a bot player's slot suppresses that player's native decision AI while the module remains assigned
 - The Debug menu's **Module Telemetry** view shows sampled `Update()` and `Render()` timing for active modules, plus a sampled baseline frame cost
-- `Spectator Mode` replaced the old `Reveal Map` misc option and keeps controls enabled while spectating
+- `Spectator Mode` keeps controls enabled while spectating
 - Runtime Lua errors are displayed and logged through the UI
 
 ---

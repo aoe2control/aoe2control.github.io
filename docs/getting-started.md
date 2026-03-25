@@ -80,6 +80,7 @@ All callbacks are **optional**.
 ## Next Steps
 
 - [Quick Example](quick-example.md)
+- [Headless Mode](headless-mode.md)
 - [Lifecycle](lifecycle.md)
 - [Module System](module-system.md)
 - [Interface Options](interface-options.md)

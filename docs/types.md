@@ -2,6 +2,8 @@
 
 CONTROL exposes math helpers, game objects, and strategic helper classes to Lua.
 
+Pre-game setup access through `GetCurrentGameOptions()` is documented on the dedicated [GameOptions](game-options.md) page.
+
 !!! note "Lua signatures are strict"
     If a method parameter is listed here, pass it explicitly unless a separate overload is shown.
 
@@ -111,7 +113,6 @@ Returned by `GetObjectsByType`, `GetObjectsByTypes`, `GetObjectsByClass`, and `G
 | `GetActionTargetPosition()` | `Vector3` | Returns the current action target position, which can be used for projectile impact position. |
 | `GetDirection()` | `Vector3` | Returns the current facing vector. |
 | `IsVisible()` | `boolean` | Returns whether the object is visible on the assigned player's current map tile visibility. |
-| `IsExplored()` | `boolean` | Returns whether the object's current area has been explored by the assigned player. |
 | `IsAlive()` | `boolean` | Returns whether the object is alive. |
 | `GetUnitObjectType()` | `UnitObjectType` | Returns the unit or building type id. |
 | `GetClass()` | `UnitClass` | Returns the unit class id. |
@@ -221,6 +222,7 @@ end
 
 | Method | Returns | Description |
 |--------|---------|-------------|
+| `Update()` | `nil` | Refreshes tracked resource state for the current frame. |
 | `GetConvertibleLivestock(position, radius)` | `Object[]` | Returns convertible livestock near a position. |
 | `GetOwnedLivestock()` | `Object[]` | Returns currently owned livestock. |
 | `GetDeadLivestock(position, radius)` | `Object[]` | Returns dead livestock near a position. |

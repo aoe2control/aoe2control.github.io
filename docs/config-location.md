@@ -10,7 +10,7 @@ All CONTROL configuration and module data lives here:
 
 | Item | Description |
 |------|-------------|
-| `settings.ini` | Global module settings, experimental options, module instance configs, profiles, misc options, and module settings. |
+| `settings.ini` | Built-in submenu settings, module instance configs, sync profiles, and module-defined settings. |
 | `imgui.ini` | Saved ImGui layout. |
 | `modules/` | Lua and encrypted module projects. |
 
@@ -31,6 +31,11 @@ modules/
 - Module discovery depth: 3
 - `require()` depth: 3
 
-## Upgrade Note
+## Launcher Overrides
 
-After the old **AI** submenu was renamed to **MODULES**, you can delete `settings.ini` once to clean up stale saved UI state from older builds. CONTROL recreates the file automatically on next launch.
+The headless launcher options write into this same folder:
+
+- `--override-settings` replaces `settings.ini`
+- `--override-module` copies a module file or module folder into `modules/`
+
+See [Headless Mode](headless-mode.md) for usage details.

@@ -58,5 +58,7 @@ AoE2Control talks directly to the game, allowing developers to:
   <small>(extraction password: <code>control</code>)</small>
 - [Getting Started](getting-started.md) — Installation and first script
 - [Quick Example](quick-example.md) — Minimal working module
+- [Headless Mode](headless-mode.md) — Run the launcher from scripts
 - [Game API](commands.md) — Commands and facts reference
+- [Automation & Session Control](session-control.md) — Start games, load saves, and edit setup
 - [Render API](render-api.md) — Drawing overlays
