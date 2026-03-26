@@ -369,6 +369,7 @@ Methods:
 - `GetActionTargetPosition()`
 - `GetDirection()`
 - `IsVisible()`
+- `IsExplored()`
 - `IsAlive()`
 - `GetUnitObjectType()`
 - `GetClass()`
@@ -391,6 +392,7 @@ Behavior:
 
 - `IsVisible()` uses map-tile visibility
 - Cached objects can throw a Lua error on most method calls after they become invisible
+- Explored animals remain accessible even when they are not currently visible; this applies to prey, predator, domestic, and livestock classes
 - `GetName()`, `GetInternalName()`, and `GetMasterName()` return empty strings when name data is unavailable
 - Re-fetch object references in the current frame when fog-aware mode is active
 

@@ -28,6 +28,8 @@ CONTROL exposes a small set of functions for engine and menu automation. These f
 | `GetAvailableSaveFiles` | `()` | `string[]` | Returns the file names currently exposed by the game's load-game list. |
 | `GetCurrentGameOptions` | `()` | `GameOptions \| nil` | Returns the current session setup object when available. |
 
+When `DispatchStartGame()`, `DispatchRestartGame()`, or `DispatchLoadGame()` succeeds from the menu flow, CONTROL closes the related setup or load screen so the game view is not left underneath an open menu.
+
 ## Working With `GameOptions`
 
 `GetCurrentGameOptions()` gives Lua access to the current game setup object. Use it to inspect or modify the pending session configuration before calling `DispatchStartGame()`.
