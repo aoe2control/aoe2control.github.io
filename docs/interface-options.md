@@ -41,7 +41,7 @@ When **Tournament Mode** is off, using a game command outside `Update()` logs a 
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| **Player Perspective** | `Default` | Fog-of-war perspective override: `Default`, `Player 1` to `Player 8`, `All Players`, or `Gaia`. Default uses local-player visibility. May cause crashes. |
+| **Player Perspective** | `Default` | Fog-of-war perspective override: `Default`, `Player 1` to `Player 8`, or `Gaia`. Default uses local-player visibility. May cause crashes. |
 | **Spectator Mode** | Off | Enables spectator-style reveal behavior and keeps controls available while spectating. |
 | **Unlock Zoom** | Off | Removes the normal zoom limit. May cause rendering issues. |
 | **Chat Welcome Message** | On | Enables CONTROL's startup chat message behavior. |
@@ -60,9 +60,9 @@ Open a player section to configure that player's module slot. If no module is as
 | Control | Description |
 |---------|-------------|
 | **Enabled** | Turns that player's module slot on or off without clearing the selected module. |
-| **Sync Settings** | Shares module settings through a named profile instead of player-specific settings. |
+| **Sync Settings** | Shares custom module settings through a named profile instead of player-specific settings. |
 | **Module** | Selects the module entry point for that player. Selecting the same module again reloads it. |
-| **Sync Profile** | Appears when **Sync Settings** is enabled. Multiple player slots can share the same profile. |
+| **Sync Profile** | Appears when **Sync Settings** is enabled. Multiple player slots can share the same custom settings profile. |
 | **Create Profile / Remove Profile** | Manages reusable module settings profiles for the selected module. |
 | **Remove Module** | Clears the selected module from that player's slot. |
 

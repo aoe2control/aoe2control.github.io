@@ -23,9 +23,9 @@ This page mirrors the `Facts` block in `BindGameAPI()`. Most facts read game sta
 | `GetObjectCost` | `(unitObjectType, costMultiplier)` | `{ resourceId = ResourceType, amount = number }[]` | Returns the assigned player's current object cost entries with the given multiplier applied. |
 | `CanResearch` | `(technology)` | `boolean` | Returns whether the assigned player can currently research a technology. |
 | `IsTechnologyResearched` | `(technology)` | `boolean` | Returns whether the assigned player has researched a technology. |
-| `GetObjectsByType` | `(unitType)` | `Object[]` | Returns matching alive world objects, not just owned objects. |
-| `GetObjectsByTypes` | `(unitTypes)` | `Object[]` | Returns alive world objects matching any type in the list. |
-| `GetObjectsByClass` | `(unitClass)` | `Object[]` | Returns alive world objects of a class, not just owned objects. |
+| `GetObjectsByType` | `(unitType)` | `Object[]` | Returns matching world objects, not just owned objects. Loot-bearing dead huntables and livestock are included. |
+| `GetObjectsByTypes` | `(unitTypes)` | `Object[]` | Returns matching world objects for any listed type. Loot-bearing dead huntables and livestock are included. |
+| `GetObjectsByClass` | `(unitClass)` | `Object[]` | Returns matching world objects of a class, not just owned objects. Loot-bearing dead huntables and livestock are included. |
 | `GetGameTime` | `()` | `number` | Returns the current match time in seconds. |
 | `GetAllChatMessages` | `()` | `string[]` | Returns the current chat buffer as plain message strings. |
 | `GetNewChatMessages` | `()` | `string[]` | Returns chat messages that became visible since this module instance last called the function. |
@@ -41,7 +41,7 @@ This page mirrors the `Facts` block in `BindGameAPI()`. Most facts read game sta
 | `GetAllMapTiles` | `()` | `MapTile[]` | Returns all map tiles. Individual tile methods still respect fog-aware visibility. |
 | `CalculatePath` | `(startPos, targetPos)` | `Vector3[]` | Calculates a native path between two `Vector3` positions. |
 | `CalculatePath` | `(startPos, targetPos, collisionRadius)` | `Vector3[]` | Overload: calculates a native path between two `Vector3` positions with an explicit collision radius. |
-| `GetObjectsInArea` | `(pos1, pos2)` | `Object[]` | Returns alive objects whose current tile lies inside the rectangular area between two `Vector2` positions. |
+| `GetObjectsInArea` | `(pos1, pos2)` | `Object[]` | Returns objects whose current tile lies inside the rectangular area between two `Vector2` positions. Loot-bearing dead huntables and livestock are included. |
 | `GetObjectsPtr` | `()` | `number, number` | Returns `(ptr, count)` for an engine-owned packed object snapshot buffer. Intended for IPC / RPM readers. |
 | `GetObjectTypeData` | `(objectTypeId, objectData)` | `number` | Returns static object-type data for a `UnitObjectType` and `ObjectData` field. |
 | `GetObjectTypeAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number` | Returns a static object-type attribute value for a `UnitObjectType`. |
@@ -139,10 +139,10 @@ end
 
 - Use `GetAssignedPlayer()`, not `GetLocalPlayer()`.
 - `GetAssignedPlayerId()` is documented on the control page because it is bound under the engine section and is also available in `Load(playerId)`.
-- `GetObjectsByType`, `GetObjectsByTypes`, and `GetObjectsByClass` scan alive world objects, not only the assigned player's objects.
+- `GetObjectsByType`, `GetObjectsByTypes`, and `GetObjectsByClass` scan world objects, not only the assigned player's objects. Loot-bearing dead huntables and livestock are included.
 - `GetMapTile(position)` floors `position.x` and `position.y` to integer tile coordinates before resolving the tile.
 - `CalculatePath()` uses the game's native pathfinding, accepts `Vector3` start and target positions, and returns an empty list when no path is available.
-- `GetObjectsInArea(pos1, pos2)` only returns alive objects and follows the same fog-aware visibility checks as the rest of the object API.
+- `GetObjectsInArea(pos1, pos2)` uses the same object filter as the other scan APIs. Loot-bearing dead huntables and livestock are included, and fog-aware visibility still applies.
 - `GetTechCost()` and `GetObjectCost()` return arrays of resource-cost entries. Use `entry.resourceId` and `entry.amount`; numeric indexes `entry[1]` and `entry[2]` mirror the same values.
 - `GetAllChatMessages()` and `GetLastChatMessage()` read from the game's current chat buffer.
 - `GetNewChatMessages()` tracks unread chat state per module instance. On the first call after load or reload, it returns the currently visible buffer.

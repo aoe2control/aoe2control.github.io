@@ -71,6 +71,7 @@ Notes:
 | `SetAntiquityMode(antiquityMode)` | `boolean` | Sets whether antiquity mode is enabled. |
 | `GetLocation()` | `OptionsLocation` | Returns the selected map or location id. |
 | `SetLocation(location)` | `boolean` | Sets the selected map or location id. |
+| `SetRandomMapPoolLocations(locations)` | `boolean` | Sets a custom random map pool from a Lua array of `OptionsLocation` values. |
 | `GetPlayersCount()` | `number` | Returns the configured player-slot count. |
 | `SetPlayersCount(playersCount)` | `boolean` | Sets the configured player-slot count. |
 | `GetTreatyLength()` | `number` | Returns the treaty length. |
@@ -110,6 +111,31 @@ function Load()
     DispatchStartGame()
 end
 ```
+
+## Custom Random Map Pools
+
+Use `SetRandomMapPoolLocations()` when you want the setup screen to use a custom random map pool instead of a single fixed location.
+
+```lua
+function Load()
+    local options = GetCurrentGameOptions()
+    if not options then
+        return
+    end
+
+    options:SetRandomMapPoolLocations({
+        OptionsLocation.ARABIA,
+        OptionsLocation.ARENA,
+        OptionsLocation.BLACK_FOREST,
+    })
+end
+```
+
+Notes:
+
+- Pass a Lua array of `OptionsLocation` values.
+- Passing one location behaves like `SetLocation(...)`.
+- Passing multiple locations sets `GetLocation()` to `OptionsLocation.CUSTOM_MAP_POOL`.
 
 ## Option Enums
 
@@ -209,6 +235,7 @@ Common values:
 
 | Value | Numeric Value |
 |-------|---------------|
+| `CUSTOM_MAP_POOL` | `137` |
 | `SCENARIO_MAP` | `-1` |
 | `ARABIA` | `9` |
 | `BLACK_FOREST` | `12` |
@@ -224,6 +251,7 @@ Common values:
 
     | Value | Numeric Value |
     |-------|---------------|
+    | `CUSTOM_MAP_POOL` | `137` |
     | `SCENARIO_MAP` | `-1` |
     | `ARABIA` | `9` |
     | `ARCHIPELAGO` | `10` |

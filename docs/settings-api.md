@@ -68,4 +68,4 @@ end
 
 ## Multi-Module Note
 
-When **Sync Settings** is enabled for a player's module slot, the UI stores values under a shared profile-specific settings group instead of a per-player group.
+When **Sync Settings** is enabled for a player's module slot, the UI stores custom setting values under a shared profile-specific settings group instead of a per-player group.
