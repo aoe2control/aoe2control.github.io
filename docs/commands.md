@@ -7,7 +7,7 @@ description: Reference for AoE2Control engine control APIs, session automation h
 This page follows the same grouping used by `BindGameAPI()` in `module_bindings.cpp`: `Engine`, `Menu / UI`, `Replays`, and `Commands`.
 
 !!! warning "Game must be running"
-    Calling most game API functions before the game starts logs an error. The main exception is `GetAssignedPlayerId()`, which is also available in `Load`.
+    Calling most game API functions before the game starts logs an error. The main exceptions are `GetAssignedPlayerId()` and `AssignAndLoadModule()`.
 
 !!! note "Lua signatures are strict"
     Lua only gets overloads that are explicitly bound. If a parameter is shown here, pass it explicitly even if the C++ function has a default value.
@@ -17,7 +17,7 @@ This page follows the same grouping used by `BindGameAPI()` in `module_bindings.
 - Only the **Commands** section below is subject to replay blocking, the `Update()`-only warning, `Sequential Actions`, and **Tournament Mode** blocking.
 - Most unit and building commands silently filter the input list down to objects owned by the assigned player.
 - `SetCameraPosition` and `SendChatMessage` are command-style functions, but they are not ownership-filtered.
-- `Log()`, `SetEngineUIVisibility()`, and `UnloadEngine()` are not in-match game commands and can be used from any callback.
+- `Log()`, `SetEngineUIVisibility()`, `UnloadEngine()`, and `AssignAndLoadModule()` are not in-match game commands and can be used from any callback.
 
 For a deeper guide to match startup, save loading, and pre-game setup, see [Automation & Session Control](session-control.md) and [GameOptions](game-options.md).
 
@@ -29,6 +29,9 @@ For a deeper guide to match startup, save loading, and pre-game setup, see [Auto
 | `SetEngineUIVisibility` | `(visible)` | `nil` | Shows or hides the CONTROL overlay. |
 | `UnloadEngine` | `()` | `nil` | Detaches CONTROL from the game process. |
 | `GetAssignedPlayerId` | `()` | `number` | Returns the player id currently assigned to this module instance. Available in `Load`. |
+| `AssignAndLoadModule` | `(playerId, moduleName)` | `boolean` | Assigns a discovered module entry to a player slot and loads or reloads it. |
+
+`AssignAndLoadModule()` accepts player ids `1` to `8`. `moduleName` must match a discovered module entry name. When called from inside a running module callback, CONTROL queues the reassignment and applies it safely through the module manager.
 
 ## Menu / UI
 
@@ -66,7 +69,7 @@ For a deeper guide to match startup, save loading, and pre-game setup, see [Auto
 | `UnitsTargetObject` | `(units, target)` | `boolean` | Orders owned units to attack, interact with, or target an object. |
 | `UnitsBuildStructure` | `(builders, structureId, position)` | `boolean` | Orders owned builders to place a structure at a `Vector3` world position. |
 | `UnitsMove` | `(units, position)` | `boolean` | Orders owned units to move to a `Vector3` world position. |
-| `EnableScouting` | `()` | `boolean` | Enables auto-scouting on an idle assigned scout if one is available. |
+| `EnableScouting` | `()` | `boolean` | Enables auto-scouting on an idle assigned scout-line unit if one is available. |
 | `ResearchTechnology` | `(researchSources, technology)` | `boolean` | Researches a technology using the assigned player's most common matching research source. |
 | `DeleteUnit` | `(unit)` | `nil` | Deletes an owned unit. |
 | `DestroyBuilding` | `(building)` | `nil` | Destroys an owned building. |

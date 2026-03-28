@@ -248,9 +248,21 @@ end
 | `SetPriorities(wood, food, gold, stone)` | `nil` | Sets raw villager priority weights. |
 | `ResetPriorities()` | `nil` | Resets villager priorities to defaults. |
 | `SetPriorityPercentage(profession, percentage)` | `nil` | Sets a percentage target for one profession. |
+| `SetLivestockVillagerLimit(limit)` | `nil` | Sets the preferred cap for villagers assigned to livestock food handling. |
+| `SetForageVillagerLimit(limit)` | `nil` | Sets the preferred cap for villagers assigned to forage before farms are preferred. |
+| `SetFarmMaxTownCenterDistance(distance)` | `nil` | Sets the maximum edge distance used when evaluating farms near town centers. |
+| `SetFarmMaxMillDistance(distance)` | `nil` | Sets the maximum edge distance used when evaluating farms near mills. |
+| `SetProfessionBuildingRange(profession, range)` | `nil` | Sets the nearby collection-building range checked before auto-queuing that profession's drop-off building. |
 | `AssignVillagers(objectIds)` | `nil` | Overload: assigns villagers by object id list. |
 | `AssignVillagers(objects)` | `nil` | Overload: assigns villagers by object list. |
 | `AssignVillager(villager)` | `nil` | Assigns one villager immediately. |
+
+Notes:
+
+- Food assignment prefers livestock, then forage, then farms, and only falls back when better food targets are unavailable.
+- `SetLivestockVillagerLimit()` defaults to `6`, and `SetForageVillagerLimit()` defaults to `12`.
+- `SetFarmMaxTownCenterDistance()` and `SetFarmMaxMillDistance()` both default to `1.0`.
+- `SetProfessionBuildingRange()` clamps to `0` or higher and defaults to `8.0` tiles per profession in the current implementation.
 
 ### ConstructionPlacement
 
@@ -348,7 +360,8 @@ end
 - `ConstructionPlacement:RenderDebug()` exists in C++ but is not exposed to Lua.
 - Cached `Object` references can become invalid for method calls when the object becomes invisible in fog-aware mode. Re-fetch objects in the current frame or enable **Modules See Everything** if you need persistent access.
 - `Object:IsVisible()` is the safe visibility check for cached objects and uses map-tile visibility.
-- Explored animals remain accessible even when they are not currently visible. This applies to prey, predator, domestic, and livestock classes.
+- Explored animals and resources can still be returned even when they are not currently visible.
+- On those non-visible explored object references, only `Object:IsVisible()`, `Object:IsExplored()`, `Object:GetPosition()`, `Object:GetClass()`, and `Object:GetUnitObjectType()` are safe until visibility returns.
 - `Object:GetName()`, `Object:GetInternalName()`, and `Object:GetMasterName()` return empty strings when the underlying name data is unavailable.
 - Use `MapTile:GetPos()` instead of `GetPosX()` / `GetPosY()`.
 - `MapTile:IsWalkable()` reads the collision grid, so moving units and other blockers can affect the result.

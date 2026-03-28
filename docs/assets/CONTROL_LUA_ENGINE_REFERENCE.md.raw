@@ -69,6 +69,11 @@ This section follows the same grouping as `BindGameAPI()` in `module_bindings.cp
 | `SetEngineUIVisibility` | `(visible)` | `nil` | Show or hide the CONTROL overlay. |
 | `UnloadEngine` | `()` | `nil` | Detach CONTROL from the game process. |
 | `GetAssignedPlayerId` | `()` | `number` | Assigned player id for this module instance. Available in `Load`. |
+| `AssignAndLoadModule` | `(playerId, moduleName)` | `boolean` | Assign a discovered module entry to a player slot and load or reload it. |
+
+- `AssignAndLoadModule()` accepts player ids `1` to `8`
+- `moduleName` must match a discovered module entry name
+- Calls made from inside a running module callback are queued and applied safely by the module manager
 
 ### Menu / UI
 
@@ -108,7 +113,7 @@ Command functions usually filter input objects to ones owned by the assigned pla
 | `UnitsTargetObject` | `(units, target)` | `boolean` | Order owned units to target an object. |
 | `UnitsBuildStructure` | `(builders, structureId, position)` | `boolean` | Order owned builders to construct a building. |
 | `UnitsMove` | `(units, position)` | `boolean` | Order owned units to move. |
-| `EnableScouting` | `()` | `boolean` | Enable auto-scouting on an idle assigned scout. |
+| `EnableScouting` | `()` | `boolean` | Enable auto-scouting on an idle assigned scout-line unit. |
 | `ResearchTechnology` | `(researchSources, technology)` | `boolean` | Research a technology from the assigned player's most common matching source type. |
 | `DeleteUnit` | `(unit)` | `nil` | Delete an owned unit. |
 | `DestroyBuilding` | `(building)` | `nil` | Destroy an owned building. |
@@ -188,11 +193,13 @@ Notes:
 - `GetMapTile(position)` floors `position.x` and `position.y`.
 - `CalculatePath()` uses the game's native pathfinding, accepts `Vector3` start and target positions, and returns an empty list when no path is available.
 - `GetObjectsInArea(pos1, pos2)` uses the same object filter as the other scan APIs. Loot-bearing dead huntables and livestock are included, and fog-aware visibility still applies.
+- `GetObjectsByType()`, `GetObjectsByTypes()`, `GetObjectsByClass()`, `GetObjectsInArea()`, and `GetObjectById()` can still return explored animals or resources outside active vision
+- On those non-visible explored object references, only `IsVisible()`, `IsExplored()`, `GetPosition()`, `GetClass()`, and `GetUnitObjectType()` are safe
 - `GetTechCost()` and `GetObjectCost()` return arrays of resource-cost entries. Use `entry.resourceId` and `entry.amount`; numeric indexes `entry[1]` and `entry[2]` mirror the same values.
 - `GetAllChatMessages()` and `GetLastChatMessage()` read from the game's current chat buffer.
 - `GetNewChatMessages()` tracks unread chat state per module instance; the first call after load or reload returns the currently visible buffer.
 - Projectile lookup functions return normal `Object` references whose `ObjectType` is `ObjectType.PROJECTILE` and follow the same visibility restrictions as other object queries.
-- Object retrieval respects the assigned player's fog-of-war when **Modules See Everything** is disabled. This includes `GetObjectById()`.
+- Object retrieval follows the assigned player's fog-of-war when **Modules See Everything** is disabled, except for the explored animal and resource exception above. This includes `GetObjectById()`.
 - With **Modules See Everything** disabled, player-state methods on other `Player` objects return neutral values for resources, facts, tech state, and object availability.
 - `GetAllMapTiles()` returns the full grid, but each `MapTile` only exposes data allowed by the current fog state.
 - `GetMapTilesPtr()` and `GetObjectsPtr()` return `(ptr, count)`, where `count` is an element count, not a byte count.
@@ -392,7 +399,8 @@ Behavior:
 
 - `IsVisible()` uses map-tile visibility
 - Cached objects can throw a Lua error on most method calls after they become invisible
-- Explored animals remain accessible even when they are not currently visible; this applies to prey, predator, domestic, and livestock classes
+- Explored animals and resources can still be returned even when they are not currently visible
+- On those non-visible explored object references, only `IsVisible()`, `IsExplored()`, `GetPosition()`, `GetClass()`, and `GetUnitObjectType()` are safe
 - `GetName()`, `GetInternalName()`, and `GetMasterName()` return empty strings when name data is unavailable
 - Re-fetch object references in the current frame when fog-aware mode is active
 
@@ -551,9 +559,21 @@ Methods:
 - `SetPriorities(wood, food, gold, stone)`
 - `ResetPriorities()`
 - `SetPriorityPercentage(profession, percentage)`
+- `SetLivestockVillagerLimit(limit)`
+- `SetForageVillagerLimit(limit)`
+- `SetFarmMaxTownCenterDistance(distance)`
+- `SetFarmMaxMillDistance(distance)`
+- `SetProfessionBuildingRange(profession, range)`
 - `AssignVillagers(objectIds)`
 - `AssignVillagers(objects)`
 - `AssignVillager(villager)`
+
+Notes:
+
+- Food assignment prefers livestock, then forage, then farms, with fallback when needed
+- `SetLivestockVillagerLimit()` defaults to `6`, and `SetForageVillagerLimit()` defaults to `12`
+- `SetFarmMaxTownCenterDistance()` and `SetFarmMaxMillDistance()` default to `1.0`
+- `SetProfessionBuildingRange()` defaults to `8.0` tiles per profession in the current implementation
 
 ### ConstructionPlacement
 
@@ -597,6 +617,7 @@ Not exposed to Lua:
 - `Suppress Native AI` defaults to `true`; when enabled, assigned bot players have their native decision AI disabled while a Lua module is attached
 - `Modules See Everything` defaults to `false` and affects map-tile reads, object visibility, and restricted cross-player data access
 - Player perspective options live under the **MISC** submenu: `Default`, `Player 1` to `Player 8`, `Gaia`
+- CONTROL resets `Player Perspective` to `Default` on startup
 - Menu scale and transparency live under the **UI** submenu
 - `Tournament Mode` blocks game commands outside `Update()`
 - By default, assigning a module to a bot player's slot suppresses that player's native decision AI while the module remains assigned

@@ -46,6 +46,8 @@ When **Tournament Mode** is off, using a game command outside `Update()` logs a 
 | **Unlock Zoom** | Off | Removes the normal zoom limit. May cause rendering issues. |
 | **Chat Welcome Message** | On | Enables CONTROL's startup chat message behavior. |
 
+`Player Perspective` is reset to `Default` when CONTROL starts.
+
 ## KEYBINDS Submenu
 
 | Setting | Default | Description |
@@ -93,7 +95,7 @@ When **Module Telemetry** is enabled, the Debug menu shows:
 
 ## Perspective And Visibility
 
-`Player Perspective` changes the rendered fog view. `Modules See Everything` changes what Lua can read. When **Modules See Everything** is off, map tiles, objects, and restricted player-state methods follow the assigned player's visibility and ownership limits.
+`Player Perspective` changes the rendered fog view. `Modules See Everything` changes what Lua can read. When **Modules See Everything** is off, map tiles, objects, and restricted player-state methods follow the assigned player's visibility and ownership limits, with a limited explored-object exception for animals and resources.
 
 ## Log Window
 
