@@ -330,7 +330,7 @@ function Update()
     villagerOcc:Update()
     placement:Update()
 
-    if GetFact(Fact.HOUSING_HEADROOM) <= 2 then
+    if GetFact(Fact.HOUSING_HEADROOM) <= 2 and GetFact(Fact.BUILDING_TYPE_COUNT_TOTAL, type) - GetFact(Fact.BUILDING_TYPE_COUNT, type) == 0 then
         placement:BuildStructureAtTown(
             UnitObjectType.HOUSE_DARK_AGE,
             1,
