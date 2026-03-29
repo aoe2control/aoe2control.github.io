@@ -63,7 +63,7 @@ flowchart LR
 
 - `Load` may run again when an instance is reloaded.
 - `Init` runs per module instance, not globally.
-- `Update` is the callback intended for game commands. Calling commands from other callbacks logs a warning, and **Tournament Mode** blocks them.
+- `Update` is the callback intended for game commands. Calling commands from other callbacks logs a warning, and **Tournament Mode** blocks them. Selected non-command helper APIs are also tournament-restricted.
 - Manually exiting a running match triggers `End(false)`.
 - Replay playback reaching the end also triggers `End()`.
 - `Unload` can run without `End` if the user disables the instance, removes it, switches modules, or ejects CONTROL.

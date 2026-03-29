@@ -93,6 +93,12 @@ These methods operate on one of the eight setup slots.
 | `SetPlayerColor(playerIndex, color)` | `boolean` | Sets the raw player color index for a player slot. |
 | `GetPlayerCivilization(playerIndex)` | `OptionsCivilization` | Returns the civilization assigned to a player slot. |
 | `SetPlayerCivilization(playerIndex, civilization)` | `boolean` | Sets the civilization assigned to a player slot. |
+| `SetAssignedPlayerCivilization(civilization)` | `boolean` | Sets the civilization for the module's assigned player slot. |
+
+Notes:
+
+- `SetAssignedPlayerCivilization()` uses the current module instance's assigned player id and requires that id to be a regular player slot from `1` to `8`.
+- Most `GameOptions` methods are blocked while **Tournament Mode** is enabled. `SetAssignedPlayerCivilization()` remains available in the current Lua API.
 
 ## Example
 

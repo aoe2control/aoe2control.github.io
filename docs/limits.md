@@ -39,4 +39,4 @@ Game API (commands, facts, render) must be called when the game is active. Calli
 
 Move game logic to `Init`, `Update`, or `Render`.
 
-Game commands belong in `Update()`. Using them from other callbacks logs a warning, and **Tournament Mode** blocks them.
+Game commands belong in `Update()`. Using them from other callbacks logs a warning, and **Tournament Mode** blocks them. Selected non-command helper APIs are also tournament-restricted.

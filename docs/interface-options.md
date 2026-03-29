@@ -23,12 +23,12 @@ CONTROL scans `modules/` recursively for:
 | **Auto Move Camera** | On | Auto-centers the camera on executed command targets. |
 | **Command Visualization** | On | Draws command feedback overlays. |
 | **Suppress Native AI** | On | If enabled, assigning a module to a bot player disables that player's built-in AI while the module is attached. |
-| **Tournament Mode** | Off | Blocks Lua game commands outside `Update()`. Read-only APIs remain available. |
+| **Tournament Mode** | Off | Blocks Lua game commands outside `Update()` and restricts selected engine, menu, replay, render, and `GameOptions` APIs. |
 | **Modules See Everything** | Off | If enabled, Lua modules ignore fog-of-war and cross-player data restrictions when reading map tiles, objects, and player state. |
 
 The update interval is clamped to `0.1` seconds in the UI and `0.01` seconds when loaded from `settings.ini`.
 
-When **Tournament Mode** is off, using a game command outside `Update()` logs a warning once per module load. When it is on, the command is rejected.
+When **Tournament Mode** is off, using a game command outside `Update()` logs a warning once per module load. When it is on, those commands are rejected and selected helper APIs are also tournament-restricted.
 
 ## UI Submenu
 

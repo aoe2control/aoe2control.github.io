@@ -14,10 +14,11 @@ This page follows the same grouping used by `BindGameAPI()` in `module_bindings.
 
 ## API Rules
 
-- Only the **Commands** section below is subject to replay blocking, the `Update()`-only warning, `Sequential Actions`, and **Tournament Mode** blocking.
+- The **Commands** section below is the only part affected by replay blocking, the `Update()`-only warning, and `Sequential Actions`.
+- **Tournament Mode** also blocks selected functions in the `Engine`, `Menu / UI`, and `Replays` sections, plus many render and `GameOptions` APIs documented on other pages.
 - Most unit and building commands silently filter the input list down to objects owned by the assigned player.
 - `SetCameraPosition` and `SendChatMessage` are command-style functions, but they are not ownership-filtered.
-- `Log()`, `SetEngineUIVisibility()`, `UnloadEngine()`, and `AssignAndLoadModule()` are not in-match game commands and can be used from any callback.
+- `Log()`, `SetEngineUIVisibility()`, `UnloadEngine()`, and `AssignAndLoadModule()` are not in-match game commands and can be used from any callback, unless **Tournament Mode** blocks them.
 
 For a deeper guide to match startup, save loading, and pre-game setup, see [Automation & Session Control](session-control.md) and [GameOptions](game-options.md).
 
@@ -133,4 +134,5 @@ end
 - `TrainUnit(unitId)` and `TrainUnit(unitId, amount)` look up eligible source object types automatically.
 - `ResearchTechnology` requires all shown arguments in Lua.
 - `DeleteUnit`, `DestroyBuilding`, and stance commands do not return success flags.
-- Only the **Commands** section is affected by replay blocking, `Sequential Actions`, outside-`Update()` warnings, and **Tournament Mode** blocking.
+- Only the **Commands** section is affected by replay blocking, `Sequential Actions`, and outside-`Update()` warnings.
+- **Tournament Mode** also blocks selected engine, menu, replay, render, and `GameOptions` APIs outside the **Commands** section.

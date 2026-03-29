@@ -361,7 +361,7 @@ end
 - Cached `Object` references can become invalid for method calls when the object becomes invisible in fog-aware mode. Re-fetch objects in the current frame or enable **Modules See Everything** if you need persistent access.
 - `Object:IsVisible()` is the safe visibility check for cached objects and uses map-tile visibility.
 - Explored animals and resources can still be returned even when they are not currently visible.
-- On those non-visible explored object references, only `Object:IsVisible()`, `Object:IsExplored()`, `Object:GetPosition()`, `Object:GetClass()`, and `Object:GetUnitObjectType()` are safe until visibility returns.
+- On those non-visible explored object references, only `Object:IsVisible()`, `Object:IsExplored()`, `Object:GetId()`, `Object:GetPosition()`, `Object:GetClass()`, and `Object:GetUnitObjectType()` are safe until visibility returns.
 - `Object:GetName()`, `Object:GetInternalName()`, and `Object:GetMasterName()` return empty strings when the underlying name data is unavailable.
 - Use `MapTile:GetPos()` instead of `GetPosX()` / `GetPosY()`.
 - `MapTile:IsWalkable()` reads the collision grid, so moving units and other blockers can affect the result.
