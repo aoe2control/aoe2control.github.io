@@ -6,17 +6,17 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Documentation for AoE2Control, a Lua scripting engine for Age of Empires II: Definitive Edition with game-state access, commands, rendering, and IPC.">
+        <meta name="description" content="Automate launcher and menu workflows in AoE2Control, including match startup, restarts, resigning, save loading, UI visibility, and engine unload.">
       
       
       
-        <link rel="canonical" href="https://aoe2control.github.io/settings-api/">
+        <link rel="canonical" href="https://aoe2control.github.io/session-control/">
       
       
-        <link rel="prev" href="../enums/">
+        <link rel="prev" href="../commands/">
       
       
-        <link rel="next" href="../render-api-impl/">
+        <link rel="next" href="../facts/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Settings API - AoE2Control Documentation</title>
+        <title>Automation & Session Control - AoE2Control Documentation</title>
       
     
     
@@ -81,7 +81,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#settings-api" class="md-skip">
+        <a href="#automation-session-control" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Settings API
+              Automation &amp; Session Control
             
           </span>
         </div>
@@ -270,10 +270,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../commands/" class="md-tabs__link">
           
   
@@ -329,13 +331,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../settings-api/" class="md-tabs__link">
           
   
   
@@ -824,26 +824,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -861,7 +864,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -904,10 +907,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../session-control/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Automation &amp; Session Control
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -923,6 +953,92 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#engine-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Engine Control
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#session-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Session Control
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#working-with-gameoptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Working With GameOptions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-configure-and-start-a-match" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Configure And Start A Match
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-load-the-first-matching-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Load The First Matching File
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#typical-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Typical Patterns
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1137,29 +1253,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
         
           
-          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
             
   
   
@@ -1177,7 +1290,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_8">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1192,37 +1305,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Settings API
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../settings-api/" class="md-nav__link">
         
   
   
@@ -1238,81 +1324,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#add-functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Add Functions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#get-functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Get Functions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#input-helper" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Input Helper
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Example
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#multi-module-note" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Multi-Module Note
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1624,62 +1635,13 @@
 
 
 
-<h1 id="settings-api">Settings API</h1>
-<p>The Settings API adds module-specific controls to CONTROL's UI.</p>
+<h1 id="automation-session-control">Automation &amp; Session Control</h1>
+<p>CONTROL exposes a small set of functions for engine and menu automation. These functions cover overlay visibility, engine unload, save discovery, pre-game setup access, match startup, restarts, resigning, and loading saves.</p>
 <div class="admonition note">
-<p class="admonition-title">Lua signatures are strict</p>
-<p>Getter functions require the fallback/default argument in Lua. They are not optional overloads.</p>
+<p class="admonition-title">Separate from in-match commands</p>
+<p>These functions are not the same as the in-match command API such as <code>TrainUnit</code>, <code>UnitsMove</code>, or <code>ResearchTechnology</code>. The in-match command API is blocked during replays.</p>
 </div>
-<h2 id="add-functions">Add Functions</h2>
-<p>Call these only from <code>Load(playerId)</code>.</p>
-<table>
-<thead>
-<tr>
-<th>Function</th>
-<th>Signature</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Settings.AddBool</code></td>
-<td><code>(key, defaultValue)</code></td>
-<td>Adds a checkbox.</td>
-</tr>
-<tr>
-<td><code>Settings.AddInt</code></td>
-<td><code>(key, defaultValue, minValue, maxValue)</code></td>
-<td>Adds an integer slider.</td>
-</tr>
-<tr>
-<td><code>Settings.AddFloat</code></td>
-<td><code>(key, defaultValue, minValue, maxValue)</code></td>
-<td>Adds a float slider.</td>
-</tr>
-<tr>
-<td><code>Settings.AddDropdown</code></td>
-<td><code>(key, defaultValue, options)</code></td>
-<td>Adds a dropdown from a string array.</td>
-</tr>
-<tr>
-<td><code>Settings.AddKeybind</code></td>
-<td><code>(key, defaultVkCode)</code></td>
-<td>Adds a keybind picker.</td>
-</tr>
-<tr>
-<td><code>Settings.AddTooltip</code></td>
-<td><code>(key, tooltip)</code></td>
-<td>Adds a tooltip to an existing setting.</td>
-</tr>
-<tr>
-<td><code>Settings.AddColor</code></td>
-<td><code>(key, defaultColor)</code></td>
-<td>Adds a color picker.</td>
-</tr>
-</tbody>
-</table>
-<h2 id="get-functions">Get Functions</h2>
-<p>Call these from <code>Load</code>, <code>Init</code>, <code>Update</code>, or <code>Render</code>.</p>
+<h2 id="engine-control">Engine Control</h2>
 <table>
 <thead>
 <tr>
@@ -1691,44 +1653,20 @@
 </thead>
 <tbody>
 <tr>
-<td><code>Settings.GetBool</code></td>
-<td><code>(key, defaultValue)</code></td>
-<td><code>boolean</code></td>
-<td>Reads a checkbox value.</td>
+<td><code>SetEngineUIVisibility</code></td>
+<td><code>(visible)</code></td>
+<td><code>nil</code></td>
+<td>Shows or hides the CONTROL overlay.</td>
 </tr>
 <tr>
-<td><code>Settings.GetInt</code></td>
-<td><code>(key, defaultValue)</code></td>
-<td><code>number</code></td>
-<td>Reads an integer value.</td>
-</tr>
-<tr>
-<td><code>Settings.GetFloat</code></td>
-<td><code>(key, defaultValue)</code></td>
-<td><code>number</code></td>
-<td>Reads a float value.</td>
-</tr>
-<tr>
-<td><code>Settings.GetString</code></td>
-<td><code>(key, defaultValue)</code></td>
-<td><code>string</code></td>
-<td>Reads a string or dropdown value.</td>
-</tr>
-<tr>
-<td><code>Settings.GetKeybind</code></td>
-<td><code>(key, defaultVkCode)</code></td>
-<td><code>number</code></td>
-<td>Reads a keybind virtual key code.</td>
-</tr>
-<tr>
-<td><code>Settings.GetColor</code></td>
-<td><code>(key, defaultColor)</code></td>
-<td><code>Color</code></td>
-<td>Reads a color value.</td>
+<td><code>UnloadEngine</code></td>
+<td><code>()</code></td>
+<td><code>nil</code></td>
+<td>Detaches CONTROL from the game process.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="input-helper">Input Helper</h2>
+<h2 id="session-control">Session Control</h2>
 <table>
 <thead>
 <tr>
@@ -1740,46 +1678,110 @@
 </thead>
 <tbody>
 <tr>
-<td><code>IsKeyPressed</code></td>
-<td><code>(vkCode)</code></td>
+<td><code>DispatchStartGame</code></td>
+<td><code>()</code></td>
 <td><code>boolean</code></td>
-<td>Returns whether a key is currently pressed.</td>
+<td>Starts the currently configured session. If an ended session is already on an end screen, CONTROL attempts a restart.</td>
+</tr>
+<tr>
+<td><code>DispatchRestartGame</code></td>
+<td><code>()</code></td>
+<td><code>boolean</code></td>
+<td>Restarts the current single-player session when the game state supports it.</td>
+</tr>
+<tr>
+<td><code>DispatchResignGame</code></td>
+<td><code>()</code></td>
+<td><code>boolean</code></td>
+<td>Resigns the current game.</td>
+</tr>
+<tr>
+<td><code>DispatchQuitGame</code></td>
+<td><code>()</code></td>
+<td><code>boolean</code></td>
+<td>Exits the current game flow back toward menus when supported.</td>
+</tr>
+<tr>
+<td><code>DispatchLoadGame</code></td>
+<td><code>(saveGameFileName)</code></td>
+<td><code>boolean</code></td>
+<td>Loads a file from the current load-game list by file name. The file name must match one of the entries returned by <code>GetAvailableSaveFiles()</code>.</td>
+</tr>
+<tr>
+<td><code>GetAvailableSaveFiles</code></td>
+<td><code>()</code></td>
+<td><code>string[]</code></td>
+<td>Returns the file names currently exposed by the game's load-game list.</td>
+</tr>
+<tr>
+<td><code>GetCurrentGameOptions</code></td>
+<td><code>()</code></td>
+<td><code>GameOptions \| nil</code></td>
+<td>Returns the current session setup object when available.</td>
 </tr>
 </tbody>
 </table>
-<h2 id="example">Example</h2>
-<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Load</span><span class="p">(</span><span class="nv">playerId</span><span class="p">)</span>
-<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddBool</span><span class="p">(</span><span class="s2">&quot;Show Overlay&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddDropdown</span><span class="p">(</span><span class="s2">&quot;Mode&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Eco&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;Eco&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Rush&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Boom&quot;</span><span class="w"> </span><span class="p">})</span>
-<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddColor</span><span class="p">(</span><span class="s2">&quot;Overlay Color&quot;</span><span class="p">,</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">))</span>
-<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddKeybind</span><span class="p">(</span><span class="s2">&quot;Toggle Speed&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">Key</span><span class="p">.</span><span class="py">Add</span><span class="p">)</span>
-<span class="w">    </span><span class="nf">Log</span><span class="p">(</span><span class="s2">&quot;Registered settings for player &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nv">playerId</span><span class="p">))</span>
-<span class="kr">end</span>
-
-<span class="kr">function</span><span class="w"> </span><span class="nf">Render</span><span class="p">()</span>
-<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetBool</span><span class="p">(</span><span class="s2">&quot;Show Overlay&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<p>When <code>DispatchStartGame()</code>, <code>DispatchRestartGame()</code>, or <code>DispatchLoadGame()</code> succeeds from the menu flow, CONTROL closes the related setup or load screen so the game view is not left underneath an open menu.</p>
+<h2 id="working-with-gameoptions">Working With <code>GameOptions</code></h2>
+<p><code>GetCurrentGameOptions()</code> gives Lua access to the current game setup object. Use it to inspect or modify the pending session configuration before calling <code>DispatchStartGame()</code>.</p>
+<p>See <a href="../game-options/">GameOptions</a> for the full type reference and associated enums.</p>
+<p>Important rules:</p>
+<ul>
+<li><code>GetCurrentGameOptions()</code> can return <code>nil</code>, so guard it before use.</li>
+<li><code>GameOptions</code> setter methods return <code>false</code> while already in game.</li>
+<li>Player-slot methods accept slot indexes <code>0</code> to <code>7</code>.</li>
+</ul>
+<h2 id="example-configure-and-start-a-match">Example: Configure And Start A Match</h2>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Load</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetCurrentGameOptions</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">options</span><span class="w"> </span><span class="kr">then</span>
 <span class="w">        </span><span class="kr">return</span>
 <span class="w">    </span><span class="kr">end</span>
 
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetString</span><span class="p">(</span><span class="s2">&quot;Mode&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Eco&quot;</span><span class="p">)</span>
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetKeybind</span><span class="p">(</span><span class="s2">&quot;Toggle Speed&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">Key</span><span class="p">.</span><span class="py">Add</span><span class="p">)</span>
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetColor</span><span class="p">(</span><span class="s2">&quot;Overlay Color&quot;</span><span class="p">,</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">))</span>
+<span class="w">    </span><span class="nv">options</span><span class="p">:</span><span class="nf">SetPlayerCivilization</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nv">OptionsCivilization</span><span class="p">.</span><span class="py">KOREANS</span><span class="p">)</span>
+<span class="w">    </span><span class="nf">DispatchStartGame</span><span class="p">()</span>
+<span class="kr">end</span>
 
-<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nf">IsKeyPressed</span><span class="p">(</span><span class="nv">key</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">        </span><span class="nf">SetGameSpeedMultiplier</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
-<span class="w">    </span><span class="kr">end</span>
-
-<span class="w">    </span><span class="nf">RenderText</span><span class="p">(</span><span class="s2">&quot;Mode: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">mode</span><span class="p">,</span><span class="w"> </span><span class="nf">Vector2</span><span class="p">(</span><span class="mi">120</span><span class="p">,</span><span class="w"> </span><span class="mi">40</span><span class="p">),</span><span class="w"> </span><span class="mf">16.0</span><span class="p">,</span><span class="w"> </span><span class="nv">color</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<span class="kr">function</span><span class="w"> </span><span class="nf">End</span><span class="p">()</span>
+<span class="w">    </span><span class="nf">DispatchRestartGame</span><span class="p">()</span>
 <span class="kr">end</span>
 </code></pre></div>
-<h2 id="multi-module-note">Multi-Module Note</h2>
-<p>When <strong>Sync Settings</strong> is enabled for a player's module slot, the UI stores custom setting values under a shared profile-specific settings group instead of a per-player group.</p>
+<h2 id="example-load-the-first-matching-file">Example: Load The First Matching File</h2>
+<p><code>DispatchLoadGame()</code> expects the exact file name from <code>GetAvailableSaveFiles()</code>, not a full path.</p>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nc">string</span><span class="p">:</span><span class="nf">endswith</span><span class="p">(</span><span class="nv">ending</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="nv">ending</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nv">self</span><span class="p">:</span><span class="nf">sub</span><span class="p">(</span><span class="o">-#</span><span class="nv">ending</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nv">ending</span>
+<span class="kr">end</span>
+
+<span class="kr">function</span><span class="w"> </span><span class="nf">Load</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">for</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">v</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="nb">ipairs</span><span class="p">(</span><span class="nf">GetAvailableSaveFiles</span><span class="p">())</span><span class="w"> </span><span class="kr">do</span>
+<span class="w">        </span><span class="kr">if</span><span class="w"> </span><span class="nv">v</span><span class="p">:</span><span class="nf">endswith</span><span class="p">(</span><span class="s2">&quot;.aoe2record&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">            </span><span class="nf">Log</span><span class="p">(</span><span class="s2">&quot;Loading &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">v</span><span class="p">)</span>
+<span class="w">            </span><span class="nf">DispatchLoadGame</span><span class="p">(</span><span class="nv">v</span><span class="p">)</span>
+<span class="w">            </span><span class="kr">break</span>
+<span class="w">        </span><span class="kr">end</span>
+<span class="w">    </span><span class="kr">end</span>
+<span class="kr">end</span>
+
+<span class="kr">function</span><span class="w"> </span><span class="nf">End</span><span class="p">()</span>
+<span class="w">    </span><span class="nf">DispatchRestartGame</span><span class="p">()</span>
+<span class="kr">end</span>
+</code></pre></div>
+<h2 id="typical-patterns">Typical Patterns</h2>
+<ul>
+<li>Hide the overlay before handing control to a streamer setup with <code>SetEngineUIVisibility(false)</code>.</li>
+<li>Read <code>GameOptions</code>, adjust map or civilization settings, then call <code>DispatchStartGame()</code>.</li>
+<li>Enumerate saves with <code>GetAvailableSaveFiles()</code> and pass one exact entry to <code>DispatchLoadGame()</code>.</li>
+<li>Call <code>UnloadEngine()</code> from a cleanup workflow when a module needs to detach CONTROL programmatically.</li>
+</ul>
 
 
 
 
 
 
+
+  
+  
 
 
 

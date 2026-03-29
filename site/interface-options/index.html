@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://aoe2control.github.io/interface-options/">
       
       
-        <link rel="prev" href="../quick-example/">
+        <link rel="prev" href="../headless-mode/">
       
       
         <link rel="next" href="../config-location/">
@@ -555,6 +555,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../headless-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Headless Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -695,10 +723,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#modules-menu" class="md-nav__link">
+  <a href="#modules-submenu" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Modules Menu
+        MODULES Submenu
       
     </span>
   </a>
@@ -706,10 +734,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#experimental-menu" class="md-nav__link">
+  <a href="#ui-submenu" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Experimental Menu
+        UI Submenu
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#misc-submenu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MISC Submenu
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#keybinds-submenu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KEYBINDS Submenu
       
     </span>
   </a>
@@ -739,10 +789,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#debug-menu" class="md-nav__link">
+  <a href="#debug-submenu" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Debug Menu
+        DEBUG Submenu
       
     </span>
   </a>
@@ -750,21 +800,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#misc-settings" class="md-nav__link">
+  <a href="#perspective-and-visibility" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Misc Settings
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#perspective-warning" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Perspective Warning
+        Perspective And Visibility
       
     </span>
   </a>
@@ -1028,6 +1067,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../session-control/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Automation &amp; Session Control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../facts/" class="md-nav__link">
         
   
@@ -1150,6 +1217,34 @@
     
   
     Types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../game-options/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameOptions
   
 
     
@@ -1585,7 +1680,7 @@
 
 
 <h1 id="interface-options">Interface Options</h1>
-<p>The CONTROL overlay groups module configuration by player. Each <code>Player 1</code> to <code>Player 8</code> section exposes that player's module slot and runtime status.</p>
+<p>The CONTROL overlay is organized into built-in submenus and player-specific module slots. Each <code>Player 1</code> to <code>Player 8</code> section exposes one module slot, its selected module, and its runtime status.</p>
 <p><img alt="CONTROL Interface - Modules Settings" src="../images/ControlUI.png" /></p>
 <h2 id="module-discovery">Module Discovery</h2>
 <p>CONTROL scans <code>modules/</code> recursively for:</p>
@@ -1594,9 +1689,7 @@
 <li><code>*.main.module</code></li>
 </ul>
 <p><strong>Depth limit:</strong> 3 levels below <code>modules/</code>.</p>
-<h2 id="modules-menu">Modules Menu</h2>
-<p>The old <strong>AI</strong> submenu was renamed to <strong>MODULES</strong>.</p>
-<p>If you are upgrading from an older build and want to remove stale submenu state, delete <code>%appdata%\CONTROL\AoE2Control\settings.ini</code> once and let CONTROL recreate it on the next launch.</p>
+<h2 id="modules-submenu">MODULES Submenu</h2>
 <table>
 <thead>
 <tr>
@@ -1622,11 +1715,6 @@
 <td>Allows only one successful command per update tick.</td>
 </tr>
 <tr>
-<td><strong>Tournament Mode</strong></td>
-<td>Off</td>
-<td>Blocks Lua game commands outside <code>Update()</code>. Read-only APIs such as facts remain available.</td>
-</tr>
-<tr>
 <td><strong>Auto Move Camera</strong></td>
 <td>On</td>
 <td>Auto-centers the camera on executed command targets.</td>
@@ -1637,9 +1725,14 @@
 <td>Draws command feedback overlays.</td>
 </tr>
 <tr>
-<td><strong>Disable AI Suppression</strong></td>
+<td><strong>Suppress Native AI</strong></td>
+<td>On</td>
+<td>If enabled, assigning a module to a bot player disables that player's built-in AI while the module is attached.</td>
+</tr>
+<tr>
+<td><strong>Tournament Mode</strong></td>
 <td>Off</td>
-<td>If enabled, assigning a module to a bot player no longer suppresses that player's native decision AI.</td>
+<td>Blocks Lua game commands outside <code>Update()</code> and restricts selected engine, menu, replay, render, and <code>GameOptions</code> APIs.</td>
 </tr>
 <tr>
 <td><strong>Modules See Everything</strong></td>
@@ -1648,10 +1741,31 @@
 </tr>
 </tbody>
 </table>
-<p>The update interval is clamped to <code>0.1</code> seconds in the UI and <code>0.01</code> seconds if edited directly in <code>settings.ini</code>.</p>
-<p>When <strong>Tournament Mode</strong> is off, using a game command outside <code>Update()</code> logs a warning once per module load. When it is on, the command is rejected.</p>
-<h2 id="experimental-menu">Experimental Menu</h2>
-<p><code>Player Perspective</code> was moved to the new <strong>EXPERIMENTAL</strong> submenu.</p>
+<p>The update interval is clamped to <code>0.1</code> seconds in the UI and <code>0.01</code> seconds when loaded from <code>settings.ini</code>.</p>
+<p>When <strong>Tournament Mode</strong> is off, using a game command outside <code>Update()</code> logs a warning once per module load. When it is on, those commands are rejected and selected helper APIs are also tournament-restricted.</p>
+<h2 id="ui-submenu">UI Submenu</h2>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Menu Scale</strong></td>
+<td><code>1.0</code></td>
+<td>Additional menu scale multiplier applied on top of the current Windows DPI scale.</td>
+</tr>
+<tr>
+<td><strong>Menu Transparency</strong></td>
+<td><code>0.05</code></td>
+<td>Controls the background transparency of the overlay windows.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="misc-submenu">MISC Submenu</h2>
 <table>
 <thead>
 <tr>
@@ -1664,7 +1778,45 @@
 <tr>
 <td><strong>Player Perspective</strong></td>
 <td><code>Default</code></td>
-<td>Fog-of-war perspective override: <code>Default</code>, <code>Player 1</code> to <code>Player 8</code>, <code>All Players</code>, or <code>Gaia</code>.</td>
+<td>Fog-of-war perspective override: <code>Default</code>, <code>Player 1</code> to <code>Player 8</code>, or <code>Gaia</code>. Default uses local-player visibility. May cause crashes.</td>
+</tr>
+<tr>
+<td><strong>Spectator Mode</strong></td>
+<td>Off</td>
+<td>Enables spectator-style reveal behavior and keeps controls available while spectating.</td>
+</tr>
+<tr>
+<td><strong>Unlock Zoom</strong></td>
+<td>Off</td>
+<td>Removes the normal zoom limit. May cause rendering issues.</td>
+</tr>
+<tr>
+<td><strong>Chat Welcome Message</strong></td>
+<td>On</td>
+<td>Enables CONTROL's startup chat message behavior.</td>
+</tr>
+</tbody>
+</table>
+<p><code>Player Perspective</code> is reset to <code>Default</code> when CONTROL starts.</p>
+<h2 id="keybinds-submenu">KEYBINDS Submenu</h2>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Menu Toggle Key</strong></td>
+<td><code>Shift</code></td>
+<td>Opens or closes the CONTROL overlay.</td>
+</tr>
+<tr>
+<td><strong>Eject Key</strong></td>
+<td><code>Delete</code></td>
+<td>Detaches CONTROL from the game process.</td>
 </tr>
 </tbody>
 </table>
@@ -1684,7 +1836,7 @@
 </tr>
 <tr>
 <td><strong>Sync Settings</strong></td>
-<td>Shares module settings through a named profile instead of player-specific settings.</td>
+<td>Shares custom module settings through a named profile instead of player-specific settings.</td>
 </tr>
 <tr>
 <td><strong>Module</strong></td>
@@ -1692,7 +1844,7 @@
 </tr>
 <tr>
 <td><strong>Sync Profile</strong></td>
-<td>Appears when <strong>Sync Settings</strong> is enabled. Multiple player slots can share the same profile.</td>
+<td>Appears when <strong>Sync Settings</strong> is enabled. Multiple player slots can share the same custom settings profile.</td>
 </tr>
 <tr>
 <td><strong>Create Profile / Remove Profile</strong></td>
@@ -1709,12 +1861,12 @@
 <li>The UI is grouped by player, not by a flat <code>Add Module</code> list.</li>
 <li>Each player section represents one module slot for that player id.</li>
 <li>By default, assigning a module to a bot player's slot suppresses that player's native decision AI while the module remains assigned.</li>
-<li>Enable <strong>Disable AI Suppression</strong> in <strong>MODULES</strong> if you want the native bot AI to keep running alongside the module assignment.</li>
+<li>Turn off <strong>Suppress Native AI</strong> in <strong>MODULES</strong> if you want the built-in AI to keep running alongside the module assignment.</li>
 <li>Module runtime warnings and Lua errors are shown directly inside the player section.</li>
 <li>Module-created settings panels appear per configured settings group while modules are enabled.</li>
 <li><strong>Open Folder</strong> opens the modules directory.</li>
 </ul>
-<h2 id="debug-menu">Debug Menu</h2>
+<h2 id="debug-submenu">DEBUG Submenu</h2>
 <table>
 <thead>
 <tr>
@@ -1727,46 +1879,20 @@
 <tr>
 <td><strong>Module Telemetry</strong></td>
 <td>Off</td>
-<td>Shows sampled <code>Update()</code> and <code>Render()</code> cost for active modules in the Debug menu.</td>
+<td>Shows sampled <code>Update()</code> and <code>Render()</code> cost for active modules.</td>
 </tr>
 </tbody>
 </table>
+<p>The Debug submenu also provides a button to show or hide the log window.</p>
 <p>When <strong>Module Telemetry</strong> is enabled, the Debug menu shows:</p>
 <ul>
-<li>Active modules only.</li>
-<li>A sampled <strong>Baseline Frame</strong> value, which represents host frame cost after subtracting sampled module time.</li>
-<li>Per-module <code>Upd</code> and <code>Rnd</code> entries with both sampled milliseconds and relative <code>x base</code> values.</li>
-<li>Samples spread across multiple frames each second rather than every frame.</li>
+<li>active modules only</li>
+<li>a sampled <strong>Baseline Frame</strong> value, which represents host frame cost after subtracting sampled module time</li>
+<li>per-module <code>Upd</code> and <code>Rnd</code> entries with both sampled milliseconds and relative <code>x base</code> values</li>
+<li>samples spread across multiple frames each second rather than every frame</li>
 </ul>
-<h2 id="misc-settings">Misc Settings</h2>
-<table>
-<thead>
-<tr>
-<th>Setting</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Spectator Mode</strong></td>
-<td>Off</td>
-<td>Enables the spectator-style reveal behavior that replaced the old <code>Reveal Map</code> option and keeps controls enabled while spectating.</td>
-</tr>
-<tr>
-<td><strong>Unlock Zoom</strong></td>
-<td>Off</td>
-<td>Removes the normal zoom limit. Release note: may cause rendering issues or crashes.</td>
-</tr>
-<tr>
-<td><strong>Chat Welcome Message</strong></td>
-<td>On</td>
-<td>Enables CONTROL's startup chat message behavior.</td>
-</tr>
-</tbody>
-</table>
-<h2 id="perspective-warning">Perspective Warning</h2>
-<p><code>Player Perspective</code> changes the rendered fog view. <code>Modules See Everything</code> changes what Lua can read. When <strong>Modules See Everything</strong> is off, map tiles, objects, and restricted player-state methods follow the assigned player's visibility and ownership limits.</p>
+<h2 id="perspective-and-visibility">Perspective And Visibility</h2>
+<p><code>Player Perspective</code> changes the rendered fog view. <code>Modules See Everything</code> changes what Lua can read. When <strong>Modules See Everything</strong> is off, map tiles, objects, and restricted player-state methods follow the assigned player's visibility and ownership limits, with a limited explored-object exception for animals and resources.</p>
 <h2 id="log-window">Log Window</h2>
 <p>Use <code>Log("message")</code> from Lua to write script messages to the log window. Runtime Lua errors are also displayed and logged through the interface.</p>
 

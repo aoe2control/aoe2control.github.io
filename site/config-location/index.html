@@ -555,6 +555,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../headless-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Headless Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -745,10 +773,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#upgrade-note" class="md-nav__link">
+  <a href="#launcher-overrides" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Upgrade Note
+        Launcher Overrides
       
     </span>
   </a>
@@ -973,6 +1001,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../session-control/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Automation &amp; Session Control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../facts/" class="md-nav__link">
         
   
@@ -1095,6 +1151,34 @@
     
   
     Types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../game-options/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameOptions
   
 
     
@@ -1544,7 +1628,7 @@
 <tbody>
 <tr>
 <td><code>settings.ini</code></td>
-<td>Global module settings, experimental options, module instance configs, profiles, misc options, and module settings.</td>
+<td>Built-in submenu settings, module instance configs, sync profiles, and module-defined settings.</td>
 </tr>
 <tr>
 <td><code>imgui.ini</code></td>
@@ -1570,8 +1654,13 @@
 <li>Module discovery depth: 3</li>
 <li><code>require()</code> depth: 3</li>
 </ul>
-<h2 id="upgrade-note">Upgrade Note</h2>
-<p>After the old <strong>AI</strong> submenu was renamed to <strong>MODULES</strong>, you can delete <code>settings.ini</code> once to clean up stale saved UI state from older builds. CONTROL recreates the file automatically on next launch.</p>
+<h2 id="launcher-overrides">Launcher Overrides</h2>
+<p>The headless launcher options write into this same folder:</p>
+<ul>
+<li><code>--override-settings</code> replaces <code>settings.ini</code></li>
+<li><code>--override-module</code> copies a module file or module folder into <code>modules/</code></li>
+</ul>
+<p>See <a href="../headless-mode/">Headless Mode</a> for usage details.</p>
 
 
 

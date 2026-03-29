@@ -1,0 +1,3593 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Reference for the GameOptions Lua type in AoE2Control, including writable setup fields, player-slot methods, and the option enums used by session setup automation.">
+      
+      
+      
+        <link rel="canonical" href="https://aoe2control.github.io/game-options/">
+      
+      
+        <link rel="prev" href="../types/">
+      
+      
+        <link rel="next" href="../enums/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.4">
+    
+    
+      
+        <title>GameOptions - AoE2Control Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  
+  <meta name="google-site-verification" content="zMo1xWvMox5uFoE_LK0xapy0L8Aa48jKeXCzilfC2Ww" />
+
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="deep-blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#gameoptions" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="AoE2Control Documentation" class="md-header__button md-logo" aria-label="AoE2Control Documentation" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AoE2Control Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              GameOptions
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../getting-started/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../interface-options/" class="md-tabs__link">
+          
+  
+  
+  Interface & Configuration
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../lifecycle/" class="md-tabs__link">
+          
+  
+  
+  Scripting Fundamentals
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../commands/" class="md-tabs__link">
+          
+  
+  
+  Game API
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../render-api/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Render API
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../types/" class="md-tabs__link">
+          
+  
+  
+  Types & Enums
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../settings-api/" class="md-tabs__link">
+          
+  
+  
+  Advanced APIs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../ai-agent-reference/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="https://discord.gg/DENDVuWq5t" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Discord
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AoE2Control Documentation" class="md-nav__button md-logo" aria-label="AoE2Control Documentation" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    AoE2Control Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quick-example/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Example
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../headless-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Headless Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interface & Configuration
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Interface & Configuration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../interface-options/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interface Options
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config-location/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Config Location
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scripting Fundamentals
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Scripting Fundamentals
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lifecycle/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lifecycle
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Module System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game API
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Game API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../commands/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game API — Control &amp; Commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../session-control/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Automation &amp; Session Control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../facts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Game API — Facts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../render-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Render API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Types & Enums
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Types & Enums
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../types/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameOptions
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameOptions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Access
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#global-setup-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Global Setup Methods
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#player-slot-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Player Slot Methods
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-random-map-pools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Random Map Pools
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#option-enums" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Option Enums
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Option Enums">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optionsaidifficulty" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptionsAIDifficulty
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optionscivilizationset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptionsCivilizationSet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optionsgamemode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptionsGameMode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optionsmapsize" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptionsMapSize
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optionsage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptionsAge
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optionsrevealmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptionsRevealMap
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optionsvictory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptionsVictory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optionsresources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptionsResources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optionslocation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptionsLocation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optionscivilization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptionsCivilization
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../enums/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Enums
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced APIs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Advanced APIs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../settings-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../render-api-impl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Render API Implementation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ipc-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IPC API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ai-agent-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Agent Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../limits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Limits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../distribution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distribution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../community/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://www.youtube.com/channel/UCUW6Vl6RPbAJfej4yb7Gnuw" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    YouTube Channel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://discord.gg/DENDVuWq5t" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Discord
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="gameoptions">GameOptions</h1>
+<p><code>GetCurrentGameOptions()</code> returns a <code>GameOptions</code> object for the current session setup. Use it to inspect or edit the pending match configuration before starting the game.</p>
+<div class="admonition note">
+<p class="admonition-title">Write timing</p>
+<p><code>GameOptions</code> setter methods return <code>false</code> while a match is already running. Use them before <code>DispatchStartGame()</code> or from menu-oriented workflows.</p>
+</div>
+<h2 id="access">Access</h2>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetCurrentGameOptions</span><span class="p">()</span>
+<span class="kr">if</span><span class="w"> </span><span class="nv">options</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nv">options</span><span class="p">:</span><span class="nf">SetLocation</span><span class="p">(</span><span class="nv">OptionsLocation</span><span class="p">.</span><span class="py">ARENA</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">options</span><span class="p">:</span><span class="nf">SetGameMode</span><span class="p">(</span><span class="nv">OptionsGameMode</span><span class="p">.</span><span class="py">RANDOM_MAP</span><span class="p">)</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p>Notes:</p>
+<ul>
+<li><code>GetCurrentGameOptions()</code> can return <code>nil</code>.</li>
+<li>Player-slot methods accept slot indexes <code>0</code> to <code>7</code>.</li>
+<li><code>DispatchStartGame()</code> uses the same current setup state.</li>
+</ul>
+<h2 id="global-setup-methods">Global Setup Methods</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GetAIDifficulty()</code></td>
+<td><code>OptionsAIDifficulty</code></td>
+<td>Returns the current AI difficulty preset.</td>
+</tr>
+<tr>
+<td><code>SetAIDifficulty(difficulty)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the AI difficulty preset.</td>
+</tr>
+<tr>
+<td><code>GetCivilizationSet()</code></td>
+<td><code>OptionsCivilizationSet</code></td>
+<td>Returns the active civilization set.</td>
+</tr>
+<tr>
+<td><code>SetCivilizationSet(civilizationSet)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the civilization set.</td>
+</tr>
+<tr>
+<td><code>GetGameMode()</code></td>
+<td><code>OptionsGameMode</code></td>
+<td>Returns the selected game mode.</td>
+</tr>
+<tr>
+<td><code>SetGameMode(gameMode)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the game mode.</td>
+</tr>
+<tr>
+<td><code>GetMapSize()</code></td>
+<td><code>OptionsMapSize</code></td>
+<td>Returns the selected map size.</td>
+</tr>
+<tr>
+<td><code>SetMapSize(mapSize)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the map size.</td>
+</tr>
+<tr>
+<td><code>GetStartingAge()</code></td>
+<td><code>OptionsAge</code></td>
+<td>Returns the starting age preset.</td>
+</tr>
+<tr>
+<td><code>SetStartingAge(age)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the starting age preset.</td>
+</tr>
+<tr>
+<td><code>GetEndingAge()</code></td>
+<td><code>OptionsAge</code></td>
+<td>Returns the ending age preset.</td>
+</tr>
+<tr>
+<td><code>SetEndingAge(age)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the ending age preset.</td>
+</tr>
+<tr>
+<td><code>GetGameSpeed()</code></td>
+<td><code>number</code></td>
+<td>Returns the configured game speed multiplier.</td>
+</tr>
+<tr>
+<td><code>SetGameSpeed(gameSpeed)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the configured game speed multiplier.</td>
+</tr>
+<tr>
+<td><code>GetRevealMap()</code></td>
+<td><code>OptionsRevealMap</code></td>
+<td>Returns the reveal-map mode.</td>
+</tr>
+<tr>
+<td><code>SetRevealMap(revealMap)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the reveal-map mode.</td>
+</tr>
+<tr>
+<td><code>GetVictory()</code></td>
+<td><code>OptionsVictory</code></td>
+<td>Returns the victory rule.</td>
+</tr>
+<tr>
+<td><code>SetVictory(victory)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the victory rule.</td>
+</tr>
+<tr>
+<td><code>GetVictoryLimit()</code></td>
+<td><code>number</code></td>
+<td>Returns the current victory limit value.</td>
+</tr>
+<tr>
+<td><code>SetVictoryLimit(victoryLimit)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the victory limit value.</td>
+</tr>
+<tr>
+<td><code>GetResources()</code></td>
+<td><code>OptionsResources</code></td>
+<td>Returns the resource preset.</td>
+</tr>
+<tr>
+<td><code>SetResources(resources)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the resource preset.</td>
+</tr>
+<tr>
+<td><code>GetPopulation()</code></td>
+<td><code>number</code></td>
+<td>Returns the configured population cap.</td>
+</tr>
+<tr>
+<td><code>SetPopulation(population)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the population cap.</td>
+</tr>
+<tr>
+<td><code>GetTeamsNotTogether()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether team spawn grouping is disabled.</td>
+</tr>
+<tr>
+<td><code>SetTeamsNotTogether(teamsNotTogether)</code></td>
+<td><code>boolean</code></td>
+<td>Sets whether team spawn grouping is disabled.</td>
+</tr>
+<tr>
+<td><code>GetRecordGame()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether game recording is enabled.</td>
+</tr>
+<tr>
+<td><code>SetRecordGame(recordGame)</code></td>
+<td><code>boolean</code></td>
+<td>Sets whether game recording is enabled.</td>
+</tr>
+<tr>
+<td><code>GetTeamPositions()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether team positions are enforced.</td>
+</tr>
+<tr>
+<td><code>SetTeamPositions(teamPositions)</code></td>
+<td><code>boolean</code></td>
+<td>Sets whether team positions are enforced.</td>
+</tr>
+<tr>
+<td><code>GetFullTechTree()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether full tech tree is enabled.</td>
+</tr>
+<tr>
+<td><code>SetFullTechTree(fullTechTree)</code></td>
+<td><code>boolean</code></td>
+<td>Sets whether full tech tree is enabled.</td>
+</tr>
+<tr>
+<td><code>GetLockTeams()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether team changes are locked.</td>
+</tr>
+<tr>
+<td><code>SetLockTeams(lockTeams)</code></td>
+<td><code>boolean</code></td>
+<td>Sets whether team changes are locked.</td>
+</tr>
+<tr>
+<td><code>GetLockSpeed()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether game speed changes are locked.</td>
+</tr>
+<tr>
+<td><code>SetLockSpeed(lockSpeed)</code></td>
+<td><code>boolean</code></td>
+<td>Sets whether game speed changes are locked.</td>
+</tr>
+<tr>
+<td><code>GetTurboMode()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether turbo mode is enabled.</td>
+</tr>
+<tr>
+<td><code>SetTurboMode(turboMode)</code></td>
+<td><code>boolean</code></td>
+<td>Sets whether turbo mode is enabled.</td>
+</tr>
+<tr>
+<td><code>GetAntiquityMode()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether antiquity mode is enabled.</td>
+</tr>
+<tr>
+<td><code>SetAntiquityMode(antiquityMode)</code></td>
+<td><code>boolean</code></td>
+<td>Sets whether antiquity mode is enabled.</td>
+</tr>
+<tr>
+<td><code>GetLocation()</code></td>
+<td><code>OptionsLocation</code></td>
+<td>Returns the selected map or location id.</td>
+</tr>
+<tr>
+<td><code>SetLocation(location)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the selected map or location id.</td>
+</tr>
+<tr>
+<td><code>SetRandomMapPoolLocations(locations)</code></td>
+<td><code>boolean</code></td>
+<td>Sets a custom random map pool from a Lua array of <code>OptionsLocation</code> values.</td>
+</tr>
+<tr>
+<td><code>GetPlayersCount()</code></td>
+<td><code>number</code></td>
+<td>Returns the configured player-slot count.</td>
+</tr>
+<tr>
+<td><code>SetPlayersCount(playersCount)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the configured player-slot count.</td>
+</tr>
+<tr>
+<td><code>GetTreatyLength()</code></td>
+<td><code>number</code></td>
+<td>Returns the treaty length.</td>
+</tr>
+<tr>
+<td><code>SetTreatyLength(treatyLength)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the treaty length.</td>
+</tr>
+<tr>
+<td><code>GetHandicap()</code></td>
+<td><code>boolean</code></td>
+<td>Returns whether handicap mode is enabled.</td>
+</tr>
+<tr>
+<td><code>SetHandicap(handicap)</code></td>
+<td><code>boolean</code></td>
+<td>Sets whether handicap mode is enabled.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="player-slot-methods">Player Slot Methods</h2>
+<p>These methods operate on one of the eight setup slots.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GetPlayerTeam(playerIndex)</code></td>
+<td><code>number</code></td>
+<td>Returns the team number for a player slot.</td>
+</tr>
+<tr>
+<td><code>SetPlayerTeam(playerIndex, team)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the team number for a player slot.</td>
+</tr>
+<tr>
+<td><code>GetPlayerHandicapPercentage(playerIndex)</code></td>
+<td><code>number</code></td>
+<td>Returns the handicap percentage for a player slot.</td>
+</tr>
+<tr>
+<td><code>SetPlayerHandicapPercentage(playerIndex, handicapPercentage)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the handicap percentage for a player slot.</td>
+</tr>
+<tr>
+<td><code>GetPlayerColor(playerIndex)</code></td>
+<td><code>number</code></td>
+<td>Returns the raw player color index for a player slot.</td>
+</tr>
+<tr>
+<td><code>SetPlayerColor(playerIndex, color)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the raw player color index for a player slot.</td>
+</tr>
+<tr>
+<td><code>GetPlayerCivilization(playerIndex)</code></td>
+<td><code>OptionsCivilization</code></td>
+<td>Returns the civilization assigned to a player slot.</td>
+</tr>
+<tr>
+<td><code>SetPlayerCivilization(playerIndex, civilization)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the civilization assigned to a player slot.</td>
+</tr>
+<tr>
+<td><code>SetAssignedPlayerCivilization(civilization)</code></td>
+<td><code>boolean</code></td>
+<td>Sets the civilization for the module's assigned player slot.</td>
+</tr>
+</tbody>
+</table>
+<p>Notes:</p>
+<ul>
+<li><code>SetAssignedPlayerCivilization()</code> uses the current module instance's assigned player id and requires that id to be a regular player slot from <code>1</code> to <code>8</code>.</li>
+<li>Most <code>GameOptions</code> methods are blocked while <strong>Tournament Mode</strong> is enabled. <code>SetAssignedPlayerCivilization()</code> remains available in the current Lua API.</li>
+</ul>
+<h2 id="example">Example</h2>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Load</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetCurrentGameOptions</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">options</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="nv">options</span><span class="p">:</span><span class="nf">SetLocation</span><span class="p">(</span><span class="nv">OptionsLocation</span><span class="p">.</span><span class="py">ARENA</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">options</span><span class="p">:</span><span class="nf">SetMapSize</span><span class="p">(</span><span class="nv">OptionsMapSize</span><span class="p">.</span><span class="py">MEDIUM</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">options</span><span class="p">:</span><span class="nf">SetResources</span><span class="p">(</span><span class="nv">OptionsResources</span><span class="p">.</span><span class="py">STANDARD</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">options</span><span class="p">:</span><span class="nf">SetPlayerCivilization</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nv">OptionsCivilization</span><span class="p">.</span><span class="py">KOREANS</span><span class="p">)</span>
+
+<span class="w">    </span><span class="nf">DispatchStartGame</span><span class="p">()</span>
+<span class="kr">end</span>
+</code></pre></div>
+<h2 id="custom-random-map-pools">Custom Random Map Pools</h2>
+<p>Use <code>SetRandomMapPoolLocations()</code> when you want the setup screen to use a custom random map pool instead of a single fixed location.</p>
+<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Load</span><span class="p">()</span>
+<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">options</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">GetCurrentGameOptions</span><span class="p">()</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">options</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">        </span><span class="kr">return</span>
+<span class="w">    </span><span class="kr">end</span>
+
+<span class="w">    </span><span class="nv">options</span><span class="p">:</span><span class="nf">SetRandomMapPoolLocations</span><span class="p">({</span>
+<span class="w">        </span><span class="nv">OptionsLocation</span><span class="p">.</span><span class="py">ARABIA</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">OptionsLocation</span><span class="p">.</span><span class="py">ARENA</span><span class="p">,</span>
+<span class="w">        </span><span class="nv">OptionsLocation</span><span class="p">.</span><span class="py">BLACK_FOREST</span><span class="p">,</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p>Notes:</p>
+<ul>
+<li>Pass a Lua array of <code>OptionsLocation</code> values.</li>
+<li>Passing one location behaves like <code>SetLocation(...)</code>.</li>
+<li>Passing multiple locations sets <code>GetLocation()</code> to <code>OptionsLocation.CUSTOM_MAP_POOL</code>.</li>
+</ul>
+<h2 id="option-enums">Option Enums</h2>
+<h3 id="optionsaidifficulty">OptionsAIDifficulty</h3>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Numeric Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>EXTREME</code></td>
+<td><code>-1</code></td>
+</tr>
+<tr>
+<td><code>HARDEST</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>HARD</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>MODERATE</code></td>
+<td><code>2</code></td>
+</tr>
+<tr>
+<td><code>STANDARD</code></td>
+<td><code>3</code></td>
+</tr>
+<tr>
+<td><code>EASIEST</code></td>
+<td><code>4</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="optionscivilizationset">OptionsCivilizationSet</h3>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Numeric Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ALL</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>AGE_OF_EMPIRES_II</code></td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="optionsgamemode">OptionsGameMode</h3>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Numeric Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>RANDOM_MAP</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>REGICIDE</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>DEATH_MATCH</code></td>
+<td><code>2</code></td>
+</tr>
+<tr>
+<td><code>SCENARIO</code></td>
+<td><code>3</code></td>
+</tr>
+<tr>
+<td><code>KING_OF_THE_HILL</code></td>
+<td><code>5</code></td>
+</tr>
+<tr>
+<td><code>WONDER_RACE</code></td>
+<td><code>6</code></td>
+</tr>
+<tr>
+<td><code>DEFEND_THE_WONDER</code></td>
+<td><code>7</code></td>
+</tr>
+<tr>
+<td><code>TURBO_RANDOM_MAP</code></td>
+<td><code>8</code></td>
+</tr>
+<tr>
+<td><code>CAPTURE_THE_RELIC</code></td>
+<td><code>10</code></td>
+</tr>
+<tr>
+<td><code>SUDDEN_DEATH</code></td>
+<td><code>11</code></td>
+</tr>
+<tr>
+<td><code>BATTLE_ROYALE</code></td>
+<td><code>12</code></td>
+</tr>
+<tr>
+<td><code>EMPIRE_WARS</code></td>
+<td><code>13</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="optionsmapsize">OptionsMapSize</h3>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Numeric Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TINY</code></td>
+<td><code>120</code></td>
+</tr>
+<tr>
+<td><code>SMALL</code></td>
+<td><code>144</code></td>
+</tr>
+<tr>
+<td><code>MEDIUM</code></td>
+<td><code>168</code></td>
+</tr>
+<tr>
+<td><code>NORMAL</code></td>
+<td><code>200</code></td>
+</tr>
+<tr>
+<td><code>LARGE</code></td>
+<td><code>220</code></td>
+</tr>
+<tr>
+<td><code>HUGE</code></td>
+<td><code>240</code></td>
+</tr>
+<tr>
+<td><code>LUDICROUS</code></td>
+<td><code>480</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="optionsage">OptionsAge</h3>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Numeric Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>STANDARD</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>DARK_AGE</code></td>
+<td><code>2</code></td>
+</tr>
+<tr>
+<td><code>FEUDAL_AGE</code></td>
+<td><code>3</code></td>
+</tr>
+<tr>
+<td><code>CASTLE_AGE</code></td>
+<td><code>4</code></td>
+</tr>
+<tr>
+<td><code>IMPERIAL_AGE</code></td>
+<td><code>5</code></td>
+</tr>
+<tr>
+<td><code>POST_IMPERIAL_AGE</code></td>
+<td><code>6</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="optionsrevealmap">OptionsRevealMap</h3>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Numeric Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NORMAL</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>EXPLORED</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>ALL_VISIBLE</code></td>
+<td><code>2</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="optionsvictory">OptionsVictory</h3>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Numeric Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>STANDARD</code></td>
+<td><code>9</code></td>
+</tr>
+<tr>
+<td><code>CONQUEST</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>TIME_LIMIT</code></td>
+<td><code>7</code></td>
+</tr>
+<tr>
+<td><code>SCORE</code></td>
+<td><code>8</code></td>
+</tr>
+<tr>
+<td><code>LAST_MAN_STANDING</code></td>
+<td><code>11</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="optionsresources">OptionsResources</h3>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Numeric Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>STANDARD</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>LOW</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>MEDIUM</code></td>
+<td><code>2</code></td>
+</tr>
+<tr>
+<td><code>HIGH</code></td>
+<td><code>3</code></td>
+</tr>
+<tr>
+<td><code>ULTRA_HIGH</code></td>
+<td><code>4</code></td>
+</tr>
+<tr>
+<td><code>INFINITE_</code></td>
+<td><code>5</code></td>
+</tr>
+<tr>
+<td><code>RANDOM</code></td>
+<td><code>6</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="optionslocation">OptionsLocation</h3>
+<p>The binding exposes the current engine map table as <code>OptionsLocation</code>.</p>
+<p>Common values:</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Numeric Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CUSTOM_MAP_POOL</code></td>
+<td><code>137</code></td>
+</tr>
+<tr>
+<td><code>SCENARIO_MAP</code></td>
+<td><code>-1</code></td>
+</tr>
+<tr>
+<td><code>ARABIA</code></td>
+<td><code>9</code></td>
+</tr>
+<tr>
+<td><code>BLACK_FOREST</code></td>
+<td><code>12</code></td>
+</tr>
+<tr>
+<td><code>ARENA</code></td>
+<td><code>29</code></td>
+</tr>
+<tr>
+<td><code>NOMAD</code></td>
+<td><code>33</code></td>
+</tr>
+<tr>
+<td><code>ACROPOLIS</code></td>
+<td><code>67</code></td>
+</tr>
+<tr>
+<td><code>MEGARANDOM</code></td>
+<td><code>77</code></td>
+</tr>
+<tr>
+<td><code>SOCOTRA</code></td>
+<td><code>87</code></td>
+</tr>
+<tr>
+<td><code>FOUR_LAKES</code></td>
+<td><code>140</code></td>
+</tr>
+<tr>
+<td><code>LAND_NOMAD</code></td>
+<td><code>141</code></td>
+</tr>
+</tbody>
+</table>
+<details class="info">
+<summary>Full OptionsLocation value table</summary>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Numeric Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CUSTOM_MAP_POOL</code></td>
+<td><code>137</code></td>
+</tr>
+<tr>
+<td><code>SCENARIO_MAP</code></td>
+<td><code>-1</code></td>
+</tr>
+<tr>
+<td><code>ARABIA</code></td>
+<td><code>9</code></td>
+</tr>
+<tr>
+<td><code>ARCHIPELAGO</code></td>
+<td><code>10</code></td>
+</tr>
+<tr>
+<td><code>BALTIC</code></td>
+<td><code>11</code></td>
+</tr>
+<tr>
+<td><code>BLACK_FOREST</code></td>
+<td><code>12</code></td>
+</tr>
+<tr>
+<td><code>COASTAL</code></td>
+<td><code>13</code></td>
+</tr>
+<tr>
+<td><code>CONTINENTAL</code></td>
+<td><code>14</code></td>
+</tr>
+<tr>
+<td><code>CRATER_LAKE</code></td>
+<td><code>15</code></td>
+</tr>
+<tr>
+<td><code>FORTRESS</code></td>
+<td><code>16</code></td>
+</tr>
+<tr>
+<td><code>GOLD_RUSH</code></td>
+<td><code>17</code></td>
+</tr>
+<tr>
+<td><code>HIGHLAND</code></td>
+<td><code>18</code></td>
+</tr>
+<tr>
+<td><code>ISLANDS</code></td>
+<td><code>19</code></td>
+</tr>
+<tr>
+<td><code>MEDITERRANEAN</code></td>
+<td><code>20</code></td>
+</tr>
+<tr>
+<td><code>MIGRATION</code></td>
+<td><code>21</code></td>
+</tr>
+<tr>
+<td><code>RIVERS</code></td>
+<td><code>22</code></td>
+</tr>
+<tr>
+<td><code>TEAM_ISLANDS</code></td>
+<td><code>23</code></td>
+</tr>
+<tr>
+<td><code>SCANDANAVIA</code></td>
+<td><code>25</code></td>
+</tr>
+<tr>
+<td><code>MONGOLIA</code></td>
+<td><code>26</code></td>
+</tr>
+<tr>
+<td><code>YUCATAN</code></td>
+<td><code>27</code></td>
+</tr>
+<tr>
+<td><code>SALT_MARSH</code></td>
+<td><code>28</code></td>
+</tr>
+<tr>
+<td><code>ARENA</code></td>
+<td><code>29</code></td>
+</tr>
+<tr>
+<td><code>KING_OF_THE_HILL</code></td>
+<td><code>30</code></td>
+</tr>
+<tr>
+<td><code>OASIS</code></td>
+<td><code>31</code></td>
+</tr>
+<tr>
+<td><code>GHOST_LAKE</code></td>
+<td><code>32</code></td>
+</tr>
+<tr>
+<td><code>NOMAD</code></td>
+<td><code>33</code></td>
+</tr>
+<tr>
+<td><code>CANALS</code></td>
+<td><code>34</code></td>
+</tr>
+<tr>
+<td><code>CAPRICIOUS</code></td>
+<td><code>35</code></td>
+</tr>
+<tr>
+<td><code>DINGOS</code></td>
+<td><code>36</code></td>
+</tr>
+<tr>
+<td><code>GRAVEYARDS</code></td>
+<td><code>37</code></td>
+</tr>
+<tr>
+<td><code>METROPOLIS</code></td>
+<td><code>38</code></td>
+</tr>
+<tr>
+<td><code>MOATS</code></td>
+<td><code>39</code></td>
+</tr>
+<tr>
+<td><code>PARADISE_ISLAND</code></td>
+<td><code>40</code></td>
+</tr>
+<tr>
+<td><code>PILGRIMS</code></td>
+<td><code>41</code></td>
+</tr>
+<tr>
+<td><code>PRAIRIE</code></td>
+<td><code>42</code></td>
+</tr>
+<tr>
+<td><code>SEASONS</code></td>
+<td><code>43</code></td>
+</tr>
+<tr>
+<td><code>SHERWOOD_FOREST</code></td>
+<td><code>44</code></td>
+</tr>
+<tr>
+<td><code>SHIPWRECK</code></td>
+<td><code>46</code></td>
+</tr>
+<tr>
+<td><code>TEAM_GLACIERS</code></td>
+<td><code>47</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_SPAIN</code></td>
+<td><code>49</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_ENGLAND</code></td>
+<td><code>50</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_MIDEAST</code></td>
+<td><code>51</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_TEXAS</code></td>
+<td><code>52</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_ITALY</code></td>
+<td><code>53</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_CARIBBEAN</code></td>
+<td><code>54</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_FRANCE</code></td>
+<td><code>55</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_JUTLAND</code></td>
+<td><code>56</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_NIPPON</code></td>
+<td><code>57</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_BYZANTIUM</code></td>
+<td><code>58</code></td>
+</tr>
+<tr>
+<td><code>CUSTOM_MAP</code></td>
+<td><code>59</code></td>
+</tr>
+<tr>
+<td><code>ACROPOLIS</code></td>
+<td><code>67</code></td>
+</tr>
+<tr>
+<td><code>BUDAPEST</code></td>
+<td><code>68</code></td>
+</tr>
+<tr>
+<td><code>CENOTES</code></td>
+<td><code>69</code></td>
+</tr>
+<tr>
+<td><code>CITYOFLAKES</code></td>
+<td><code>70</code></td>
+</tr>
+<tr>
+<td><code>GOLDENPIT</code></td>
+<td><code>71</code></td>
+</tr>
+<tr>
+<td><code>HIDEOUT</code></td>
+<td><code>72</code></td>
+</tr>
+<tr>
+<td><code>HILLFORT</code></td>
+<td><code>73</code></td>
+</tr>
+<tr>
+<td><code>LOMBARDIA</code></td>
+<td><code>74</code></td>
+</tr>
+<tr>
+<td><code>STEPPE</code></td>
+<td><code>75</code></td>
+</tr>
+<tr>
+<td><code>VALLEY</code></td>
+<td><code>76</code></td>
+</tr>
+<tr>
+<td><code>MEGARANDOM</code></td>
+<td><code>77</code></td>
+</tr>
+<tr>
+<td><code>HAMBURGER</code></td>
+<td><code>78</code></td>
+</tr>
+<tr>
+<td><code>CTR_RANDOM</code></td>
+<td><code>79</code></td>
+</tr>
+<tr>
+<td><code>CTR_MONSOON</code></td>
+<td><code>80</code></td>
+</tr>
+<tr>
+<td><code>CTR_PYRAMID_DESCENT</code></td>
+<td><code>81</code></td>
+</tr>
+<tr>
+<td><code>CTR_SPIRAL</code></td>
+<td><code>82</code></td>
+</tr>
+<tr>
+<td><code>KILIMANJARO</code></td>
+<td><code>83</code></td>
+</tr>
+<tr>
+<td><code>MOUNTAIN_PASS</code></td>
+<td><code>84</code></td>
+</tr>
+<tr>
+<td><code>NILE_DELTA</code></td>
+<td><code>85</code></td>
+</tr>
+<tr>
+<td><code>SERENGETI</code></td>
+<td><code>86</code></td>
+</tr>
+<tr>
+<td><code>SOCOTRA</code></td>
+<td><code>87</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_AMAZON</code></td>
+<td><code>88</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_CHINA</code></td>
+<td><code>89</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_HORN_OF_AFRICA</code></td>
+<td><code>90</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_INDIA</code></td>
+<td><code>91</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_MADAGASCAR</code></td>
+<td><code>92</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_WEST_AFRICA</code></td>
+<td><code>93</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_BOHEMIA</code></td>
+<td><code>94</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_EARTH</code></td>
+<td><code>95</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_CANYONS</code></td>
+<td><code>96</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_ARCHIPELAGO</code></td>
+<td><code>97</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_ENEMY_ISLANDS</code></td>
+<td><code>98</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_FAR_OUT</code></td>
+<td><code>99</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_FRONT_LINE</code></td>
+<td><code>100</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_INNER_CIRCLE</code></td>
+<td><code>101</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_MOTHERLAND</code></td>
+<td><code>102</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_OPEN_PLAINS</code></td>
+<td><code>103</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_RING_OF_WATER</code></td>
+<td><code>104</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_SNAKE_PIT</code></td>
+<td><code>105</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_THE_EYE</code></td>
+<td><code>106</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_AUSTRALIA</code></td>
+<td><code>107</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_INDOCHINA</code></td>
+<td><code>108</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_INDONESIA</code></td>
+<td><code>109</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_MALACCA</code></td>
+<td><code>110</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_PHILIPPINES</code></td>
+<td><code>111</code></td>
+</tr>
+<tr>
+<td><code>BOG_ISLANDS</code></td>
+<td><code>112</code></td>
+</tr>
+<tr>
+<td><code>MANGROVE_JUNGLE</code></td>
+<td><code>113</code></td>
+</tr>
+<tr>
+<td><code>PACIFIC_ISLANDS</code></td>
+<td><code>114</code></td>
+</tr>
+<tr>
+<td><code>SANDBANK</code></td>
+<td><code>115</code></td>
+</tr>
+<tr>
+<td><code>WATER_NOMAD</code></td>
+<td><code>116</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_JUNGLE_ISLANDS</code></td>
+<td><code>117</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_HOLY_LINE</code></td>
+<td><code>118</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_BORDER_STONES</code></td>
+<td><code>119</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_YIN_YANG</code></td>
+<td><code>120</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_JUNGLE_LANES</code></td>
+<td><code>121</code></td>
+</tr>
+<tr>
+<td><code>ALPINE_LAKES</code></td>
+<td><code>122</code></td>
+</tr>
+<tr>
+<td><code>BOGLAND</code></td>
+<td><code>123</code></td>
+</tr>
+<tr>
+<td><code>MOUNTAIN_RIDGE</code></td>
+<td><code>124</code></td>
+</tr>
+<tr>
+<td><code>RAVINES</code></td>
+<td><code>125</code></td>
+</tr>
+<tr>
+<td><code>WOLF_HILL</code></td>
+<td><code>126</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_SWIRLING_RIVER</code></td>
+<td><code>127</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_TWIN_FORESTS</code></td>
+<td><code>128</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_JOURNEY_SOUTH</code></td>
+<td><code>129</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_SNAKE_FOREST</code></td>
+<td><code>130</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_SPRAWLING_STREAMS</code></td>
+<td><code>131</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_ANTARCTICA</code></td>
+<td><code>132</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_ARAL_SEA</code></td>
+<td><code>133</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_BLACK_SEA</code></td>
+<td><code>134</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_CAUCASUS</code></td>
+<td><code>135</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_SIBERIA</code></td>
+<td><code>136</code></td>
+</tr>
+<tr>
+<td><code>GOLDEN_SWAMP</code></td>
+<td><code>139</code></td>
+</tr>
+<tr>
+<td><code>FOUR_LAKES</code></td>
+<td><code>140</code></td>
+</tr>
+<tr>
+<td><code>LAND_NOMAD</code></td>
+<td><code>141</code></td>
+</tr>
+<tr>
+<td><code>BATTLE_ON_THE_ICE</code></td>
+<td><code>142</code></td>
+</tr>
+<tr>
+<td><code>EL_DORADO</code></td>
+<td><code>143</code></td>
+</tr>
+<tr>
+<td><code>FALL_OF_AXUM</code></td>
+<td><code>144</code></td>
+</tr>
+<tr>
+<td><code>FALL_OF_ROME</code></td>
+<td><code>145</code></td>
+</tr>
+<tr>
+<td><code>THE_MAJAPAHIT_EMPIRE</code></td>
+<td><code>146</code></td>
+</tr>
+<tr>
+<td><code>AMAZON_TUNNEL</code></td>
+<td><code>147</code></td>
+</tr>
+<tr>
+<td><code>COASTAL_FOREST</code></td>
+<td><code>148</code></td>
+</tr>
+<tr>
+<td><code>AFRICAN_CLEARING</code></td>
+<td><code>149</code></td>
+</tr>
+<tr>
+<td><code>ATACAMA</code></td>
+<td><code>150</code></td>
+</tr>
+<tr>
+<td><code>SEIZE_THE_MOUNTAIN</code></td>
+<td><code>151</code></td>
+</tr>
+<tr>
+<td><code>CRATER</code></td>
+<td><code>152</code></td>
+</tr>
+<tr>
+<td><code>CROSSROADS</code></td>
+<td><code>153</code></td>
+</tr>
+<tr>
+<td><code>VOLCANIC_ISLAND</code></td>
+<td><code>156</code></td>
+</tr>
+<tr>
+<td><code>ACCLIVITY</code></td>
+<td><code>157</code></td>
+</tr>
+<tr>
+<td><code>ERUPTION</code></td>
+<td><code>158</code></td>
+</tr>
+<tr>
+<td><code>FRIGID_LAKE</code></td>
+<td><code>159</code></td>
+</tr>
+<tr>
+<td><code>GREENLAND</code></td>
+<td><code>160</code></td>
+</tr>
+<tr>
+<td><code>LOWLAND</code></td>
+<td><code>161</code></td>
+</tr>
+<tr>
+<td><code>MARKETPLACE</code></td>
+<td><code>162</code></td>
+</tr>
+<tr>
+<td><code>MEADOW</code></td>
+<td><code>163</code></td>
+</tr>
+<tr>
+<td><code>MOUNTAIN_RANGE</code></td>
+<td><code>164</code></td>
+</tr>
+<tr>
+<td><code>NORTHERN_ISLES</code></td>
+<td><code>165</code></td>
+</tr>
+<tr>
+<td><code>RING_FORTRESS</code></td>
+<td><code>166</code></td>
+</tr>
+<tr>
+<td><code>RUNESTONES</code></td>
+<td><code>167</code></td>
+</tr>
+<tr>
+<td><code>AFTERMATH</code></td>
+<td><code>168</code></td>
+</tr>
+<tr>
+<td><code>ENCLOSED</code></td>
+<td><code>169</code></td>
+</tr>
+<tr>
+<td><code>HABOOB</code></td>
+<td><code>170</code></td>
+</tr>
+<tr>
+<td><code>KAWASAN</code></td>
+<td><code>171</code></td>
+</tr>
+<tr>
+<td><code>LAND_MADNESS</code></td>
+<td><code>172</code></td>
+</tr>
+<tr>
+<td><code>SACRED_SPRINGS</code></td>
+<td><code>173</code></td>
+</tr>
+<tr>
+<td><code>WADE</code></td>
+<td><code>174</code></td>
+</tr>
+<tr>
+<td><code>MORASS</code></td>
+<td><code>175</code></td>
+</tr>
+<tr>
+<td><code>SHOALS</code></td>
+<td><code>176</code></td>
+</tr>
+<tr>
+<td><code>CLIFFBOUND</code></td>
+<td><code>177</code></td>
+</tr>
+<tr>
+<td><code>ISTHMUS</code></td>
+<td><code>178</code></td>
+</tr>
+<tr>
+<td><code>DUNE_SPRINGS</code></td>
+<td><code>179</code></td>
+</tr>
+<tr>
+<td><code>GOLDEN_STREAM</code></td>
+<td><code>180</code></td>
+</tr>
+<tr>
+<td><code>MOUNTAIN_DUNES</code></td>
+<td><code>181</code></td>
+</tr>
+<tr>
+<td><code>RIVER_DIVIDE</code></td>
+<td><code>182</code></td>
+</tr>
+<tr>
+<td><code>SANDRIFT</code></td>
+<td><code>183</code></td>
+</tr>
+<tr>
+<td><code>SHRUBLAND</code></td>
+<td><code>184</code></td>
+</tr>
+<tr>
+<td><code>PASSAGE</code></td>
+<td><code>185</code></td>
+</tr>
+<tr>
+<td><code>HOLLOW_WOODLANDS</code></td>
+<td><code>186</code></td>
+</tr>
+<tr>
+<td><code>KARSTS</code></td>
+<td><code>187</code></td>
+</tr>
+<tr>
+<td><code>GLADE</code></td>
+<td><code>188</code></td>
+</tr>
+<tr>
+<td><code>FORTIFIED_CLEARING</code></td>
+<td><code>189</code></td>
+</tr>
+<tr>
+<td><code>QP_ARABIA</code></td>
+<td><code>190</code></td>
+</tr>
+<tr>
+<td><code>QP_FORTIFIED_CLEARING</code></td>
+<td><code>191</code></td>
+</tr>
+<tr>
+<td><code>QP_GLADE</code></td>
+<td><code>192</code></td>
+</tr>
+<tr>
+<td><code>QP_NOMAD</code></td>
+<td><code>193</code></td>
+</tr>
+<tr>
+<td><code>QP_RUNESTONES</code></td>
+<td><code>194</code></td>
+</tr>
+<tr>
+<td><code>QP_ARENA</code></td>
+<td><code>195</code></td>
+</tr>
+<tr>
+<td><code>QP_BLACK_FOREST</code></td>
+<td><code>196</code></td>
+</tr>
+<tr>
+<td><code>REAL_WORLD_MANCHURIA</code></td>
+<td><code>197</code></td>
+</tr>
+<tr>
+<td><code>BORDER_DISPUTE</code></td>
+<td><code>198</code></td>
+</tr>
+<tr>
+<td><code>GRAUPEL</code></td>
+<td><code>199</code></td>
+</tr>
+<tr>
+<td><code>STRANDED</code></td>
+<td><code>200</code></td>
+</tr>
+<tr>
+<td><code>SARDIS</code></td>
+<td><code>201</code></td>
+</tr>
+<tr>
+<td><code>AQUARENA</code></td>
+<td><code>202</code></td>
+</tr>
+<tr>
+<td><code>SPECIAL_MAP_FOREST_BREACH</code></td>
+<td><code>203</code></td>
+</tr>
+<tr>
+<td><code>CHAOS_PIT</code></td>
+<td><code>204</code></td>
+</tr>
+<tr>
+<td><code>MIRED</code></td>
+<td><code>205</code></td>
+</tr>
+<tr>
+<td><code>MURKWOOD</code></td>
+<td><code>206</code></td>
+</tr>
+<tr>
+<td><code>CROWNWOOD</code></td>
+<td><code>207</code></td>
+</tr>
+<tr>
+<td><code>DOROTHEA_QUARRY</code></td>
+<td><code>208</code></td>
+</tr>
+<tr>
+<td><code>GLACIS</code></td>
+<td><code>209</code></td>
+</tr>
+<tr>
+<td><code>HENGEHOLD</code></td>
+<td><code>210</code></td>
+</tr>
+<tr>
+<td><code>LOCH_NESS</code></td>
+<td><code>211</code></td>
+</tr>
+<tr>
+<td><code>RAMPART</code></td>
+<td><code>212</code></td>
+</tr>
+<tr>
+<td><code>STONEFRONT</code></td>
+<td><code>213</code></td>
+</tr>
+<tr>
+<td><code>THAMES</code></td>
+<td><code>214</code></td>
+</tr>
+<tr>
+<td><code>VULPINE</code></td>
+<td><code>215</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+<h3 id="optionscivilization">OptionsCivilization</h3>
+<details class="info">
+<summary>Full OptionsCivilization value table</summary>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Numeric Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GAIA</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>BRITONS</code></td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td><code>FRANKS</code></td>
+<td><code>2</code></td>
+</tr>
+<tr>
+<td><code>GOTHS</code></td>
+<td><code>3</code></td>
+</tr>
+<tr>
+<td><code>TEUTONS</code></td>
+<td><code>4</code></td>
+</tr>
+<tr>
+<td><code>JAPANESE</code></td>
+<td><code>5</code></td>
+</tr>
+<tr>
+<td><code>CHINESE</code></td>
+<td><code>6</code></td>
+</tr>
+<tr>
+<td><code>BYZANTINES</code></td>
+<td><code>7</code></td>
+</tr>
+<tr>
+<td><code>PERSIANS</code></td>
+<td><code>8</code></td>
+</tr>
+<tr>
+<td><code>SARACENS</code></td>
+<td><code>9</code></td>
+</tr>
+<tr>
+<td><code>TURKS</code></td>
+<td><code>10</code></td>
+</tr>
+<tr>
+<td><code>VIKINGS</code></td>
+<td><code>11</code></td>
+</tr>
+<tr>
+<td><code>MONGOLS</code></td>
+<td><code>12</code></td>
+</tr>
+<tr>
+<td><code>CELTS</code></td>
+<td><code>13</code></td>
+</tr>
+<tr>
+<td><code>SPANISH</code></td>
+<td><code>14</code></td>
+</tr>
+<tr>
+<td><code>AZTECS</code></td>
+<td><code>15</code></td>
+</tr>
+<tr>
+<td><code>MAYANS</code></td>
+<td><code>16</code></td>
+</tr>
+<tr>
+<td><code>HUNS</code></td>
+<td><code>17</code></td>
+</tr>
+<tr>
+<td><code>KOREANS</code></td>
+<td><code>18</code></td>
+</tr>
+<tr>
+<td><code>ITALIANS</code></td>
+<td><code>19</code></td>
+</tr>
+<tr>
+<td><code>HINDUSTANIS</code></td>
+<td><code>20</code></td>
+</tr>
+<tr>
+<td><code>INCAS</code></td>
+<td><code>21</code></td>
+</tr>
+<tr>
+<td><code>MAGYARS</code></td>
+<td><code>22</code></td>
+</tr>
+<tr>
+<td><code>SLAVS</code></td>
+<td><code>23</code></td>
+</tr>
+<tr>
+<td><code>PORTUGUESE</code></td>
+<td><code>24</code></td>
+</tr>
+<tr>
+<td><code>ETHIOPIANS</code></td>
+<td><code>25</code></td>
+</tr>
+<tr>
+<td><code>MALIANS</code></td>
+<td><code>26</code></td>
+</tr>
+<tr>
+<td><code>BERBERS</code></td>
+<td><code>27</code></td>
+</tr>
+<tr>
+<td><code>KHMER</code></td>
+<td><code>28</code></td>
+</tr>
+<tr>
+<td><code>MALAY</code></td>
+<td><code>29</code></td>
+</tr>
+<tr>
+<td><code>BURMESE</code></td>
+<td><code>30</code></td>
+</tr>
+<tr>
+<td><code>VIETNAMESE</code></td>
+<td><code>31</code></td>
+</tr>
+<tr>
+<td><code>BULGARIANS</code></td>
+<td><code>32</code></td>
+</tr>
+<tr>
+<td><code>TATARS</code></td>
+<td><code>33</code></td>
+</tr>
+<tr>
+<td><code>CUMANS</code></td>
+<td><code>34</code></td>
+</tr>
+<tr>
+<td><code>LITHUANIANS</code></td>
+<td><code>35</code></td>
+</tr>
+<tr>
+<td><code>BURGUNDIANS</code></td>
+<td><code>36</code></td>
+</tr>
+<tr>
+<td><code>SICILIANS</code></td>
+<td><code>37</code></td>
+</tr>
+<tr>
+<td><code>POLES</code></td>
+<td><code>38</code></td>
+</tr>
+<tr>
+<td><code>BOHEMIANS</code></td>
+<td><code>39</code></td>
+</tr>
+<tr>
+<td><code>DRAVIDIANS</code></td>
+<td><code>40</code></td>
+</tr>
+<tr>
+<td><code>BENGALIS</code></td>
+<td><code>41</code></td>
+</tr>
+<tr>
+<td><code>GURJARAS</code></td>
+<td><code>42</code></td>
+</tr>
+<tr>
+<td><code>ROMANS</code></td>
+<td><code>43</code></td>
+</tr>
+<tr>
+<td><code>ARMENIANS</code></td>
+<td><code>44</code></td>
+</tr>
+<tr>
+<td><code>GEORGIANS</code></td>
+<td><code>45</code></td>
+</tr>
+<tr>
+<td><code>ACHAEMENIDS</code></td>
+<td><code>46</code></td>
+</tr>
+<tr>
+<td><code>ATHENIANS</code></td>
+<td><code>47</code></td>
+</tr>
+<tr>
+<td><code>SPARTANS</code></td>
+<td><code>48</code></td>
+</tr>
+<tr>
+<td><code>SHU</code></td>
+<td><code>49</code></td>
+</tr>
+<tr>
+<td><code>WU</code></td>
+<td><code>50</code></td>
+</tr>
+<tr>
+<td><code>WEI</code></td>
+<td><code>51</code></td>
+</tr>
+<tr>
+<td><code>JURCHENS</code></td>
+<td><code>52</code></td>
+</tr>
+<tr>
+<td><code>KHITANS</code></td>
+<td><code>53</code></td>
+</tr>
+<tr>
+<td><code>MACEDONIANS</code></td>
+<td><code>54</code></td>
+</tr>
+<tr>
+<td><code>THRACIANS</code></td>
+<td><code>55</code></td>
+</tr>
+<tr>
+<td><code>PURU</code></td>
+<td><code>56</code></td>
+</tr>
+<tr>
+<td><code>MUISCA</code></td>
+<td><code>57</code></td>
+</tr>
+<tr>
+<td><code>MAPUCHE</code></td>
+<td><code>58</code></td>
+</tr>
+<tr>
+<td><code>TUPI</code></td>
+<td><code>59</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright © Big John
+    </div>
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://discord.gg/DENDVuWq5t" target="_blank" rel="noopener" title="Discord" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M492.5 69.8c-.2-.3-.4-.6-.8-.7-38.1-17.5-78.4-30-119.7-37.1-.4-.1-.8 0-1.1.1s-.6.4-.8.8c-5.5 9.9-10.5 20.2-14.9 30.6-44.6-6.8-89.9-6.8-134.4 0-4.5-10.5-9.5-20.7-15.1-30.6-.2-.3-.5-.6-.8-.8s-.7-.2-1.1-.2C162.5 39 122.2 51.5 84.1 69c-.3.1-.6.4-.8.7C7.1 183.5-13.8 294.6-3.6 404.2c0 .3.1.5.2.8s.3.4.5.6c44.4 32.9 94 58 146.8 74.2.4.1.8.1 1.1 0s.7-.4.9-.7c11.3-15.4 21.4-31.8 30-48.8.1-.2.2-.5.2-.8s0-.5-.1-.8-.2-.5-.4-.6-.4-.3-.7-.4c-15.8-6.1-31.2-13.4-45.9-21.9-.3-.2-.5-.4-.7-.6s-.3-.6-.3-.9 0-.6.2-.9.3-.5.6-.7c3.1-2.3 6.2-4.7 9.1-7.1.3-.2.6-.4.9-.4s.7 0 1 .1c96.2 43.9 200.4 43.9 295.5 0 .3-.1.7-.2 1-.2s.7.2.9.4c2.9 2.4 6 4.9 9.1 7.2.2.2.4.4.6.7s.2.6.2.9-.1.6-.3.9-.4.5-.6.6c-14.7 8.6-30 15.9-45.9 21.8-.2.1-.5.2-.7.4s-.3.4-.4.7-.1.5-.1.8.1.5.2.8c8.8 17 18.8 33.3 30 48.8.2.3.6.6.9.7s.8.1 1.1 0c52.9-16.2 102.6-41.3 147.1-74.2.2-.2.4-.4.5-.6s.2-.5.2-.8c12.3-126.8-20.5-236.9-86.9-334.5zm-302 267.7c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.4 59.2-52.8 59.2m195.4 0c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.2 59.2-52.8 59.2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://www.youtube.com/channel/UCUW6Vl6RPbAJfej4yb7Gnuw" target="_blank" rel="noopener" title="YouTube" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M549.7 124.1c-6.2-23.7-24.8-42.3-48.3-48.6C458.9 64 288.1 64 288.1 64S117.3 64 74.7 75.5c-23.5 6.3-42 24.9-48.3 48.6C15 167 15 256.4 15 256.4s0 89.4 11.4 132.3c6.3 23.6 24.8 41.5 48.3 47.8C117.3 448 288.1 448 288.1 448s170.8 0 213.4-11.5c23.5-6.3 42-24.2 48.3-47.8 11.4-42.9 11.4-132.3 11.4-132.3s0-89.4-11.4-132.3zM232.2 337.6V175.2l142.7 81.2z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.expand", "search.suggest", "search.highlight", "toc.integrate", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": "1.0"}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

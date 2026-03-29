@@ -555,6 +555,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../headless-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Headless Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -879,6 +907,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../session-control/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Automation &amp; Session Control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../facts/" class="md-nav__link">
         
   
@@ -1001,6 +1057,34 @@
     
   
     Types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../game-options/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameOptions
   
 
     
@@ -1263,6 +1347,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Agent Reference
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -1279,6 +1381,58 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#usage-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage Rules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fast-navigation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fast Navigation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-mistakes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common Mistakes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -1449,8 +1603,8 @@
 
 
 <h1 id="ai-agent-reference">AI Agent Reference</h1>
-<p>This document provides complete information about the CONTROL Lua scripting engine for Age of Empires II: Definitive Edition. Provide the full reference to a coding agent (Cursor, Copilot, ChatGPT, etc.) to help users with limited Lua knowledge quickly build modules.</p>
-<p><strong>Target:</strong> Coding agents assisting users to write CONTROL Lua modules. The agent should use this as the sole source of truth for engine behavior and API.</p>
+<p>This page is the thin companion guide for the downloadable CONTROL Lua reference. It is meant for coding agents and human developers who need a short operating checklist without duplicating the full API contract.</p>
+<p><strong>Target:</strong> Coding agents assisting users with CONTROL Lua modules, plus developers who want a short set of guardrails before opening the full reference.</p>
 <div class="admonition tip">
 <p class="admonition-title">Quick access for coding agents</p>
 <p>Get the full reference text to paste into your coding agent:</p>
@@ -1477,6 +1631,28 @@
 })();
 </script></p>
 </div>
+<h2 id="usage-rules">Usage Rules</h2>
+<ol>
+<li>Treat the downloaded <code>CONTROL_LUA_ENGINE_REFERENCE.md</code> as the contract for function names, signatures, lifecycle behavior, and sandbox restrictions.</li>
+<li>If the bundled reference appears incomplete or stale, confirm the missing detail on the official docs before shipping code: <a href="https://aoe2control.github.io/">AoE2Control Documentation</a>.</li>
+<li>Do not assume standard AoE2 <code>.per</code> AI syntax or generic engine APIs unless CONTROL documents them explicitly.</li>
+<li>Never guess enum member names or numeric values. Verify the correct table first, especially when working with <code>Age</code> versus <code>OptionsAge</code>.</li>
+<li>Keep the module entry file thin and move real logic into submodules loaded with <code>require("folder.filename")</code>.</li>
+</ol>
+<h2 id="fast-navigation">Fast Navigation</h2>
+<ul>
+<li>Lifecycle and callback intent: <a href="../lifecycle/">Lifecycle</a></li>
+<li>Module loading rules and sandbox behavior: <a href="../module-system/">Module System</a></li>
+<li>Enum and constant lookup: <a href="../enums/">Enums</a></li>
+<li>Setup-only enums and lobby configuration: <a href="../game-options/">Game Options</a></li>
+<li>Fact readers and player attributes: <a href="../facts/">Facts</a></li>
+</ul>
+<h2 id="common-mistakes">Common Mistakes</h2>
+<ul>
+<li>Hard-coding numeric ids for facts, units, technologies, or ages.</li>
+<li>Mixing setup enums such as <code>OptionsAge</code> with in-match enums such as <code>Age</code> without verifying the API expects that table.</li>
+<li>Repeating large API tables in prompts or project docs instead of linking or attaching the full reference.</li>
+</ul>
 
 
 

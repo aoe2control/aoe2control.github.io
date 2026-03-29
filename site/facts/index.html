@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://aoe2control.github.io/facts/">
       
       
-        <link rel="prev" href="../commands/">
+        <link rel="prev" href="../session-control/">
       
       
         <link rel="next" href="../render-api/">
@@ -555,6 +555,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../headless-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Headless Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -879,6 +907,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../session-control/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Automation &amp; Session Control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1084,6 +1140,34 @@
     
   
     Types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../game-options/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameOptions
   
 
     
@@ -1519,7 +1603,7 @@
 
 
 <h1 id="game-api-facts">Game API — Facts</h1>
-<p>This page mirrors the <code>Facts</code> block in <code>ai_bindings.cpp</code>. Most facts read game state and should be called from <code>Init</code>, <code>Update</code>, or <code>Render</code> while a match is running. <strong>Tournament Mode</strong> applies to game commands, not these read-only APIs.</p>
+<p>This page mirrors the <code>Facts</code> block in <code>BindGameAPI()</code>. Most facts read game state and should be called from <code>Init</code>, <code>Update</code>, or <code>Render</code> while a match is running. <strong>Tournament Mode</strong> applies to game commands, not these read-only APIs.</p>
 <div class="admonition warning">
 <p class="admonition-title">Game must be running</p>
 <p>Calling these APIs before the game starts logs an error.</p>
@@ -1609,19 +1693,19 @@
 <td><code>GetObjectsByType</code></td>
 <td><code>(unitType)</code></td>
 <td><code>Object[]</code></td>
-<td>Returns matching alive world objects, not just owned objects.</td>
+<td>Returns matching world objects, not just owned objects. Loot-bearing dead huntables and livestock are included.</td>
 </tr>
 <tr>
 <td><code>GetObjectsByTypes</code></td>
 <td><code>(unitTypes)</code></td>
 <td><code>Object[]</code></td>
-<td>Returns alive world objects matching any type in the list.</td>
+<td>Returns matching world objects for any listed type. Loot-bearing dead huntables and livestock are included.</td>
 </tr>
 <tr>
 <td><code>GetObjectsByClass</code></td>
 <td><code>(unitClass)</code></td>
 <td><code>Object[]</code></td>
-<td>Returns alive world objects of a class, not just owned objects.</td>
+<td>Returns matching world objects of a class, not just owned objects. Loot-bearing dead huntables and livestock are included.</td>
 </tr>
 <tr>
 <td><code>GetGameTime</code></td>
@@ -1717,7 +1801,7 @@
 <td><code>GetObjectsInArea</code></td>
 <td><code>(pos1, pos2)</code></td>
 <td><code>Object[]</code></td>
-<td>Returns alive objects whose current tile lies inside the rectangular area between two <code>Vector2</code> positions.</td>
+<td>Returns objects whose current tile lies inside the rectangular area between two <code>Vector2</code> positions. Loot-bearing dead huntables and livestock are included.</td>
 </tr>
 <tr>
 <td><code>GetObjectsPtr</code></td>
@@ -1852,15 +1936,15 @@
 <ul>
 <li>Use <code>GetAssignedPlayer()</code>, not <code>GetLocalPlayer()</code>.</li>
 <li><code>GetAssignedPlayerId()</code> is documented on the control page because it is bound under the engine section and is also available in <code>Load(playerId)</code>.</li>
-<li><code>GetObjectsByType</code>, <code>GetObjectsByTypes</code>, and <code>GetObjectsByClass</code> scan alive world objects, not only the assigned player's objects.</li>
+<li><code>GetObjectsByType</code>, <code>GetObjectsByTypes</code>, and <code>GetObjectsByClass</code> scan world objects, not only the assigned player's objects. Loot-bearing dead huntables and livestock are included, and explored animals or resources can still be returned outside active vision.</li>
 <li><code>GetMapTile(position)</code> floors <code>position.x</code> and <code>position.y</code> to integer tile coordinates before resolving the tile.</li>
-<li><code>CalculatePath()</code> uses the game's native pathfinding, now accepts <code>Vector3</code> start and target positions, and returns an empty list when no path is available.</li>
-<li><code>GetObjectsInArea(pos1, pos2)</code> only returns alive objects and follows the same fog-aware visibility checks as the rest of the object API.</li>
+<li><code>CalculatePath()</code> uses the game's native pathfinding, accepts <code>Vector3</code> start and target positions, and returns an empty list when no path is available.</li>
+<li><code>GetObjectsInArea(pos1, pos2)</code> uses the same object filter as the other scan APIs. Loot-bearing dead huntables and livestock are included, and fog-aware visibility still applies.</li>
 <li><code>GetTechCost()</code> and <code>GetObjectCost()</code> return arrays of resource-cost entries. Use <code>entry.resourceId</code> and <code>entry.amount</code>; numeric indexes <code>entry[1]</code> and <code>entry[2]</code> mirror the same values.</li>
 <li><code>GetAllChatMessages()</code> and <code>GetLastChatMessage()</code> read from the game's current chat buffer.</li>
 <li><code>GetNewChatMessages()</code> tracks unread chat state per module instance. On the first call after load or reload, it returns the currently visible buffer.</li>
 <li>Projectile lookup functions return normal <code>Object</code> references whose <code>ObjectType</code> is <code>ObjectType.PROJECTILE</code> and follow the same visibility restrictions as other object queries.</li>
-<li>When <strong>Modules See Everything</strong> is disabled, object retrieval functions filter by the assigned player's current fog-of-war. This includes <code>GetObjectById()</code>.</li>
+<li>When <strong>Modules See Everything</strong> is disabled, object retrieval functions follow the assigned player's fog-of-war with one exception: explored animals and resources can still be returned. On those non-visible references, only <code>IsVisible()</code>, <code>IsExplored()</code>, <code>GetPosition()</code>, <code>GetClass()</code>, and <code>GetUnitObjectType()</code> are safe.</li>
 <li>When <strong>Modules See Everything</strong> is disabled, player-state access through <code>GetPlayerById()</code> is limited. Resource, fact, tech, and object-availability methods only expose the assigned player's data.</li>
 <li><code>GetAllMapTiles()</code> returns the full map grid, but <code>MapTile</code> methods only expose what the assigned player is currently allowed to know.</li>
 <li><code>GetMapTilesPtr()</code> and <code>GetObjectsPtr()</code> return engine-owned buffers rebuilt on demand. The second return value is an element count, not a byte count.</li>

@@ -6,17 +6,17 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Documentation for AoE2Control, a Lua scripting engine for Age of Empires II: Definitive Edition with game-state access, commands, rendering, and IPC.">
+        <meta name="description" content="Run the AoE2Control launcher in headless mode, override settings or modules from the command line, and read launcher status from scripts.">
       
       
       
-        <link rel="canonical" href="https://aoe2control.github.io/settings-api/">
+        <link rel="canonical" href="https://aoe2control.github.io/headless-mode/">
       
       
-        <link rel="prev" href="../enums/">
+        <link rel="prev" href="../quick-example/">
       
       
-        <link rel="next" href="../render-api-impl/">
+        <link rel="next" href="../interface-options/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Settings API - AoE2Control Documentation</title>
+        <title>Headless Mode - AoE2Control Documentation</title>
       
     
     
@@ -81,7 +81,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#settings-api" class="md-skip">
+        <a href="#headless-mode" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Settings API
+              Headless Mode
             
           </span>
         </div>
@@ -210,10 +210,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../getting-started/" class="md-tabs__link">
           
   
@@ -329,13 +331,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../settings-api/" class="md-tabs__link">
           
   
   
@@ -451,26 +451,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   
@@ -488,7 +491,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -559,10 +562,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../headless-mode/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Headless Mode
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -578,6 +608,142 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-use-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When To Use It
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#command-line" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Command Line
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arguments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arguments
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#override-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Override Behavior
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Override Behavior">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-override-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --override-settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-override-module" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        --override-module
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exit-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exit Codes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Examples
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1137,29 +1303,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" checked>
         
           
-          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
             
   
   
@@ -1177,7 +1340,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_8">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1192,37 +1355,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Settings API
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../settings-api/" class="md-nav__link">
         
   
   
@@ -1238,81 +1374,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#add-functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Add Functions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#get-functions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Get Functions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#input-helper" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Input Helper
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Example
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#multi-module-note" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Multi-Module Note
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1624,162 +1685,189 @@
 
 
 
-<h1 id="settings-api">Settings API</h1>
-<p>The Settings API adds module-specific controls to CONTROL's UI.</p>
+<h1 id="headless-mode">Headless Mode</h1>
+<p>The launcher supports a headless mode for script-driven startup. In this mode it writes status lines to standard output instead of showing the normal launcher window.</p>
+<h2 id="when-to-use-it">When To Use It</h2>
+<p>Use headless mode when you want to:</p>
+<ul>
+<li>start CONTROL from another program or test harness</li>
+<li>apply a temporary <code>settings.ini</code> before startup</li>
+<li>copy a module file or module folder into the config directory automatically</li>
+<li>watch launcher progress from Python or another scripting language</li>
+</ul>
 <div class="admonition note">
-<p class="admonition-title">Lua signatures are strict</p>
-<p>Getter functions require the fallback/default argument in Lua. They are not optional overloads.</p>
+<p class="admonition-title">Game first</p>
+<p>Start Age of Empires II: Definitive Edition before launching CONTROL in headless mode. The launcher still attaches to an already running game process.</p>
 </div>
-<h2 id="add-functions">Add Functions</h2>
-<p>Call these only from <code>Load(playerId)</code>.</p>
-<table>
-<thead>
-<tr>
-<th>Function</th>
-<th>Signature</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Settings.AddBool</code></td>
-<td><code>(key, defaultValue)</code></td>
-<td>Adds a checkbox.</td>
-</tr>
-<tr>
-<td><code>Settings.AddInt</code></td>
-<td><code>(key, defaultValue, minValue, maxValue)</code></td>
-<td>Adds an integer slider.</td>
-</tr>
-<tr>
-<td><code>Settings.AddFloat</code></td>
-<td><code>(key, defaultValue, minValue, maxValue)</code></td>
-<td>Adds a float slider.</td>
-</tr>
-<tr>
-<td><code>Settings.AddDropdown</code></td>
-<td><code>(key, defaultValue, options)</code></td>
-<td>Adds a dropdown from a string array.</td>
-</tr>
-<tr>
-<td><code>Settings.AddKeybind</code></td>
-<td><code>(key, defaultVkCode)</code></td>
-<td>Adds a keybind picker.</td>
-</tr>
-<tr>
-<td><code>Settings.AddTooltip</code></td>
-<td><code>(key, tooltip)</code></td>
-<td>Adds a tooltip to an existing setting.</td>
-</tr>
-<tr>
-<td><code>Settings.AddColor</code></td>
-<td><code>(key, defaultColor)</code></td>
-<td>Adds a color picker.</td>
-</tr>
-</tbody>
-</table>
-<h2 id="get-functions">Get Functions</h2>
-<p>Call these from <code>Load</code>, <code>Init</code>, <code>Update</code>, or <code>Render</code>.</p>
-<table>
-<thead>
-<tr>
-<th>Function</th>
-<th>Signature</th>
-<th>Returns</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>Settings.GetBool</code></td>
-<td><code>(key, defaultValue)</code></td>
-<td><code>boolean</code></td>
-<td>Reads a checkbox value.</td>
-</tr>
-<tr>
-<td><code>Settings.GetInt</code></td>
-<td><code>(key, defaultValue)</code></td>
-<td><code>number</code></td>
-<td>Reads an integer value.</td>
-</tr>
-<tr>
-<td><code>Settings.GetFloat</code></td>
-<td><code>(key, defaultValue)</code></td>
-<td><code>number</code></td>
-<td>Reads a float value.</td>
-</tr>
-<tr>
-<td><code>Settings.GetString</code></td>
-<td><code>(key, defaultValue)</code></td>
-<td><code>string</code></td>
-<td>Reads a string or dropdown value.</td>
-</tr>
-<tr>
-<td><code>Settings.GetKeybind</code></td>
-<td><code>(key, defaultVkCode)</code></td>
-<td><code>number</code></td>
-<td>Reads a keybind virtual key code.</td>
-</tr>
-<tr>
-<td><code>Settings.GetColor</code></td>
-<td><code>(key, defaultColor)</code></td>
-<td><code>Color</code></td>
-<td>Reads a color value.</td>
-</tr>
-</tbody>
-</table>
-<h2 id="input-helper">Input Helper</h2>
-<table>
-<thead>
-<tr>
-<th>Function</th>
-<th>Signature</th>
-<th>Returns</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>IsKeyPressed</code></td>
-<td><code>(vkCode)</code></td>
-<td><code>boolean</code></td>
-<td>Returns whether a key is currently pressed.</td>
-</tr>
-</tbody>
-</table>
-<h2 id="example">Example</h2>
-<div class="highlight"><pre><span></span><code><span class="kr">function</span><span class="w"> </span><span class="nf">Load</span><span class="p">(</span><span class="nv">playerId</span><span class="p">)</span>
-<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddBool</span><span class="p">(</span><span class="s2">&quot;Show Overlay&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddDropdown</span><span class="p">(</span><span class="s2">&quot;Mode&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Eco&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;Eco&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Rush&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Boom&quot;</span><span class="w"> </span><span class="p">})</span>
-<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddColor</span><span class="p">(</span><span class="s2">&quot;Overlay Color&quot;</span><span class="p">,</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">))</span>
-<span class="w">    </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">AddKeybind</span><span class="p">(</span><span class="s2">&quot;Toggle Speed&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">Key</span><span class="p">.</span><span class="py">Add</span><span class="p">)</span>
-<span class="w">    </span><span class="nf">Log</span><span class="p">(</span><span class="s2">&quot;Registered settings for player &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nb">tostring</span><span class="p">(</span><span class="nv">playerId</span><span class="p">))</span>
-<span class="kr">end</span>
-
-<span class="kr">function</span><span class="w"> </span><span class="nf">Render</span><span class="p">()</span>
-<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetBool</span><span class="p">(</span><span class="s2">&quot;Show Overlay&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">        </span><span class="kr">return</span>
-<span class="w">    </span><span class="kr">end</span>
-
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetString</span><span class="p">(</span><span class="s2">&quot;Mode&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Eco&quot;</span><span class="p">)</span>
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetKeybind</span><span class="p">(</span><span class="s2">&quot;Toggle Speed&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">Key</span><span class="p">.</span><span class="py">Add</span><span class="p">)</span>
-<span class="w">    </span><span class="kd">local</span><span class="w"> </span><span class="nv">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">Settings</span><span class="p">.</span><span class="nf">GetColor</span><span class="p">(</span><span class="s2">&quot;Overlay Color&quot;</span><span class="p">,</span><span class="w"> </span><span class="nf">Color</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">255</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">90</span><span class="p">))</span>
-
-<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nf">IsKeyPressed</span><span class="p">(</span><span class="nv">key</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
-<span class="w">        </span><span class="nf">SetGameSpeedMultiplier</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
-<span class="w">    </span><span class="kr">end</span>
-
-<span class="w">    </span><span class="nf">RenderText</span><span class="p">(</span><span class="s2">&quot;Mode: &quot;</span><span class="w"> </span><span class="o">..</span><span class="w"> </span><span class="nv">mode</span><span class="p">,</span><span class="w"> </span><span class="nf">Vector2</span><span class="p">(</span><span class="mi">120</span><span class="p">,</span><span class="w"> </span><span class="mi">40</span><span class="p">),</span><span class="w"> </span><span class="mf">16.0</span><span class="p">,</span><span class="w"> </span><span class="nv">color</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-<span class="kr">end</span>
+<h2 id="command-line">Command Line</h2>
+<div class="highlight"><pre><span></span><code>AoE2Control.exe --headless [--override-settings &lt;file&gt;] [--override-module &lt;file-or-folder&gt;]
 </code></pre></div>
-<h2 id="multi-module-note">Multi-Module Note</h2>
-<p>When <strong>Sync Settings</strong> is enabled for a player's module slot, the UI stores custom setting values under a shared profile-specific settings group instead of a per-player group.</p>
+<p>The launcher accepts both styles for option values:</p>
+<ul>
+<li><code>--override-settings "C:\path\to\settings.ini"</code></li>
+<li><code>--override-settings="C:\path\to\settings.ini"</code></li>
+<li><code>--override-module "C:\path\to\my_module"</code></li>
+<li><code>--override-module="C:\path\to\my_module"</code></li>
+</ul>
+<h2 id="arguments">Arguments</h2>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--headless</code></td>
+<td>Runs the launcher without the normal window and writes status lines to stdout.</td>
+</tr>
+<tr>
+<td><code>--override-settings &lt;file&gt;</code></td>
+<td>Replaces <code>%appdata%\CONTROL\AoE2Control\settings.ini</code> with the given file before startup.</td>
+</tr>
+<tr>
+<td><code>--override-module &lt;file-or-folder&gt;</code></td>
+<td>Copies a module file or a module folder into <code>%appdata%\CONTROL\AoE2Control\modules\</code> before startup.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="override-behavior">Override Behavior</h2>
+<h3 id="-override-settings"><code>--override-settings</code></h3>
+<ul>
+<li>The source must be a file.</li>
+<li>The target is always <code>%appdata%\CONTROL\AoE2Control\settings.ini</code>.</li>
+<li>Existing <code>settings.ini</code> is removed first and then replaced.</li>
+</ul>
+<h3 id="-override-module"><code>--override-module</code></h3>
+<ul>
+<li>The source can be a single file or a folder.</li>
+<li>If the source is a file, it is copied to <code>%appdata%\CONTROL\AoE2Control\modules\&lt;filename&gt;</code>.</li>
+<li>If the source is a folder, it is copied to <code>%appdata%\CONTROL\AoE2Control\modules\&lt;folder-name&gt;\...</code>.</li>
+<li>Existing targets with the same name are replaced first.</li>
+</ul>
+<p>See <a href="../config-location/">Config Location</a> for the destination layout.</p>
+<h2 id="output">Output</h2>
+<p>With <code>--headless</code>, the launcher writes one line per status change. The first line is the launcher version, followed by progress and terminal status lines.</p>
+<p>Typical output looks like this:</p>
+<div class="highlight"><pre><span></span><code>v1.0.0
+Scanning...
+Checking game startup...
+Waiting for connection...
+Initializing...
+Fetching Offsets...
+Ready
+</code></pre></div>
+<p>Possible terminal success lines include:</p>
+<ul>
+<li><code>Ready</code></li>
+<li><code>Ready - May require update</code></li>
+<li><code>Already Running!</code></li>
+</ul>
+<p>Possible terminal failure lines include:</p>
+<ul>
+<li><code>Process not found</code></li>
+<li><code>Startup validation failed</code></li>
+<li><code>Offset Error</code></li>
+<li><code>Render Hook Failed</code></li>
+<li>override copy errors such as missing files or invalid paths</li>
+</ul>
+<h2 id="exit-codes">Exit Codes</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Exit Code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;"><code>0</code></td>
+<td>Success. This also includes the <code>Already Running!</code> engine-attached status.</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>1</code></td>
+<td>Another launcher instance is already running.</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>2</code></td>
+<td>Invalid command-line arguments.</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>3</code></td>
+<td>An override file or folder could not be applied.</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>4</code></td>
+<td>Startup failed.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="examples">Examples</h2>
+<p>Start normally in headless mode:</p>
+<div class="highlight"><pre><span></span><code><span class="p">.\</span><span class="n">AoE2Control</span><span class="p">.</span><span class="n">exe</span> <span class="p">-</span><span class="n">-headless</span>
+</code></pre></div>
+<p>Apply a custom settings file:</p>
+<div class="highlight"><pre><span></span><code><span class="p">.\</span><span class="n">AoE2Control</span><span class="p">.</span><span class="n">exe</span> <span class="p">-</span><span class="n">-headless</span> <span class="p">-</span><span class="n">-override-settings</span> <span class="s2">&quot;C:\temp\settings.ini&quot;</span>
+</code></pre></div>
+<p>Copy a module folder before startup:</p>
+<div class="highlight"><pre><span></span><code><span class="p">.\</span><span class="n">AoE2Control</span><span class="p">.</span><span class="n">exe</span> <span class="p">-</span><span class="n">-headless</span> <span class="p">-</span><span class="n">-override-module</span> <span class="s2">&quot;C:\temp\my_module&quot;</span>
+</code></pre></div>
+<p>Copy a single module entry file before startup:</p>
+<div class="highlight"><pre><span></span><code><span class="p">.\</span><span class="n">AoE2Control</span><span class="p">.</span><span class="n">exe</span> <span class="p">-</span><span class="n">-headless</span> <span class="p">-</span><span class="n">-override-module</span> <span class="s2">&quot;C:\temp\my_module.main.lua&quot;</span>
+</code></pre></div>
+<h2 id="python-example">Python Example</h2>
+<p>This is a working base for starting the launcher, streaming status lines, and checking the exit code:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+
+
+<span class="n">launcher_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;C:\AoE2Control\AoE2Control.exe&quot;</span><span class="p">)</span>
+<span class="n">override_settings</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">override_module</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">launcher_path</span><span class="p">),</span> <span class="s2">&quot;--headless&quot;</span><span class="p">]</span>
+
+<span class="k">if</span> <span class="n">override_settings</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;--override-settings&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">override_settings</span><span class="p">)])</span>
+
+<span class="k">if</span> <span class="n">override_module</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;--override-module&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">override_module</span><span class="p">)])</span>
+
+<span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+    <span class="n">args</span><span class="p">,</span>
+    <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+    <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+    <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+    <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;replace&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">assert</span> <span class="n">process</span><span class="o">.</span><span class="n">stdout</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+<span class="k">for</span> <span class="n">raw_line</span> <span class="ow">in</span> <span class="n">process</span><span class="o">.</span><span class="n">stdout</span><span class="p">:</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="n">raw_line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+        <span class="k">continue</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[launcher] </span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">exit_code</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;launcher exit code: </span><span class="si">{</span><span class="n">exit_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">exit_code</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">SystemExit</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span>
+</code></pre></div>
+<p>Replace <code>launcher_path</code> with the packaged launcher executable on your system.</p>
 
 
 
 
 
 
+
+  
+  
 
 
 

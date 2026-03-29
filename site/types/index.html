@@ -16,7 +16,7 @@
         <link rel="prev" href="../render-api/">
       
       
-        <link rel="next" href="../enums/">
+        <link rel="next" href="../game-options/">
       
       
         
@@ -555,6 +555,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../headless-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Headless Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -859,6 +887,34 @@
     
   
     Game API — Control &amp; Commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../session-control/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Automation &amp; Session Control
   
 
     
@@ -1270,6 +1326,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../game-options/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameOptions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1698,6 +1782,7 @@
 
 <h1 id="types">Types</h1>
 <p>CONTROL exposes math helpers, game objects, and strategic helper classes to Lua.</p>
+<p>Pre-game setup access through <code>GetCurrentGameOptions()</code> is documented on the dedicated <a href="../game-options/">GameOptions</a> page.</p>
 <div class="admonition note">
 <p class="admonition-title">Lua signatures are strict</p>
 <p>If a method parameter is listed here, pass it explicitly unless a separate overload is shown.</p>
@@ -2025,7 +2110,7 @@
 <tr>
 <td><code>IsExplored()</code></td>
 <td><code>boolean</code></td>
-<td>Returns whether the object's current area has been explored by the assigned player.</td>
+<td>Returns whether the object's location has been explored by the assigned player.</td>
 </tr>
 <tr>
 <td><code>IsAlive()</code></td>
@@ -2363,6 +2448,11 @@
 </thead>
 <tbody>
 <tr>
+<td><code>Update()</code></td>
+<td><code>nil</code></td>
+<td>Refreshes tracked resource state for the current frame.</td>
+</tr>
+<tr>
 <td><code>GetConvertibleLivestock(position, radius)</code></td>
 <td><code>Object[]</code></td>
 <td>Returns convertible livestock near a position.</td>
@@ -2461,6 +2551,31 @@
 <td>Sets a percentage target for one profession.</td>
 </tr>
 <tr>
+<td><code>SetLivestockVillagerLimit(limit)</code></td>
+<td><code>nil</code></td>
+<td>Sets the preferred cap for villagers assigned to livestock food handling.</td>
+</tr>
+<tr>
+<td><code>SetForageVillagerLimit(limit)</code></td>
+<td><code>nil</code></td>
+<td>Sets the preferred cap for villagers assigned to forage before farms are preferred.</td>
+</tr>
+<tr>
+<td><code>SetFarmMaxTownCenterDistance(distance)</code></td>
+<td><code>nil</code></td>
+<td>Sets the maximum edge distance used when evaluating farms near town centers.</td>
+</tr>
+<tr>
+<td><code>SetFarmMaxMillDistance(distance)</code></td>
+<td><code>nil</code></td>
+<td>Sets the maximum edge distance used when evaluating farms near mills.</td>
+</tr>
+<tr>
+<td><code>SetProfessionBuildingRange(profession, range)</code></td>
+<td><code>nil</code></td>
+<td>Sets the nearby collection-building range checked before auto-queuing that profession's drop-off building.</td>
+</tr>
+<tr>
 <td><code>AssignVillagers(objectIds)</code></td>
 <td><code>nil</code></td>
 <td>Overload: assigns villagers by object id list.</td>
@@ -2477,6 +2592,13 @@
 </tr>
 </tbody>
 </table>
+<p>Notes:</p>
+<ul>
+<li>Food assignment prefers livestock, then forage, then farms, and only falls back when better food targets are unavailable.</li>
+<li><code>SetLivestockVillagerLimit()</code> defaults to <code>6</code>, and <code>SetForageVillagerLimit()</code> defaults to <code>12</code>.</li>
+<li><code>SetFarmMaxTownCenterDistance()</code> and <code>SetFarmMaxMillDistance()</code> both default to <code>1.0</code>.</li>
+<li><code>SetProfessionBuildingRange()</code> clamps to <code>0</code> or higher and defaults to <code>8.0</code> tiles per profession in the current implementation.</li>
+</ul>
 <h3 id="constructionplacement">ConstructionPlacement</h3>
 <p><strong>Constructor:</strong> <code>ConstructionPlacement(villagerOccupation)</code></p>
 <table>
@@ -2606,7 +2728,7 @@
 <span class="w">    </span><span class="nv">villagerOcc</span><span class="p">:</span><span class="nf">Update</span><span class="p">()</span>
 <span class="w">    </span><span class="nv">placement</span><span class="p">:</span><span class="nf">Update</span><span class="p">()</span>
 
-<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nf">GetFact</span><span class="p">(</span><span class="nv">Fact</span><span class="p">.</span><span class="py">HOUSING_HEADROOM</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="nf">GetFact</span><span class="p">(</span><span class="nv">Fact</span><span class="p">.</span><span class="py">HOUSING_HEADROOM</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nf">GetFact</span><span class="p">(</span><span class="nv">Fact</span><span class="p">.</span><span class="py">BUILDING_TYPE_COUNT_TOTAL</span><span class="p">,</span><span class="w"> </span><span class="nb">type</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nf">GetFact</span><span class="p">(</span><span class="nv">Fact</span><span class="p">.</span><span class="py">BUILDING_TYPE_COUNT</span><span class="p">,</span><span class="w"> </span><span class="nb">type</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="kr">then</span>
 <span class="w">        </span><span class="nv">placement</span><span class="p">:</span><span class="nf">BuildStructureAtTown</span><span class="p">(</span>
 <span class="w">            </span><span class="nv">UnitObjectType</span><span class="p">.</span><span class="py">HOUSE_DARK_AGE</span><span class="p">,</span>
 <span class="w">            </span><span class="mi">1</span><span class="p">,</span>
@@ -2623,6 +2745,8 @@
 <li><code>ConstructionPlacement:RenderDebug()</code> exists in C++ but is not exposed to Lua.</li>
 <li>Cached <code>Object</code> references can become invalid for method calls when the object becomes invisible in fog-aware mode. Re-fetch objects in the current frame or enable <strong>Modules See Everything</strong> if you need persistent access.</li>
 <li><code>Object:IsVisible()</code> is the safe visibility check for cached objects and uses map-tile visibility.</li>
+<li>Explored animals and resources can still be returned even when they are not currently visible.</li>
+<li>On those non-visible explored object references, only <code>Object:IsVisible()</code>, <code>Object:IsExplored()</code>, <code>Object:GetId()</code>, <code>Object:GetPosition()</code>, <code>Object:GetClass()</code>, and <code>Object:GetUnitObjectType()</code> are safe until visibility returns.</li>
 <li><code>Object:GetName()</code>, <code>Object:GetInternalName()</code>, and <code>Object:GetMasterName()</code> return empty strings when the underlying name data is unavailable.</li>
 <li>Use <code>MapTile:GetPos()</code> instead of <code>GetPosX()</code> / <code>GetPosY()</code>.</li>
 <li><code>MapTile:IsWalkable()</code> reads the collision grid, so moving units and other blockers can affect the result.</li>

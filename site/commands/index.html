@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Reference for AoE2Control engine control APIs and game commands in Lua, including replay control, menu state, training units, moving armies, researching technologies, camera control, and chat.">
+        <meta name="description" content="Reference for AoE2Control engine control APIs, session automation helpers, replay controls, and in-match command functions in Lua.">
       
       
       
@@ -16,7 +16,7 @@
         <link rel="prev" href="../module-system/">
       
       
-        <link rel="next" href="../facts/">
+        <link rel="next" href="../session-control/">
       
       
         
@@ -555,6 +555,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../headless-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Headless Mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1006,6 +1034,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../session-control/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Automation &amp; Session Control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../facts/" class="md-nav__link">
         
   
@@ -1128,6 +1184,34 @@
     
   
     Types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../game-options/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GameOptions
   
 
     
@@ -1563,10 +1647,10 @@
 
 
 <h1 id="game-api-control-commands">Game API — Control &amp; Commands</h1>
-<p>This page mirrors the same grouping used in <code>ai_bindings.cpp</code>: <code>Engine</code>, <code>Menu / UI</code>, <code>Replays</code>, and <code>Commands</code>.</p>
+<p>This page follows the same grouping used by <code>BindGameAPI()</code> in <code>module_bindings.cpp</code>: <code>Engine</code>, <code>Menu / UI</code>, <code>Replays</code>, and <code>Commands</code>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Game must be running</p>
-<p>Calling game API before the game starts logs an error, except for <code>GetAssignedPlayerId()</code>, which is also available in <code>Load</code>.</p>
+<p>Calling most game API functions before the game starts logs an error. The main exceptions are <code>GetAssignedPlayerId()</code> and <code>AssignAndLoadModule()</code>.</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Lua signatures are strict</p>
@@ -1574,11 +1658,13 @@
 </div>
 <h2 id="api-rules">API Rules</h2>
 <ul>
-<li>Only the <strong>Commands</strong> section below is subject to the <code>Update()</code>-only warning and <strong>Tournament Mode</strong> blocking.</li>
+<li>The <strong>Commands</strong> section below is the only part affected by replay blocking, the <code>Update()</code>-only warning, and <code>Sequential Actions</code>.</li>
+<li><strong>Tournament Mode</strong> also blocks selected functions in the <code>Engine</code>, <code>Menu / UI</code>, and <code>Replays</code> sections, plus many render and <code>GameOptions</code> APIs documented on other pages.</li>
 <li>Most unit and building commands silently filter the input list down to objects owned by the assigned player.</li>
-<li><code>SetCameraPosition</code> and <code>SendChatMessage</code> are game commands, but they are not ownership-filtered.</li>
-<li><code>Log()</code> is not a game command and can be used from any callback.</li>
+<li><code>SetCameraPosition</code> and <code>SendChatMessage</code> are command-style functions, but they are not ownership-filtered.</li>
+<li><code>Log()</code>, <code>SetEngineUIVisibility()</code>, <code>UnloadEngine()</code>, and <code>AssignAndLoadModule()</code> are not in-match game commands and can be used from any callback, unless <strong>Tournament Mode</strong> blocks them.</li>
 </ul>
+<p>For a deeper guide to match startup, save loading, and pre-game setup, see <a href="../session-control/">Automation &amp; Session Control</a> and <a href="../game-options/">GameOptions</a>.</p>
 <h2 id="engine">Engine</h2>
 <table>
 <thead>
@@ -1594,7 +1680,19 @@
 <td><code>Log</code></td>
 <td><code>(message)</code></td>
 <td><code>nil</code></td>
-<td>Writes a message to CONTROL's log window.</td>
+<td>Writes a message to the CONTROL log window.</td>
+</tr>
+<tr>
+<td><code>SetEngineUIVisibility</code></td>
+<td><code>(visible)</code></td>
+<td><code>nil</code></td>
+<td>Shows or hides the CONTROL overlay.</td>
+</tr>
+<tr>
+<td><code>UnloadEngine</code></td>
+<td><code>()</code></td>
+<td><code>nil</code></td>
+<td>Detaches CONTROL from the game process.</td>
 </tr>
 <tr>
 <td><code>GetAssignedPlayerId</code></td>
@@ -1602,8 +1700,15 @@
 <td><code>number</code></td>
 <td>Returns the player id currently assigned to this module instance. Available in <code>Load</code>.</td>
 </tr>
+<tr>
+<td><code>AssignAndLoadModule</code></td>
+<td><code>(playerId, moduleName)</code></td>
+<td><code>boolean</code></td>
+<td>Assigns a discovered module entry to a player slot and loads or reloads it.</td>
+</tr>
 </tbody>
 </table>
+<p><code>AssignAndLoadModule()</code> accepts player ids <code>1</code> to <code>8</code>. <code>moduleName</code> must match a discovered module entry name. When called from inside a running module callback, CONTROL queues the reassignment and applies it safely through the module manager.</p>
 <h2 id="menu-ui">Menu / UI</h2>
 <table>
 <thead>
@@ -1615,6 +1720,48 @@
 </tr>
 </thead>
 <tbody>
+<tr>
+<td><code>DispatchStartGame</code></td>
+<td><code>()</code></td>
+<td><code>boolean</code></td>
+<td>Starts the currently configured session.</td>
+</tr>
+<tr>
+<td><code>DispatchRestartGame</code></td>
+<td><code>()</code></td>
+<td><code>boolean</code></td>
+<td>Restarts the current single-player session when supported.</td>
+</tr>
+<tr>
+<td><code>DispatchResignGame</code></td>
+<td><code>()</code></td>
+<td><code>boolean</code></td>
+<td>Resigns the current game.</td>
+</tr>
+<tr>
+<td><code>DispatchQuitGame</code></td>
+<td><code>()</code></td>
+<td><code>boolean</code></td>
+<td>Exits the current game flow when supported.</td>
+</tr>
+<tr>
+<td><code>DispatchLoadGame</code></td>
+<td><code>(saveGameFileName)</code></td>
+<td><code>boolean</code></td>
+<td>Loads a file from the current load-game list by file name.</td>
+</tr>
+<tr>
+<td><code>GetAvailableSaveFiles</code></td>
+<td><code>()</code></td>
+<td><code>string[]</code></td>
+<td>Returns the file names currently exposed by the game's load-game list.</td>
+</tr>
+<tr>
+<td><code>GetCurrentGameOptions</code></td>
+<td><code>()</code></td>
+<td><code>GameOptions \| nil</code></td>
+<td>Returns the current session setup object when available.</td>
+</tr>
 <tr>
 <td><code>IsGamePaused</code></td>
 <td><code>()</code></td>
@@ -1650,7 +1797,7 @@
 <td><code>SetGamePaused</code></td>
 <td><code>(paused)</code></td>
 <td><code>nil</code></td>
-<td>Pauses or resumes the active replay.</td>
+<td>Pauses or resumes the current game or replay session.</td>
 </tr>
 <tr>
 <td><code>SetReplaySpeed</code></td>
@@ -1735,7 +1882,7 @@
 <td><code>EnableScouting</code></td>
 <td><code>()</code></td>
 <td><code>boolean</code></td>
-<td>Enables auto-scouting on an idle assigned scout if one is available.</td>
+<td>Enables auto-scouting on an idle assigned scout-line unit if one is available.</td>
 </tr>
 <tr>
 <td><code>ResearchTechnology</code></td>
@@ -1867,13 +2014,15 @@
 <h2 id="notes">Notes</h2>
 <ul>
 <li><code>GetAssignedPlayerId()</code> is intentionally available in <code>Load(playerId)</code> before the match is running.</li>
-<li><code>IsMenuOpen()</code> now also works during replays.</li>
+<li><code>GetCurrentGameOptions()</code> returns the session setup object documented on <a href="../game-options/">GameOptions</a>.</li>
+<li><code>DispatchLoadGame()</code> expects an exact file name from <code>GetAvailableSaveFiles()</code>.</li>
 <li><code>SetReplaySpeed()</code> uses <code>ReplaySpeed.SLOW</code>, <code>ReplaySpeed.NORMAL</code>, <code>ReplaySpeed.FAST</code>, and <code>ReplaySpeed.FASTEST</code>.</li>
 <li><code>TrainUnit</code> has overloads with and without explicit <code>trainSources</code>.</li>
 <li><code>TrainUnit(unitId)</code> and <code>TrainUnit(unitId, amount)</code> look up eligible source object types automatically.</li>
-<li><code>ResearchTechnology</code> still requires all shown arguments in Lua.</li>
+<li><code>ResearchTechnology</code> requires all shown arguments in Lua.</li>
 <li><code>DeleteUnit</code>, <code>DestroyBuilding</code>, and stance commands do not return success flags.</li>
-<li>Only the <strong>Commands</strong> section is affected by <code>Sequential Actions</code>, outside-<code>Update()</code> warnings, and <strong>Tournament Mode</strong> blocking.</li>
+<li>Only the <strong>Commands</strong> section is affected by replay blocking, <code>Sequential Actions</code>, and outside-<code>Update()</code> warnings.</li>
+<li><strong>Tournament Mode</strong> also blocks selected engine, menu, replay, render, and <code>GameOptions</code> APIs outside the <strong>Commands</strong> section.</li>
 </ul>
 
 
