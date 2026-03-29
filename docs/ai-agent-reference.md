@@ -60,24 +60,13 @@ This page is the thin companion guide for the downloadable CONTROL Lua reference
     })();
     </script>
 
-## Usage Rules
+## Recommended Workflow
 
-1. Treat the downloaded `CONTROL_LUA_ENGINE_REFERENCE.md` as the contract for function names, signatures, lifecycle behavior, and sandbox restrictions.
-2. If the bundled reference appears incomplete or stale, confirm the missing detail on the official docs before shipping code: [AoE2Control Documentation](https://aoe2control.github.io/).
-3. Do not assume standard AoE2 `.per` AI syntax or generic engine APIs unless CONTROL documents them explicitly.
-4. Never guess enum member names or numeric values. Verify the correct table first, especially when working with `Age` versus `OptionsAge`.
-5. Keep the module entry file thin and move real logic into submodules loaded with `require("folder.filename")`.
+To start coding immediately, place both downloaded files in the root of your Lua project:
 
-## Fast Navigation
+- `CONTROL_LUA_ENGINE_REFERENCE.md`
+- `CONTROL_LUA_AGENT_INSTRUCTIONS.md`
 
-- Lifecycle and callback intent: [Lifecycle](lifecycle.md)
-- Module loading rules and sandbox behavior: [Module System](module-system.md)
-- Enum and constant lookup: [Enums](enums.md)
-- Setup-only enums and lobby configuration: [Game Options](game-options.md)
-- Fact readers and player attributes: [Facts](facts.md)
+Use `CONTROL_LUA_ENGINE_REFERENCE.md` as the API contract and behavior reference. Point your editor, coding agent, or workspace instructions at `CONTROL_LUA_AGENT_INSTRUCTIONS.md` so the tool knows how to use the reference correctly in your project context.
 
-## Common Mistakes
-
-- Hard-coding numeric ids for facts, units, technologies, or ages.
-- Mixing setup enums such as `OptionsAge` with in-match enums such as `Age` without verifying the API expects that table.
-- Repeating large API tables in prompts or project docs instead of linking or attaching the full reference.
+Which file you reference directly depends on the editor or AI workflow you use. In setups with a dedicated instruction field, use the agent instructions there and keep the full reference alongside it in the project root for lookup.
