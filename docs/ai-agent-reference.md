@@ -1,8 +1,8 @@
 # AI Agent Reference
 
-This document provides complete information about the CONTROL Lua scripting engine for Age of Empires II: Definitive Edition. Provide the full reference to a coding agent (Cursor, Copilot, ChatGPT, etc.) to help users with limited Lua knowledge quickly build modules.
+This page is the thin companion guide for the downloadable CONTROL Lua reference. It is meant for coding agents and human developers who need a short operating checklist without duplicating the full API contract.
 
-**Target:** Coding agents assisting users to write CONTROL Lua modules. The agent should use this as the sole source of truth for engine behavior and API.
+**Target:** Coding agents assisting users with CONTROL Lua modules, plus developers who want a short set of guardrails before opening the full reference.
 
 !!! tip "Quick access for coding agents"
     Get the full reference text to paste into your coding agent:
@@ -31,3 +31,25 @@ This document provides complete information about the CONTROL Lua scripting engi
       };
     })();
     </script>
+
+## Usage Rules
+
+1. Treat the downloaded `CONTROL_LUA_ENGINE_REFERENCE.md` as the contract for function names, signatures, lifecycle behavior, and sandbox restrictions.
+2. If the bundled reference appears incomplete or stale, confirm the missing detail on the official docs before shipping code: [AoE2Control Documentation](https://aoe2control.github.io/).
+3. Do not assume standard AoE2 `.per` AI syntax or generic engine APIs unless CONTROL documents them explicitly.
+4. Never guess enum member names or numeric values. Verify the correct table first, especially when working with `Age` versus `OptionsAge`.
+5. Keep the module entry file thin and move real logic into submodules loaded with `require("folder.filename")`.
+
+## Fast Navigation
+
+- Lifecycle and callback intent: [Lifecycle](lifecycle.md)
+- Module loading rules and sandbox behavior: [Module System](module-system.md)
+- Enum and constant lookup: [Enums](enums.md)
+- Setup-only enums and lobby configuration: [Game Options](game-options.md)
+- Fact readers and player attributes: [Facts](facts.md)
+
+## Common Mistakes
+
+- Hard-coding numeric ids for facts, units, technologies, or ages.
+- Mixing setup enums such as `OptionsAge` with in-match enums such as `Age` without verifying the API expects that table.
+- Repeating large API tables in prompts or project docs instead of linking or attaching the full reference.

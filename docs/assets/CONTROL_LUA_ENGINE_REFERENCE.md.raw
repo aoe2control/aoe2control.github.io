@@ -4,6 +4,10 @@
 
 **Rule:** Treat the signatures below as strict Lua signatures. A C++ default argument is not optional in Lua unless a separate overload is explicitly listed.
 
+**Scope:** Treat this file as the primary contract for Lua function names, signatures, lifecycle behavior, and sandbox restrictions. Do not assume standard AoE2 `.per` AI syntax or generic game-engine APIs unless they are documented here or on the official CONTROL docs.
+
+**When incomplete:** If a needed behavior is missing here or appears outdated, confirm it before shipping code on the official documentation hub: [AoE2Control Documentation](https://aoe2control.github.io/).
+
 ---
 
 ## 1. Overview
@@ -31,6 +35,7 @@ modules/
 
 Rules:
 
+- Keep the module entry file thin; move reusable logic into required submodules
 - `require("utils.logger")` loads `utils/logger.lua` relative to the module root
 - Dot notation becomes path separators
 - `require` depth limit: 3
@@ -206,6 +211,25 @@ Notes:
 - `GetMapTilesPtr()` and `GetObjectsPtr()` return `(ptr, count)`, where `count` is an element count, not a byte count.
 - `GetObjectsPtr()` is dead-inclusive.
 - `CanAfford(unitId, isBuilding)` accepts both parameters, but the binding does not distinguish the flag internally.
+
+### Enum Lookup Discipline
+
+- CONTROL exposes enums as global Lua tables such as `Fact.WOOD_AMOUNT`
+- Never guess enum member names or numeric values; wrong ids can fail at runtime or silently target the wrong system
+- Use authoritative sources in this order:
+  - [Enums](https://aoe2control.github.io/enums/) for most in-match tables such as `Fact`, `Age`, `Technology`, `UnitObjectType`, `UnitClass`, `PlayerAttribute`, and `ResourceType`
+  - [GameOptions](https://aoe2control.github.io/game-options/) for setup-only tables such as `OptionsAge`, `OptionsLocation`, `OptionsGameMode`, and the `GameOptions` API
+  - [Facts](https://aoe2control.github.io/facts/) when confirming which readers use `Fact` or `PlayerAttribute`
+- Lookup workflow:
+  - Identify the exact enum table expected by the API or by the symbol prefix before the dot
+  - Copy the documented member spelling exactly
+  - When comparing ages or similar tiers, verify which table the value came from before comparing or mapping it, especially `Age` vs `OptionsAge`
+  - If the live docs and this file disagree on enum members or numeric values, prefer the published site and refresh the local copy
+- Optional local mirror: if the AoE2Control Lua extension is installed, `definitions/control-api.d.lua` can speed up lookups, but reconcile with the published docs when precision matters
+- Anti-patterns:
+  - Hard-coding magic numbers for facts, units, technologies, or ages
+  - Using `OptionsAge` values to interpret `Fact.CURRENT_AGE`, or the reverse, without confirming they match in the current engine version
+  - Copying large enum tables into project docs instead of linking to the authoritative pages
 
 ---
 
