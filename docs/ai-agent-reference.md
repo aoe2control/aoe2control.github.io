@@ -32,6 +32,34 @@ This page is the thin companion guide for the downloadable CONTROL Lua reference
     })();
     </script>
 
+!!! tip "Quick access for coding agents"
+    Get the slim instruction text to paste into your coding agent:
+
+    <a href="../assets/CONTROL_LUA_AGENT_INSTRUCTIONS.md.raw" class="md-button md-button--primary" download="CONTROL_LUA_AGENT_INSTRUCTIONS.md">Download CONTROL_LUA_AGENT_INSTRUCTIONS.md</a>
+
+    <button class="md-button md-button--primary" id="copy-instructions-btn" onclick="window.copyAgentInstructions()">
+        <span class="copy-btn-text">Copy agent instructions to clipboard</span>
+    </button>
+
+    <script>
+    (function() {
+      window.copyAgentInstructions = async function() {
+        const btn = document.getElementById('copy-instructions-btn');
+        const textEl = btn ? btn.querySelector('.copy-btn-text') : null;
+        try {
+          const assetUrl = new URL('../assets/CONTROL_LUA_AGENT_INSTRUCTIONS.md.raw', window.location.href).href;
+          const r = await fetch(assetUrl);
+          if (!r.ok) throw new Error('Fetch failed');
+          const text = await r.text();
+          await navigator.clipboard.writeText(text);
+          if (textEl) { textEl.textContent = 'Copied!'; setTimeout(function() { textEl.textContent = 'Copy agent instructions to clipboard'; }, 2000); }
+        } catch (e) {
+          if (textEl) textEl.textContent = 'Copy failed — use download instead';
+        }
+      };
+    })();
+    </script>
+
 ## Usage Rules
 
 1. Treat the downloaded `CONTROL_LUA_ENGINE_REFERENCE.md` as the contract for function names, signatures, lifecycle behavior, and sandbox restrictions.
