@@ -119,7 +119,7 @@ Command functions usually filter input objects to ones owned by the assigned pla
 | `UnitsBuildStructure` | `(builders, structureId, position)` | `boolean` | Order owned builders to construct a building. |
 | `UnitsMove` | `(units, position)` | `boolean` | Order owned units to move. |
 | `EnableScouting` | `()` | `boolean` | Enable auto-scouting on an idle assigned scout-line unit. |
-| `ResearchTechnology` | `(researchSources, technology)` | `boolean` | Research a technology from the assigned player's most common matching source type. |
+| `ResearchTechnology` | `(technology)` | `boolean` | Research a technology from the assigned player's most common matching source type automatically. |
 | `DeleteUnit` | `(unit)` | `nil` | Delete an owned unit. |
 | `DestroyBuilding` | `(building)` | `nil` | Destroy an owned building. |
 | `SetGatherPoint` | `(buildings, targetPosition)` | `nil` | Set gather point on owned buildings. |
@@ -425,7 +425,7 @@ Behavior:
 - `IsVisible()` uses map-tile visibility
 - Cached objects can throw a Lua error on most method calls after they become invisible
 - Explored animals and resources can still be returned even when they are not currently visible
-- On those non-visible explored object references, only `IsVisible()`, `IsExplored()`, `GetPosition()`, `GetClass()`, and `GetUnitObjectType()` are safe
+- On those non-visible explored object references, only `IsVisible()`, `IsExplored()`, `GetId()`, `GetPosition()`, `GetClass()`, and `GetUnitObjectType()` are safe
 - `GetName()`, `GetInternalName()`, and `GetMasterName()` return empty strings when name data is unavailable
 - Re-fetch object references in the current frame when fog-aware mode is active
 
@@ -433,10 +433,11 @@ Behavior:
 
 Methods:
 
-- `GetPos()`
+- `GetPosition()`
 - `GetTerrain()`
 - `GetElevation()`
 - `GetTileVisibility()`
+- `IsBuildable()`
 - `IsWalkable()`
 - `IsNavigatable()`
 - `GetObjectCount()`
@@ -446,6 +447,7 @@ Behavior:
 
 - `GetTerrain()` returns `Terrain.UNKNOWN` for unexplored tiles
 - `GetElevation()` returns `0` for unexplored tiles
+- `IsBuildable()` requires a flat, walkable tile
 - `IsWalkable()` returns `false` for unexplored tiles and uses the collision grid for walkability
 - `GetObjectCount()` and `GetObjects()` only expose currently visible tiles
 
@@ -453,7 +455,7 @@ Enum notes:
 
 - `ReplaySpeed` values: `SLOW`, `NORMAL`, `FAST`, `FASTEST`
 - `ProjectileType` is exposed to Lua for `GetProjectilesByType()` filtering
-- `ResourceType` values: `FOOD`, `WOOD`, `STONE`, `GOLD`, `POPULATION`
+- `ResourceType` exposes additional engine-defined ids; common values include `FOOD`, `WOOD`, `STONE`, `GOLD`, `POPULATION`
 - `Terrain.UNKNOWN = -1`
 - `TileVisibility.UNEXPLORED = 0`
 - `TileVisibility.VISIBLE = 15`
@@ -582,9 +584,12 @@ Methods:
 - `Update()`
 - `GetVillagerCount()`
 - `GetVillagerCount(profession)`
+- `GetIdleVillagerCount()`
 - `GetAllVillagers()`
+- `GetIdleVillagers()`
 - `RequestVillagers(amount, position, urgency)`
 - `SetPriorities(wood, food, gold, stone)`
+- `GetPriorityPercentage(profession)`
 - `ResetPriorities()`
 - `SetPriorityPercentage(profession, percentage)`
 - `SetLivestockVillagerLimit(limit)`
@@ -601,6 +606,7 @@ Notes:
 - Food assignment prefers livestock, then forage, then farms, with fallback when needed
 - `SetLivestockVillagerLimit()` defaults to `6`, and `SetForageVillagerLimit()` defaults to `12`
 - `SetFarmMaxTownCenterDistance()` and `SetFarmMaxMillDistance()` default to `1.0`
+- `GetIdleVillagers()` returns idle villagers currently available for reassignment
 - `SetProfessionBuildingRange()` defaults to `8.0` tiles per profession in the current implementation
 
 ### ConstructionPlacement
@@ -610,13 +616,21 @@ Constructor: `ConstructionPlacement(villagerOccupation)`
 Methods:
 
 - `Update()`
+- `SetTownCenterPadding(padding)`
+- `BuildStructure(structureType, builderUnitId, targetPos, direction, padding)`
 - `BuildStructure(structureType, builderUnitId, targetPos, direction, padding, bypassTownCenterPadding)`
+- `BuildStructure(structureType, builderUnitId, targetPos, directionPos, padding)`
 - `BuildStructure(structureType, builderUnitId, targetPos, directionPos, padding, bypassTownCenterPadding)`
+- `BuildStructure(structureType, targetPos, direction, padding)`
 - `BuildStructure(structureType, targetPos, direction, padding, bypassTownCenterPadding)`
+- `BuildStructure(structureType, targetPos, directionPos, padding)`
 - `BuildStructure(structureType, targetPos, directionPos, padding, bypassTownCenterPadding)`
+- `BuildStructureAtTown(structureType, targetPos, padding)`
 - `BuildStructureAtTown(structureType, targetPos, padding, bypassTownCenterPadding)`
+- `BuildStructureAtTown(structureType, padding)`
 - `BuildStructureAtTown(structureType, padding, bypassTownCenterPadding)`
 - `FindBestPosition(structureType, targetPos, direction, padding, bypassTownCenterPadding)`
+- `GetValidFarmPlacementTile()`
 - `QueueBuildingRequest(structureType, targetPosition, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)`
 - `QueueBuildingRequestAtTown(structureType, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)`
 - `ProcessBuildingRequests()`
@@ -628,6 +642,9 @@ Notes:
 - `BuildStructure(...)`, `FindBestPosition(...)`, and queue helpers take `UnitObjectType` and derive placement size internally
 - Convenience `BuildStructure(...)` overloads can auto-select a builder villager and issue the build command directly
 - `BuildStructureAtTown(...)` adds town-center-oriented placement helpers
+- `SetTownCenterPadding()` defaults to `3` and clamps to `0` or higher
+- `GetValidFarmPlacementTile()` uses the current villager-occupation farm distance rules when available
+- Build helpers also expose overloads without the final `bypassTownCenterPadding` argument; those use the default `false` behavior
 - Map tile state is cached internally to improve repeated placement work
 
 Not exposed to Lua:

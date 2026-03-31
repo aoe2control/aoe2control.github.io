@@ -117,7 +117,7 @@ function Render()
         return
     end
 
-    local tilePos = tile:GetPos()
+    local tilePos = tile:GetPosition()
     local text = "Tile " .. tostring(tilePos.x) .. "," .. tostring(tilePos.y)
         .. " terrain=" .. tostring(tile:GetTerrain())
         .. " moving=" .. tostring(selected:IsMoving())

@@ -71,7 +71,7 @@ For a deeper guide to match startup, save loading, and pre-game setup, see [Auto
 | `UnitsBuildStructure` | `(builders, structureId, position)` | `boolean` | Orders owned builders to place a structure at a `Vector3` world position. |
 | `UnitsMove` | `(units, position)` | `boolean` | Orders owned units to move to a `Vector3` world position. |
 | `EnableScouting` | `()` | `boolean` | Enables auto-scouting on an idle assigned scout-line unit if one is available. |
-| `ResearchTechnology` | `(researchSources, technology)` | `boolean` | Researches a technology using the assigned player's most common matching research source. |
+| `ResearchTechnology` | `(technology)` | `boolean` | Researches a technology using the assigned player's most common matching research source automatically. |
 | `DeleteUnit` | `(unit)` | `nil` | Deletes an owned unit. |
 | `DestroyBuilding` | `(building)` | `nil` | Destroys an owned building. |
 | `SetGatherPoint` | `(buildings, targetPosition)` | `nil` | Sets the gather point of owned buildings. |
@@ -132,7 +132,7 @@ end
 - `SetReplaySpeed()` uses `ReplaySpeed.SLOW`, `ReplaySpeed.NORMAL`, `ReplaySpeed.FAST`, and `ReplaySpeed.FASTEST`.
 - `TrainUnit` has overloads with and without explicit `trainSources`.
 - `TrainUnit(unitId)` and `TrainUnit(unitId, amount)` look up eligible source object types automatically.
-- `ResearchTechnology` requires all shown arguments in Lua.
+- `ResearchTechnology(technology)` resolves eligible research sources automatically.
 - `DeleteUnit`, `DestroyBuilding`, and stance commands do not return success flags.
 - Only the **Commands** section is affected by replay blocking, `Sequential Actions`, and outside-`Update()` warnings.
 - **Tournament Mode** also blocks selected engine, menu, replay, render, and `GameOptions` APIs outside the **Commands** section.

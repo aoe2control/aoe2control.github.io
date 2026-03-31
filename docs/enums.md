@@ -50,6 +50,8 @@ Used by `SetReplaySpeed()`.
 
 Used by `GetTechCost()`, `GetObjectCost()`, `Player:GetTechCost()`, and `Player:GetObjectCost()`.
 
+The Lua enum exposes additional engine resource ids beyond the common values listed below.
+
 See the [community Parameter Details (ResourceType)](https://airef.github.io/parameters/parameters-details.html#ResourceType) for the full list of resource ids.
 
 | Value | Description |

@@ -147,7 +147,7 @@ end
 - `GetAllChatMessages()` and `GetLastChatMessage()` read from the game's current chat buffer.
 - `GetNewChatMessages()` tracks unread chat state per module instance. On the first call after load or reload, it returns the currently visible buffer.
 - Projectile lookup functions return normal `Object` references whose `ObjectType` is `ObjectType.PROJECTILE` and follow the same visibility restrictions as other object queries.
-- When **Modules See Everything** is disabled, object retrieval functions follow the assigned player's fog-of-war with one exception: explored animals and resources can still be returned. On those non-visible references, only `IsVisible()`, `IsExplored()`, `GetPosition()`, `GetClass()`, and `GetUnitObjectType()` are safe.
+- When **Modules See Everything** is disabled, object retrieval functions follow the assigned player's fog-of-war with one exception: explored animals and resources can still be returned. On those non-visible references, only `IsVisible()`, `IsExplored()`, `GetId()`, `GetPosition()`, `GetClass()`, and `GetUnitObjectType()` are safe.
 - When **Modules See Everything** is disabled, player-state access through `GetPlayerById()` is limited. Resource, fact, tech, and object-availability methods only expose the assigned player's data.
 - `GetAllMapTiles()` returns the full map grid, but `MapTile` methods only expose what the assigned player is currently allowed to know.
 - `GetMapTilesPtr()` and `GetObjectsPtr()` return engine-owned buffers rebuilt on demand. The second return value is an element count, not a byte count.

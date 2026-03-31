@@ -135,10 +135,11 @@ Returned by `GetMapTile`, `GetAllMapTiles`, and `Object:GetCurrentMapTile()`.
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `GetPos()` | `Vector2` | Returns the tile position as `Vector2(x, y)`. |
+| `GetPosition()` | `Vector2` | Returns the tile position as `Vector2(x, y)`. |
 | `GetTerrain()` | `Terrain` | Returns the tile terrain id. Returns `Terrain.UNKNOWN` for unexplored tiles. |
 | `GetElevation()` | `number` | Returns the tile elevation. Returns `0` for unexplored tiles. |
 | `GetTileVisibility()` | `TileVisibility` | Returns the assigned player's visibility state for the tile. |
+| `IsBuildable()` | `boolean` | Returns whether the tile is flat and walkable enough for building placement. Unexplored tiles return `false`. |
 | `IsWalkable()` | `boolean` | Returns whether the tile is walkable. The result is collision-aware, and unexplored tiles return `false`. |
 | `IsNavigatable()` | `boolean` | Returns whether the tile is navigatable for pathing. Unexplored tiles return `false`. |
 | `GetObjectCount()` | `number` | Returns the count of currently visible objects on the tile. Only populated for visible tiles. |
@@ -207,7 +208,7 @@ function Render()
         return
     end
 
-    local tilePos = tile:GetPos()
+    local tilePos = tile:GetPosition()
     local label = "Tile " .. tostring(tilePos.x) .. "," .. tostring(tilePos.y)
         .. " terrain=" .. tostring(tile:GetTerrain())
         .. " nav=" .. tostring(tile:IsNavigatable())
@@ -243,9 +244,12 @@ end
 | `Update()` | `nil` | Refreshes villager tracking and assignments. |
 | `GetVillagerCount()` | `number` | Returns the total tracked villager count. |
 | `GetVillagerCount(profession)` | `number` | Returns the count for a `VillagerProfession`. |
+| `GetIdleVillagerCount()` | `number` | Returns the number of idle tracked villagers currently available for reassignment. |
 | `GetAllVillagers()` | `Object[]` | Returns all tracked villagers. |
+| `GetIdleVillagers()` | `Object[]` | Returns idle tracked villagers currently available for reassignment. |
 | `RequestVillagers(amount, position, urgency)` | `Object[]` | Requests villagers near a position using an `UrgencyLevel`. |
 | `SetPriorities(wood, food, gold, stone)` | `nil` | Sets raw villager priority weights. |
+| `GetPriorityPercentage(profession)` | `number` | Returns the current target percentage for a `VillagerProfession`. |
 | `ResetPriorities()` | `nil` | Resets villager priorities to defaults. |
 | `SetPriorityPercentage(profession, percentage)` | `nil` | Sets a percentage target for one profession. |
 | `SetLivestockVillagerLimit(limit)` | `nil` | Sets the preferred cap for villagers assigned to livestock food handling. |
@@ -271,18 +275,32 @@ Notes:
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `Update()` | `nil` | Rebuilds placement data for the current frame. Map tile state is cached internally to reduce repeated placement work. |
+| `SetTownCenterPadding(padding)` | `nil` | Sets the extra blocked padding around town centers used by placement searches. |
+| `BuildStructure(structureType, builderUnitId, targetPos, direction, padding)` | `boolean` | Overload: builds relative to a `PlacementDirection` using default town-center-padding behavior. |
 | `BuildStructure(structureType, builderUnitId, targetPos, direction, padding, bypassTownCenterPadding)` | `boolean` | Overload: builds relative to a `PlacementDirection` using a `UnitObjectType` and derives placement size internally. |
+| `BuildStructure(structureType, builderUnitId, targetPos, directionPos, padding)` | `boolean` | Overload: builds using a directional world position with default town-center-padding behavior. |
 | `BuildStructure(structureType, builderUnitId, targetPos, directionPos, padding, bypassTownCenterPadding)` | `boolean` | Overload: builds using a directional world position. Placement size is derived from the `UnitObjectType`. |
+| `BuildStructure(structureType, targetPos, direction, padding)` | `boolean` | Convenience overload: auto-selects a builder villager and uses default town-center-padding behavior. |
 | `BuildStructure(structureType, targetPos, direction, padding, bypassTownCenterPadding)` | `boolean` | Convenience overload: auto-selects a builder villager, finds a valid position, and issues the build command. |
+| `BuildStructure(structureType, targetPos, directionPos, padding)` | `boolean` | Convenience overload: auto-selects a builder villager, uses a directional world position, and keeps default town-center-padding behavior. |
 | `BuildStructure(structureType, targetPos, directionPos, padding, bypassTownCenterPadding)` | `boolean` | Convenience overload: auto-selects a builder villager, finds a valid position, and issues the build command using a directional world position. |
+| `BuildStructureAtTown(structureType, targetPos, padding)` | `boolean` | Town-center-oriented helper that uses default town-center-padding behavior. |
 | `BuildStructureAtTown(structureType, targetPos, padding, bypassTownCenterPadding)` | `boolean` | Town-center-oriented helper that auto-selects a builder and places relative to the town center. |
+| `BuildStructureAtTown(structureType, padding)` | `boolean` | Simplest town build helper using default town-center-padding behavior. |
 | `BuildStructureAtTown(structureType, padding, bypassTownCenterPadding)` | `boolean` | Simplest town build helper. No target position is required. |
 | `FindBestPosition(structureType, targetPos, direction, padding, bypassTownCenterPadding)` | `Vector3` | Finds a placement candidate and derives placement size from the `UnitObjectType`. |
+| `GetValidFarmPlacementTile()` | `MapTile \| nil` | Returns a valid farm placement tile near a town center or mill using the current placement rules. |
 | `QueueBuildingRequest(structureType, targetPosition, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)` | `nil` | Queues a building request at a target position using a `UnitObjectType`. |
 | `QueueBuildingRequestAtTown(structureType, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)` | `nil` | Queues a town-centered building request using a `UnitObjectType`. |
 | `ProcessBuildingRequests()` | `nil` | Processes queued requests. |
 | `IsStructureTypeQueued(structureType)` | `boolean` | Returns whether a `UnitObjectType` is already queued. |
 | `IsUnitAssignedToBuilding(unitId)` | `boolean` | Returns whether a builder is already reserved for a request. |
+
+Notes:
+
+- `SetTownCenterPadding()` clamps to `0` or higher and defaults to `3`.
+- `GetValidFarmPlacementTile()` uses the current villager-occupation farm distance rules when a `VillagerOccupation` instance is attached.
+- `BuildStructure(...)` and `BuildStructureAtTown(...)` also expose overloads without the final `bypassTownCenterPadding` argument. Those use the default `false` behavior.
 
 ## Examples
 
@@ -363,6 +381,6 @@ end
 - Explored animals and resources can still be returned even when they are not currently visible.
 - On those non-visible explored object references, only `Object:IsVisible()`, `Object:IsExplored()`, `Object:GetId()`, `Object:GetPosition()`, `Object:GetClass()`, and `Object:GetUnitObjectType()` are safe until visibility returns.
 - `Object:GetName()`, `Object:GetInternalName()`, and `Object:GetMasterName()` return empty strings when the underlying name data is unavailable.
-- Use `MapTile:GetPos()` instead of `GetPosX()` / `GetPosY()`.
+- Use `MapTile:GetPosition()` instead of `GetPosX()` / `GetPosY()`.
 - `MapTile:IsWalkable()` reads the collision grid, so moving units and other blockers can affect the result.
 - `MapTile:GetObjectCount()` and `MapTile:GetObjects()` only expose data for tiles that are currently `TileVisibility.VISIBLE`.
