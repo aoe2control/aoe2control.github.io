@@ -264,7 +264,7 @@ end
 Notes:
 
 - Food assignment prefers livestock, then forage, then farms, and only falls back when better food targets are unavailable.
-- `SetLivestockVillagerLimit()` defaults to `6`, and `SetForageVillagerLimit()` defaults to `12`.
+- `SetLivestockVillagerLimit()` defaults to `6`, and `SetForageVillagerLimit()` defaults to `8`.
 - `SetFarmMaxTownCenterDistance()` and `SetFarmMaxMillDistance()` both default to `1.0`.
 - `SetProfessionBuildingRange()` clamps to `0` or higher and defaults to `8.0` tiles per profession in the current implementation.
 
