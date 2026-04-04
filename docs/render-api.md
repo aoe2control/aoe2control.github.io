@@ -6,6 +6,8 @@ description: "Reference for the AoE2Control Render API, including screen-space, 
 
 Use the Render API from `Render()` to draw overlays in screen, world, or minimap space.
 
+Render APIs are unavailable while **Multithreading** is enabled because `Render()` is not executed and render functions are blocked in that mode.
+
 !!! note "Lua signatures are strict"
     The C++ render functions use default arguments internally, but Lua does not receive those defaults unless an overload is bound. Pass every parameter shown below.
 

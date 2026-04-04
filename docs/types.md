@@ -233,7 +233,6 @@ end
 | `GetTrees()` | `Object[]` | Returns tree objects. |
 | `GetGold()` | `Object[]` | Returns gold mine objects. |
 | `GetStone()` | `Object[]` | Returns stone mine objects. |
-| `Cleanup()` | `nil` | Removes cached resources that are visibly gone. |
 
 ### VillagerOccupation
 
@@ -374,7 +373,6 @@ end
 
 ## Binding Notes
 
-- `ResourceTracker:Cleanup()` removes cached resources that are visibly gone.
 - `ConstructionPlacement:RenderDebug()` exists in C++ but is not exposed to Lua.
 - Cached `Object` references can become invalid for method calls when the object becomes invisible in fog-aware mode. Re-fetch objects in the current frame or enable **Modules See Everything** if you need persistent access.
 - `Object:IsVisible()` is the safe visibility check for cached objects and uses map-tile visibility.

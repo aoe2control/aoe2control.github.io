@@ -54,11 +54,13 @@ All callbacks are optional.
 | `Load(playerId)` | Instance is loaded or re-enabled | Use for `Settings.Add*` and setup that only needs the assigned player id. `GetAssignedPlayerId()` is also available here. |
 | `Init()` | Match becomes ready, world changes, or instance reloads | Per-instance setup. |
 | `Update()` | Every configured update interval while a match is running | Main logic. |
-| `Render()` | Every frame while a match is running | Overlay rendering. |
+| `Render()` | Every frame while a match is running | Overlay rendering. Not called while multithreading is enabled. |
 | `End(hasWon)` | Once when the match or replay ends, including manual match exit | `hasWon` refers to the assigned player. Manual exit reports `false`. |
 | `Unload()` | Instance unload, disable, replace, or engine eject | Cleanup that should run even without normal match end. |
 
-Read-only game API calls are valid during `Init`, `Update`, or `Render`. Game commands belong in `Update()`.
+Read-only game API calls are valid during `Init`, `Update`, or `Render`. Facts and other end-state reads are also available in `End()`. Game commands belong in `Update()`.
+
+- In **Tournament Mode**, update execution above `20 ms` adds delay to the effective update interval
 
 ---
 
@@ -140,6 +142,7 @@ Rules:
 
 - Only the **Commands** subsection is subject to replay blocking, outside-`Update()` warnings, and `Sequential Actions`
 - **Tournament Mode** also blocks selected engine, menu, replay, render, and `GameOptions` APIs
+- **Multithreading** also blocks selected menu, replay, render, and IPC wait APIs, and disables `Render()`
 - Most unit and building commands filter inputs to objects owned by the assigned player
 - `SetCameraPosition` and `SendChatMessage` are game commands, but they are not ownership-filtered
 - `Log()`, `SetEngineUIVisibility()`, and `UnloadEngine()` are not in-match game commands, but **Tournament Mode** can still restrict selected engine APIs
@@ -301,6 +304,8 @@ Custom module settings may be per-player or profile-shared depending on whether 
 | `IPC.Send` | `(message)` | `boolean` |
 | `IPC.HasMessages` | `()` | `boolean` |
 | `IPC.GetMessages` | `()` | `string[]` |
+| `IPC.WaitForMessage` | `()` | `string \| nil` |
+| `IPC.WaitForMessage` | `(timeoutMs)` | `string \| nil` |
 | `ParseJSON` | `(str)` | `table` |
 | `ToJSON` | `(obj)` | `string` |
 
@@ -314,7 +319,10 @@ Behavior:
 - `IPC.Send` wraps payloads in an envelope with source metadata
 - `IPC.HasMessages()` reports whether this module instance has queued messages
 - `IPC.GetMessages` returns strings; use `ParseJSON` when expecting JSON
+- `IPC.WaitForMessage()` returns one message at a time and waits indefinitely until a message arrives or the endpoint stops
+- `IPC.WaitForMessage(timeoutMs)` returns `nil` on timeout and treats negative values as an indefinite wait
 - `IPC.Send` and `IPC.GetMessages` can be polled continuously without waiting for a pipe close event
+- `IPC.WaitForMessage()` is blocked while **Multithreading** is enabled
 - `GetMapTilesPtr()` and `GetObjectsPtr()` are meant for high-throughput IPC / ML readers
 - Snapshot buffers are engine-owned, rebuilt on demand, and should be copied immediately
 - Snapshot byte size is `count * sizeof(Tile)` or `count * sizeof(Object)`
@@ -569,11 +577,8 @@ Methods:
 - `GetTrees()`
 - `GetGold()`
 - `GetStone()`
-- `Cleanup()`
 
 Behavior:
-
-- `Cleanup()` removes cached resources that are visibly gone
 
 ### VillagerOccupation
 
@@ -604,7 +609,7 @@ Methods:
 Notes:
 
 - Food assignment prefers livestock, then forage, then farms, with fallback when needed
-- `SetLivestockVillagerLimit()` defaults to `6`, and `SetForageVillagerLimit()` defaults to `12`
+- `SetLivestockVillagerLimit()` defaults to `6`, and `SetForageVillagerLimit()` defaults to `8`
 - `SetFarmMaxTownCenterDistance()` and `SetFarmMaxMillDistance()` default to `1.0`
 - `GetIdleVillagers()` returns idle villagers currently available for reassignment
 - `SetProfessionBuildingRange()` defaults to `8.0` tiles per profession in the current implementation
@@ -660,13 +665,16 @@ Not exposed to Lua:
 - Each player group exposes one module slot for that player
 - The built-in submenus are **MODULES**, **UI**, **MISC**, **KEYBINDS**, and **DEBUG**
 - `Suppress Native AI` defaults to `true`; when enabled, assigned bot players have their native decision AI disabled while a Lua module is attached
+- `Multithreading` detaches module execution from the game's render thread, disables `Render()`, and blocks selected menu, replay, render, and IPC wait APIs
 - `Modules See Everything` defaults to `false` and affects map-tile reads, object visibility, and restricted cross-player data access
 - Player perspective options live under the **MISC** submenu: `Default`, `Player 1` to `Player 8`, `Gaia`
+- `Game Speed Multiplier` lives under the **MISC** submenu and applies a preset game-speed override
 - CONTROL resets `Player Perspective` to `Default` on startup
 - Menu scale and transparency live under the **UI** submenu
 - `Tournament Mode` blocks game commands outside `Update()` and also restricts selected engine, menu, replay, render, and `GameOptions` APIs
 - By default, assigning a module to a bot player's slot suppresses that player's native decision AI while the module remains assigned
 - The Debug menu's **Module Telemetry** view shows sampled `Update()` and `Render()` timing for active modules, plus a sampled baseline frame cost
+- In multithreading mode, the baseline frame view is hidden
 - `Spectator Mode` keeps controls enabled while spectating
 - Runtime Lua errors are displayed and logged through the UI
 

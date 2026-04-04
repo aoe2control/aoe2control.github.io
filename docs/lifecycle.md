@@ -28,9 +28,11 @@ Each configured module instance can implement up to six callbacks. All of them a
 
 **Use for:** Decision-making, commands, and state updates.
 
+**Notes:** In **Tournament Mode**, update time above `20 ms` adds delay to the effective update interval.
+
 ### Render
 
-**When:** Every rendered frame while the match is running.
+**When:** Every rendered frame while the match is running, unless **Multithreading** is enabled.
 
 **Use for:** Overlays, debug drawing, and read-only inspection.
 
@@ -39,6 +41,8 @@ Each configured module instance can implement up to six callbacks. All of them a
 **When:** Once after the match or replay ends. It also runs if a running match is manually exited.
 
 **Parameters:** `hasWon` tells you whether the assigned player won. When the match is stopped by manually exiting, `hasWon` is `false`.
+
+**Use for:** Cleanup and final reads such as facts or other end-state inspection.
 
 ### Unload
 
@@ -64,6 +68,9 @@ flowchart LR
 - `Load` may run again when an instance is reloaded.
 - `Init` runs per module instance, not globally.
 - `Update` is the callback intended for game commands. Calling commands from other callbacks logs a warning, and **Tournament Mode** blocks them. Selected non-command helper APIs are also tournament-restricted.
+- `Render` is not executed while **Multithreading** is enabled.
+- `IPC.WaitForMessage()` is blocked while **Multithreading** is enabled.
 - Manually exiting a running match triggers `End(false)`.
 - Replay playback reaching the end also triggers `End()`.
+- Facts and other read-only game state remain accessible in `End()` while the end-state is still available.
 - `Unload` can run without `End` if the user disables the instance, removes it, switches modules, or ejects CONTROL.

@@ -30,6 +30,8 @@ CONTROL exposes a small set of functions for engine and menu automation. These f
 
 When `DispatchStartGame()`, `DispatchRestartGame()`, or `DispatchLoadGame()` succeeds from the menu flow, CONTROL closes the related setup or load screen so the game view is not left underneath an open menu.
 
+`DispatchStartGame()`, `DispatchRestartGame()`, `DispatchResignGame()`, `DispatchQuitGame()`, and `DispatchLoadGame()` are blocked while **Multithreading** is enabled.
+
 ## Working With `GameOptions`
 
 `GetCurrentGameOptions()` gives Lua access to the current game setup object. Use it to inspect or modify the pending session configuration before calling `DispatchStartGame()`.

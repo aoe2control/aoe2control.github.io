@@ -24,11 +24,14 @@ CONTROL scans `modules/` recursively for:
 | **Command Visualization** | On | Draws command feedback overlays. |
 | **Suppress Native AI** | On | If enabled, assigning a module to a bot player disables that player's built-in AI while the module is attached. |
 | **Tournament Mode** | Off | Blocks Lua game commands outside `Update()` and restricts selected engine, menu, replay, render, and `GameOptions` APIs. |
+| **Multithreading** | Off | Runs module execution outside the game's render thread. `Render()` is disabled, and selected menu, replay, render, and IPC wait APIs are blocked. |
 | **Modules See Everything** | Off | If enabled, Lua modules ignore fog-of-war and cross-player data restrictions when reading map tiles, objects, and player state. |
 
 The update interval is clamped to `0.1` seconds in the UI and `0.01` seconds when loaded from `settings.ini`.
 
 When **Tournament Mode** is off, using a game command outside `Update()` logs a warning once per module load. When it is on, those commands are rejected and selected helper APIs are also tournament-restricted.
+
+When **Multithreading** is enabled, module execution runs outside the game's render thread and `Render()` is not called.
 
 ## UI Submenu
 
@@ -42,6 +45,7 @@ When **Tournament Mode** is off, using a game command outside `Update()` logs a 
 | Setting | Default | Description |
 |---------|---------|-------------|
 | **Player Perspective** | `Default` | Fog-of-war perspective override: `Default`, `Player 1` to `Player 8`, or `Gaia`. Default uses local-player visibility. May cause crashes. |
+| **Game Speed Multiplier** | `Default` | Applies a preset game-speed override. `Default` keeps the game's base multiplier. |
 | **Spectator Mode** | Off | Enables spectator-style reveal behavior and keeps controls available while spectating. |
 | **Unlock Zoom** | Off | Removes the normal zoom limit. May cause rendering issues. |
 | **Chat Welcome Message** | On | Enables CONTROL's startup chat message behavior. |
@@ -92,6 +96,8 @@ When **Module Telemetry** is enabled, the Debug menu shows:
 - a sampled **Baseline Frame** value, which represents host frame cost after subtracting sampled module time
 - per-module `Upd` and `Rnd` entries with both sampled milliseconds and relative `x base` values
 - samples spread across multiple frames each second rather than every frame
+
+In multithreading mode, `Render()` is disabled and the baseline frame view is hidden.
 
 ## Perspective And Visibility
 

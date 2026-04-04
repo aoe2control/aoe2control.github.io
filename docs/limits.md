@@ -19,6 +19,8 @@ Multiplayer is allowed when cheats are enabled.
 - Large projects may need optimization. The Lua interpreter handles scripts of varying size; scripters are responsible for performance.
 - Avoid heavy work in `Render()` — it runs every frame.
 - The Debug menu's **Module Telemetry** view samples `Update()` and `Render()` cost against a sampled baseline frame cost.
+- In **Tournament Mode**, update execution above `20 ms` adds delay to the effective update interval.
+- In **Multithreading** mode, module execution is detached from the game's render thread and `Render()` is disabled.
 - `ConstructionPlacement` caches map tile state internally to reduce repeated placement overhead.
 
 ## Sandbox
@@ -35,8 +37,8 @@ The following Lua functions are **removed** from the environment:
 
 Game API (commands, facts, render) must be called when the game is active. Calling before the game starts logs an error:
 
-> Lua error: Game API function called before the game started. Move this logic to Init() or Update().
+> Lua error: Game API function called before the game started. Move this logic to Init(), Update() or End().
 
-Move game logic to `Init`, `Update`, or `Render`.
+Move game logic to `Init`, `Update`, `Render`, or `End`, depending on the API.
 
 Game commands belong in `Update()`. Using them from other callbacks logs a warning, and **Tournament Mode** blocks them. Selected non-command helper APIs are also tournament-restricted.

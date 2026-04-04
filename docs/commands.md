@@ -16,6 +16,7 @@ This page follows the same grouping used by `BindGameAPI()` in `module_bindings.
 
 - The **Commands** section below is the only part affected by replay blocking, the `Update()`-only warning, and `Sequential Actions`.
 - **Tournament Mode** also blocks selected functions in the `Engine`, `Menu / UI`, and `Replays` sections, plus many render and `GameOptions` APIs documented on other pages.
+- **Multithreading** blocks selected menu, replay, render, and IPC wait APIs, and `Render()` is not executed while it is enabled.
 - Most unit and building commands silently filter the input list down to objects owned by the assigned player.
 - `SetCameraPosition` and `SendChatMessage` are command-style functions, but they are not ownership-filtered.
 - `Log()`, `SetEngineUIVisibility()`, `UnloadEngine()`, and `AssignAndLoadModule()` are not in-match game commands and can be used from any callback, unless **Tournament Mode** blocks them.

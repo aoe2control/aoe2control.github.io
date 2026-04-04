@@ -1,6 +1,6 @@
 # Game API — Facts
 
-This page mirrors the `Facts` block in `BindGameAPI()`. Most facts read game state and should be called from `Init`, `Update`, or `Render` while a match is running. **Tournament Mode** applies to game commands, not these read-only APIs.
+This page mirrors the `Facts` block in `BindGameAPI()`. Most facts read game state and should be called from `Init`, `Update`, `Render`, or `End` while the match or end-state is available. **Tournament Mode** applies to game commands, not these read-only APIs.
 
 !!! warning "Game must be running"
     Calling these APIs before the game starts logs an error.
