@@ -185,8 +185,8 @@ Rules:
 | `CalculatePath` | `(startPos, targetPos, collisionRadius)` | `Vector3[]` | Calculate a native path between two `Vector3` positions with an explicit collision radius. |
 | `GetObjectsInArea` | `(pos1, pos2)` | `Object[]` | Objects inside the rectangle defined by two `Vector2` positions. Loot-bearing dead huntables and livestock are included. |
 | `GetObjectsPtr` | `()` | `number, number` | Returns `(ptr, count)` for an engine-owned packed object snapshot buffer. Intended for IPC / RPM readers. |
-| `GetObjectTypeData` | `(objectTypeId, objectData)` | `number` | Static object-type data lookup for a `UnitObjectType`. |
-| `GetObjectTypeAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number` | Static object-type attribute lookup for a `UnitObjectType`. |
+| `GetObjectTypeData` | `(objectTypeId, objectData)` | `number` | Game-resolved object-type data lookup for a `UnitObjectType`. |
+| `GetObjectTypeAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number` | Game-resolved object-type attribute lookup for a `UnitObjectType`. |
 | `IsEnemyPlayer` | `(player)` | `boolean` | Whether `player` is an enemy of the assigned player. |
 | `GetObjectById` | `(id)` | `Object` | Object by id. |
 | `GetProjectileById` | `(id)` | `Object` | Projectile object by id. |
@@ -213,7 +213,7 @@ Notes:
 - `GetAllMapTiles()` returns the full grid, but each `MapTile` only exposes data allowed by the current fog state.
 - `GetMapTilesPtr()` and `GetObjectsPtr()` return `(ptr, count)`, where `count` is an element count, not a byte count.
 - `GetObjectsPtr()` is dead-inclusive.
-- `CanAfford(unitId, isBuilding)` accepts both parameters, but the binding does not distinguish the flag internally.
+- `CanAfford(unitId, isBuilding)` forwards the `isBuilding` flag to the engine affordability helper.
 
 ### Enum Lookup Discipline
 
@@ -434,7 +434,8 @@ Behavior:
 - Cached objects can throw a Lua error on most method calls after they become invisible
 - Explored animals and resources can still be returned even when they are not currently visible
 - On those non-visible explored object references, only `IsVisible()`, `IsExplored()`, `GetId()`, `GetPosition()`, `GetClass()`, and `GetUnitObjectType()` are safe
-- `GetName()`, `GetInternalName()`, and `GetMasterName()` return empty strings when name data is unavailable
+- `GetName()` and `GetInternalName()` return empty strings when name data is unavailable
+- `GetMasterName()` is kept for compatibility and currently mirrors `GetName()`
 - Re-fetch object references in the current frame when fog-aware mode is active
 
 ### MapTile

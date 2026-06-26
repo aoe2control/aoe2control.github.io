@@ -43,8 +43,8 @@ This page mirrors the `Facts` block in `BindGameAPI()`. Most facts read game sta
 | `CalculatePath` | `(startPos, targetPos, collisionRadius)` | `Vector3[]` | Overload: calculates a native path between two `Vector3` positions with an explicit collision radius. |
 | `GetObjectsInArea` | `(pos1, pos2)` | `Object[]` | Returns objects whose current tile lies inside the rectangular area between two `Vector2` positions. Loot-bearing dead huntables and livestock are included. |
 | `GetObjectsPtr` | `()` | `number, number` | Returns `(ptr, count)` for an engine-owned packed object snapshot buffer. Intended for IPC / RPM readers. |
-| `GetObjectTypeData` | `(objectTypeId, objectData)` | `number` | Returns static object-type data for a `UnitObjectType` and `ObjectData` field. |
-| `GetObjectTypeAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number` | Returns a static object-type attribute value for a `UnitObjectType`. |
+| `GetObjectTypeData` | `(objectTypeId, objectData)` | `number` | Returns game-resolved object-type data for a `UnitObjectType` and `ObjectData` field. |
+| `GetObjectTypeAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number` | Returns a game-resolved object-type attribute value for a `UnitObjectType`. |
 | `IsEnemyPlayer` | `(player)` | `boolean` | Returns whether the given player is an enemy of the assigned player. |
 | `GetObjectById` | `(id)` | `Object` | Returns a world object by id. |
 | `GetProjectileById` | `(id)` | `Object` | Returns a projectile object by id. |
@@ -153,4 +153,4 @@ end
 - `GetMapTilesPtr()` and `GetObjectsPtr()` return engine-owned buffers rebuilt on demand. The second return value is an element count, not a byte count.
 - `GetObjectsPtr()` is dead-inclusive. Read the alive state from the snapshot flags instead of assuming every entry is alive.
 - The snapshot helpers are primarily intended for IPC / external ML readers that want to transfer compact RPM-friendly buffers. See the IPC page for the exact packed C++ layouts.
-- `CanAfford(unitId, isBuilding)` accepts both parameters in Lua, but the binding does not distinguish the second flag internally.
+- `CanAfford(unitId, isBuilding)` forwards the `isBuilding` flag to the engine affordability helper.
