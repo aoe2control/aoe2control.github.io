@@ -33,7 +33,7 @@ This page mirrors the `Facts` block in `BindGameAPI()`. Most facts read game sta
 | `GetAssignedPlayer` | `()` | `Player` | Returns the player currently assigned to this module instance. |
 | `GetPlayerById` | `(id)` | `Player` | Returns a player by index. Gaia is typically `0`, regular players are typically `1` to `8`. |
 | `GetPlayerCount` | `()` | `number` | Returns the size of the world player list. |
-| `GetMapTilesPtr` | `()` | `number, number` | Returns `(ptr, count)` for an engine-owned packed tile snapshot buffer. Intended for IPC / RPM readers. |
+| `GetMapTilesPtr` | `()` | `number, number` | Returns `(ptr, count)` for a packed tile snapshot owned by the current module instance and load generation. Intended for IPC / RPM readers. |
 | `GetMapWidth` | `()` | `number` | Returns the current map width in tiles. |
 | `GetMapHeight` | `()` | `number` | Returns the current map height in tiles. |
 | `GetMapTile` | `(x, y)` | `MapTile` | Overload: returns the tile at integer map coordinates, or `nil` if out of bounds. |
@@ -42,7 +42,7 @@ This page mirrors the `Facts` block in `BindGameAPI()`. Most facts read game sta
 | `CalculatePath` | `(startPos, targetPos)` | `Vector3[]` | Calculates a native path between two `Vector3` positions. |
 | `CalculatePath` | `(startPos, targetPos, collisionRadius)` | `Vector3[]` | Overload: calculates a native path between two `Vector3` positions with an explicit collision radius. |
 | `GetObjectsInArea` | `(pos1, pos2)` | `Object[]` | Returns objects whose current tile lies inside the rectangular area between two `Vector2` positions. Loot-bearing dead huntables and livestock are included. |
-| `GetObjectsPtr` | `()` | `number, number` | Returns `(ptr, count)` for an engine-owned packed object snapshot buffer. Intended for IPC / RPM readers. |
+| `GetObjectsPtr` | `()` | `number, number` | Returns `(ptr, count)` for a packed object snapshot owned by the current module instance and load generation. Intended for IPC / RPM readers. |
 | `GetObjectTypeData` | `(objectTypeId, objectData)` | `number` | Returns game-resolved object-type data for a `UnitObjectType` and `ObjectData` field. |
 | `GetObjectTypeAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number` | Returns a game-resolved object-type attribute value for a `UnitObjectType`. |
 | `IsEnemyPlayer` | `(player)` | `boolean` | Returns whether the given player is an enemy of the assigned player. |
@@ -150,7 +150,7 @@ end
 - When **Modules See Everything** is disabled, object retrieval functions follow the assigned player's fog-of-war with one exception: explored animals and resources can still be returned. On those non-visible references, only `IsVisible()`, `IsExplored()`, `GetId()`, `GetPosition()`, `GetClass()`, and `GetUnitObjectType()` are safe.
 - When **Modules See Everything** is disabled, player-state access through `GetPlayerById()` is limited. Resource, fact, tech, and object-availability methods only expose the assigned player's data.
 - `GetAllMapTiles()` returns the full map grid, but `MapTile` methods only expose what the assigned player is currently allowed to know.
-- `GetMapTilesPtr()` and `GetObjectsPtr()` return engine-owned buffers rebuilt on demand. The second return value is an element count, not a byte count.
+- `GetMapTilesPtr()` and `GetObjectsPtr()` return engine-owned buffers rebuilt on demand. Every buffer requested by one module instance during a callback remains stable through that callback; another module instance cannot invalidate it. The engine currently retains the last requested set until that same instance requests another snapshot or unloads, but external readers should copy it before that boundary. The second return value is an element count, not a byte count; an empty snapshot is `(0, 0)`.
 - `GetObjectsPtr()` is dead-inclusive. Read the alive state from the snapshot flags instead of assuming every entry is alive.
 - The snapshot helpers are primarily intended for IPC / external ML readers that want to transfer compact RPM-friendly buffers. See the IPC page for the exact packed C++ layouts.
 - `CanAfford(unitId, isBuilding)` forwards the `isBuilding` flag to the engine affordability helper.

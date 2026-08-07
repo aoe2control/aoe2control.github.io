@@ -73,7 +73,9 @@ Both functions return two Lua values:
 Important behavior:
 
 - The buffer is rebuilt on demand every time you call the function.
-- The pointer is transient. Copy or read the buffer immediately.
+- A nonempty buffer is owned by the calling module instance and its current load generation. An empty snapshot returns `(0, 0)`.
+- All tile and object buffers requested by that instance during one callback are retained together and remain stable through the end of the callback. A request made by another instance cannot invalidate them.
+- The current engine continues retaining that callback's last requested set until the same instance requests either kind of snapshot again or unloads. External readers should copy the bytes before that boundary rather than treating the pointer as permanent.
 - `count` is an element count, not a byte count.
 - Byte size is `count * sizeof(Tile)` or `count * sizeof(Object)`.
 - `GetObjectsPtr()` is dead-inclusive.
