@@ -14,6 +14,10 @@ The IPC API connects Lua modules to external processes through Windows named pip
 | `IPC.WaitForMessage` | `()` | `string \| nil` | Waits for one queued message and returns `nil` if the endpoint stops first. |
 | `IPC.WaitForMessage` | `(timeoutMs)` | `string \| nil` | Waits up to `timeoutMs` milliseconds for one queued message and returns `nil` on timeout. |
 
+## Connection Security
+
+IPC servers accept local-machine clients only. By default, each pipe's access list grants access only to the Windows user SID from the CONTROL process token, so a process running as another user cannot connect. Clients running under the same Windows user continue to use the ordinary `\\.\pipe\<name>` path.
+
 ## JSON Helpers
 
 | Function | Signature | Returns | Description |
