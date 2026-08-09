@@ -17,7 +17,7 @@ This page mirrors the `Facts` block in `BindGameAPI()`. Most facts read game sta
 | `IsObjectTypeAvailable` | `(unitObjectType)` | `boolean` | Returns whether the assigned player currently has access to a unit or building type. |
 | `GetUnitTypeCount` | `(unitId)` | `number` | Returns the assigned player's count for a unit type. |
 | `GetAttribute` | `(attribute)` | `number` | Returns a `PlayerAttribute` value for the assigned player. |
-| `CanAfford` | `(unitId, isBuilding)` | `boolean` | Returns whether the assigned player can afford an item. |
+| `CanAfford` | `(unitId, isBuilding)` | `boolean` | Returns whether the assigned player meets the item's resource and population cost. Availability is queried separately. |
 | `GetTechCost` | `(technology)` | `{ resourceId = ResourceType, amount = number }[]` | Returns the assigned player's current technology cost entries. |
 | `GetObjectCost` | `(unitObjectType)` | `{ resourceId = ResourceType, amount = number }[]` | Returns the assigned player's current object cost entries with multiplier `1.0`. |
 | `GetObjectCost` | `(unitObjectType, costMultiplier)` | `{ resourceId = ResourceType, amount = number }[]` | Returns the assigned player's current object cost entries with the given multiplier applied. |
@@ -65,7 +65,9 @@ function Update()
     local population = GetFact(Fact.POPULATION, 0)
     local wood = GetAttribute(PlayerAttribute.WOOD)
 
-    if population < 60 and CanAfford(UnitObjectType.HOUSE, true) then
+    if population < 60
+        and IsObjectTypeAvailable(UnitObjectType.HOUSE)
+        and CanAfford(UnitObjectType.HOUSE, true) then
         Log("Player " .. tostring(assigned:GetId()) .. " has " .. tostring(wood) .. " wood.")
     end
 end
@@ -154,4 +156,4 @@ end
 - `GetMapTilesPtr()` and `GetObjectsPtr()` return engine-owned buffers rebuilt on demand. Every buffer requested by one module instance during a callback remains stable through that callback; another module instance cannot invalidate it. The engine currently retains the last requested set until that same instance requests another snapshot or unloads, but external readers should copy it before that boundary. The second return value is an element count, not a byte count; an empty snapshot is `(0, 0)`.
 - `GetObjectsPtr()` is dead-inclusive. Read the alive state from the snapshot flags instead of assuming every entry is alive.
 - The snapshot helpers are primarily intended for IPC / external ML readers that want to transfer compact RPM-friendly buffers. See the IPC page for the exact packed C++ layouts.
-- `CanAfford(unitId, isBuilding)` forwards the `isBuilding` flag to the engine affordability helper.
+- `CanAfford(unitId, isBuilding)` forwards the `isBuilding` flag to the engine affordability helper. It intentionally does not imply `IsObjectTypeAvailable(unitId)`; check both before issuing a train/build command.

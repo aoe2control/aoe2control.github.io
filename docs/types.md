@@ -169,7 +169,7 @@ Returned by `GetAssignedPlayer`, `GetPlayerById`, and `GetVictoryPlayer`.
 | `GetUnitTypeCount(id)` | `number` | Returns the count for a unit type id. |
 | `GetFact(fact, parameter)` | `number` | Returns a fact value for this player. |
 | `IsObjectTypeAvailable(unitObjectType)` | `boolean` | Returns whether this player currently has access to a unit or building type. |
-| `CanAfford(id, isBuilding)` | `boolean` | Returns whether this player can afford an item. |
+| `CanAfford(id, isBuilding)` | `boolean` | Returns whether this player meets the item's resource and population cost; availability is separate. |
 | `GetResearchState(technology)` | `ResearchState` | Returns the research state of a technology. |
 | `GetTechCost(technology)` | `{ resourceId = ResourceType, amount = number }[]` | Returns this player's current technology cost entries. |
 | `GetObjectCost(unitObjectType)` | `{ resourceId = ResourceType, amount = number }[]` | Returns this player's current object cost entries with multiplier `1.0`. |
@@ -283,10 +283,10 @@ Notes:
 | `BuildStructure(structureType, targetPos, direction, padding, bypassTownCenterPadding)` | `boolean` | Convenience overload: auto-selects a builder villager, finds a valid position, and issues the build command. |
 | `BuildStructure(structureType, targetPos, directionPos, padding)` | `boolean` | Convenience overload: auto-selects a builder villager, uses a directional world position, and keeps default town-center-padding behavior. |
 | `BuildStructure(structureType, targetPos, directionPos, padding, bypassTownCenterPadding)` | `boolean` | Convenience overload: auto-selects a builder villager, finds a valid position, and issues the build command using a directional world position. |
-| `BuildStructureAtTown(structureType, targetPos, padding)` | `boolean` | Town-center-oriented helper that uses default town-center-padding behavior. |
-| `BuildStructureAtTown(structureType, targetPos, padding, bypassTownCenterPadding)` | `boolean` | Town-center-oriented helper that auto-selects a builder and places relative to the town center. |
-| `BuildStructureAtTown(structureType, padding)` | `boolean` | Simplest town build helper using default town-center-padding behavior. |
-| `BuildStructureAtTown(structureType, padding, bypassTownCenterPadding)` | `boolean` | Simplest town build helper. No target position is required. |
+| `BuildStructureAtTown(structureType, targetPos, padding)` | `boolean` | Town-center-oriented helper that uses default town-center-padding behavior and resumes a matching owned foundation when possible. |
+| `BuildStructureAtTown(structureType, targetPos, padding, bypassTownCenterPadding)` | `boolean` | Town-center-oriented helper that auto-selects a builder, resumes a matching owned foundation when possible, and otherwise places relative to the town center. |
+| `BuildStructureAtTown(structureType, padding)` | `boolean` | Simplest town build helper using default town-center-padding behavior, including unfinished-foundation recovery. |
+| `BuildStructureAtTown(structureType, padding, bypassTownCenterPadding)` | `boolean` | Simplest town build helper. No target position is required, and an unfinished matching foundation is resumed when possible. |
 | `FindBestPosition(structureType, targetPos, direction, padding, bypassTownCenterPadding)` | `Vector3` | Finds a placement candidate and derives placement size from the `UnitObjectType`. |
 | `GetValidFarmPlacementTile()` | `MapTile \| nil` | Returns a valid farm placement tile near a town center or mill using the current placement rules. |
 | `QueueBuildingRequest(structureType, targetPosition, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)` | `nil` | Queues a building request at a target position using a `UnitObjectType`. |
@@ -300,6 +300,7 @@ Notes:
 - `SetTownCenterPadding()` clamps to `0` or higher and defaults to `3`.
 - `GetValidFarmPlacementTile()` uses the current villager-occupation farm distance rules when a `VillagerOccupation` instance is attached.
 - `BuildStructure(...)` and `BuildStructureAtTown(...)` also expose overloads without the final `bypassTownCenterPadding` argument. Those use the default `false` behavior.
+- `BuildStructureAtTown(...)` first tries to resume a matching owned unfinished foundation. A newly reported foundation is given a short materialization window before the helper falls back to placing a replacement, preventing both immediate duplicates and permanent stalls on stale fact-only foundations.
 
 ## Examples
 
@@ -356,10 +357,9 @@ function Update()
     EnableScouting()
 
     tracker:Update()
-    villagerOcc:Update()
     placement:Update()
 
-    if GetFact(Fact.HOUSING_HEADROOM) <= 2 and GetFact(Fact.BUILDING_TYPE_COUNT_TOTAL, type) - GetFact(Fact.BUILDING_TYPE_COUNT, type) == 0 then
+    if GetFact(Fact.HOUSING_HEADROOM) <= 2 then
         placement:BuildStructureAtTown(
             UnitObjectType.HOUSE_DARK_AGE,
             1,
@@ -368,6 +368,10 @@ function Update()
     end
 
     TrainUnit(UnitObjectType.VILLAGER_MALE)
+
+    -- Run occupation last so sequential-action mode gives strategic commands
+    -- the first opportunity to use the current update tick.
+    villagerOcc:Update()
 end
 ```
 

@@ -159,7 +159,7 @@ Rules:
 | `IsObjectTypeAvailable` | `(unitObjectType)` | `boolean` | Check whether the assigned player currently has access to a unit or building type. |
 | `GetUnitTypeCount` | `(unitId)` | `number` | Count a unit type for the assigned player. |
 | `GetAttribute` | `(attribute)` | `number` | Read a `PlayerAttribute` for the assigned player. |
-| `CanAfford` | `(unitId, isBuilding)` | `boolean` | Check whether the assigned player can afford an item. |
+| `CanAfford` | `(unitId, isBuilding)` | `boolean` | Check whether the assigned player meets the item's resource and population cost; availability is separate. |
 | `GetTechCost` | `(technology)` | `{ resourceId = ResourceType, amount = number }[]` | Current technology cost entries for the assigned player. |
 | `GetObjectCost` | `(unitObjectType)` | `{ resourceId = ResourceType, amount = number }[]` | Current object cost entries for the assigned player with multiplier `1.0`. |
 | `GetObjectCost` | `(unitObjectType, costMultiplier)` | `{ resourceId = ResourceType, amount = number }[]` | Current object cost entries for the assigned player with the given multiplier applied. |
@@ -213,7 +213,7 @@ Notes:
 - `GetAllMapTiles()` returns the full grid, but each `MapTile` only exposes data allowed by the current fog state.
 - `GetMapTilesPtr()` and `GetObjectsPtr()` return `(ptr, count)`, where `count` is an element count, not a byte count.
 - `GetObjectsPtr()` is dead-inclusive.
-- `CanAfford(unitId, isBuilding)` forwards the `isBuilding` flag to the engine affordability helper.
+- `CanAfford(unitId, isBuilding)` forwards the `isBuilding` flag to the engine affordability helper. It does not imply `IsObjectTypeAvailable(unitId)`; check both before issuing a train/build command.
 
 ### Enum Lookup Discipline
 
@@ -544,7 +544,7 @@ Methods:
 - `GetUnitTypeCount(id)`
 - `GetFact(fact, parameter)`
 - `IsObjectTypeAvailable(unitObjectType)`
-- `CanAfford(id, isBuilding)`
+- `CanAfford(id, isBuilding)` — checks resource/population cost; query availability separately.
 - `GetResearchState(technology)`
 - `GetTechCost(technology)`
 - `GetObjectCost(unitObjectType)`
@@ -647,7 +647,7 @@ Notes:
 
 - `BuildStructure(...)`, `FindBestPosition(...)`, and queue helpers take `UnitObjectType` and derive placement size internally
 - Convenience `BuildStructure(...)` overloads can auto-select a builder villager and issue the build command directly
-- `BuildStructureAtTown(...)` adds town-center-oriented placement helpers
+- `BuildStructureAtTown(...)` adds town-center-oriented placement helpers, resumes a matching owned unfinished foundation when possible, and uses a short materialization window before replacing a stale fact-only foundation
 - `SetTownCenterPadding()` defaults to `3` and clamps to `0` or higher
 - `GetValidFarmPlacementTile()` uses the current villager-occupation farm distance rules when available
 - Build helpers also expose overloads without the final `bypassTownCenterPadding` argument; those use the default `false` behavior

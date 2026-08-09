@@ -1,0 +1,16 @@
+# Python and MkDocs caches
+__pycache__/
+*.py[cod]
+.cache/
+.pytest_cache/
+.mkdocs_cache/
+
+# Local virtual environments
+.venv/
+venv/
+
+# Editor and operating-system artifacts
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
