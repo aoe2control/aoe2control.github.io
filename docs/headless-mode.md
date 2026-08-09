@@ -75,8 +75,12 @@ Ready
 Possible terminal success lines include:
 
 - `Ready`
-- `Ready - May require update`
+- `Ready - Diagnostics pending`
+- `Ready - Partially outdated`
+- `Ready - Requires update`
 - `Already Running!`
+
+The graphical launcher may first show `Ready - Diagnostics pending` while match-only checks are waiting to run. After passive diagnostics finish, the displayed status refreshes to `Ready` or the applicable update warning. Headless mode treats the first typed ready status as startup success and exits with code `0`.
 
 Possible terminal failure lines include:
 
