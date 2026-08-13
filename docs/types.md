@@ -326,6 +326,7 @@ function Init()
 end
 
 function Update()
+    resources:Update()
     villagers:Update()
 
     for _, entry in ipairs(trackedProfessions) do

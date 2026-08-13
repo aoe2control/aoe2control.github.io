@@ -14,9 +14,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y lua5.4
       - run: pip install "mkdocs==1.6.1" "mkdocs-material==9.7.4" "pymdown-extensions==10.21" "Markdown==3.10" "Pygments==2.19.2"
       - run: python -m pip show mkdocs mkdocs-material pymdown-extensions Markdown Pygments
-      - run: mkdocs build
+      - run: python tools/validate_examples.py --lua-compiler /usr/bin/luac5.4
+      - run: mkdocs build --strict
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site

@@ -66,8 +66,8 @@ function Update()
     local wood = GetAttribute(PlayerAttribute.WOOD)
 
     if population < 60
-        and IsObjectTypeAvailable(UnitObjectType.HOUSE)
-        and CanAfford(UnitObjectType.HOUSE, true) then
+        and IsObjectTypeAvailable(UnitObjectType.HOUSE_DARK_AGE)
+        and CanAfford(UnitObjectType.HOUSE_DARK_AGE, true) then
         Log("Player " .. tostring(assigned:GetId()) .. " has " .. tostring(wood) .. " wood.")
     end
 end
@@ -131,7 +131,7 @@ end
 ```lua
 function Init()
     local villagerHp = GetObjectTypeAttribute(UnitObjectType.VILLAGER_MALE, ObjectAttribute.HITPOINTS, 0)
-    local villagerTrainTime = GetObjectTypeData(UnitObjectType.VILLAGER_MALE, ObjectData.CREATION_TIME)
+    local villagerTrainTime = GetObjectTypeData(UnitObjectType.VILLAGER_MALE, ObjectData.TRAIN_TIME)
 
     Log("Villager HP=" .. tostring(villagerHp) .. ", train time=" .. tostring(villagerTrainTime))
 end

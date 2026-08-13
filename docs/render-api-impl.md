@@ -37,7 +37,12 @@ end
 
 ```lua
 function Render()
-    local hovered = GetAssignedPlayer():GetMouseHoveredObject()
+    local player = GetAssignedPlayer()
+    if not player then
+        return
+    end
+
+    local hovered = player:GetMouseHoveredObject()
     if hovered and hovered:IsAlive() then
         local pos = hovered:GetPosition()
         RenderWorldCircle(pos, 2.0, Color(255, 128, 0, 255), 2.0, 24)
