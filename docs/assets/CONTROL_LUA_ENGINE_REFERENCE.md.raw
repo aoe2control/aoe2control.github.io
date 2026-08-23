@@ -93,6 +93,11 @@ This section follows the same grouping as `BindGameAPI()` in `module_bindings.cp
 | `DispatchLoadGame` | `(saveGameFileName)` | `boolean` | Load a file from the current load-game list by file name. |
 | `GetAvailableSaveFiles` | `()` | `string[]` | File names currently exposed by the game's load-game list. |
 | `GetCurrentGameOptions` | `()` | `GameOptions \| nil` | Current session setup object when available. |
+| `GetRandomMapControlCapabilities` | `()` | `table` | RMS API version and capability flags. |
+| `RefreshRandomMapSources` | `()` | `number \| nil` | Refresh the game-visible RMS catalog and return its generation. |
+| `GetAvailableRandomMapSources` | `()` | `RandomMapSource[]` | Immutable copied game-catalog sources. |
+| `GetEffectiveRandomMapSeed` | `()` | `number \| nil` | Authoritative unsigned 32-bit running-world seed. |
+| `GetEffectiveRandomMapSource` | `()` | `RandomMapSource \| nil` | Authoritative running-world RMS catalog source. |
 | `IsGamePaused` | `()` | `boolean` | Whether the current game or replay is paused. |
 | `IsMenuOpen` | `()` | `boolean` | Whether the game UI is currently in a menu state. Also works during replays. |
 
@@ -500,6 +505,8 @@ Global setup methods:
 - `GetAntiquityMode()` / `SetAntiquityMode(antiquityMode)`
 - `GetLocation()` / `SetLocation(location)`
 - `SetRandomMapPoolLocations(locations)`
+- `GetRandomMapSeed()` / `SetRandomMapSeed(seed)` / `ClearRandomMapSeed()`
+- `GetRandomMapSource()` / `SetRandomMapSource(source)`
 - `GetPlayersCount()` / `SetPlayersCount(playersCount)`
 - `GetTreatyLength()` / `SetTreatyLength(treatyLength)`
 - `GetHandicap()` / `SetHandicap(handicap)`
@@ -520,7 +527,25 @@ Behavior:
 - `SetAssignedPlayerCivilization()` uses the current module instance's assigned player slot and requires a valid player id from `1` to `8`
 - `SetRandomMapPoolLocations()` accepts a Lua array of `OptionsLocation` values; one entry behaves like `SetLocation()`, while multiple entries switch the location to `OptionsLocation.CUSTOM_MAP_POOL`
 - Most `GameOptions` methods are blocked while **Tournament Mode** is enabled; `SetAssignedPlayerCivilization()` remains available in the current Lua API
+- RMS seed/source mutators are rejected during active matches and for multiplayer setup
+- Fixed RMS seeds cover the complete unsigned 32-bit range; `nil` means game-selected randomness
+- `GetRandomMapControlCapabilities()` reports API version `1`; `freshStart` is available on the current supported build when its focused native dependencies resolve, while `directPath` and `inlineSource` are deliberately false
+- `DispatchStartGame()` rejects active matches; after an ended ordinary non-replay single-player match it queues native teardown/setup reconstruction and creates a fresh world while preserving every exposed option plus the requested source/seed
+- `DispatchRestartGame()` remains an explicit same-session restart, and replay end-screen routing is unchanged
 - The associated enum tables are `OptionsAIDifficulty`, `OptionsCivilizationSet`, `OptionsGameMode`, `OptionsMapSize`, `OptionsAge`, `OptionsRevealMap`, `OptionsVictory`, `OptionsResources`, `OptionsLocation`, and `OptionsCivilization`
+
+### RandomMapSource
+
+Read-only properties and matching getters:
+
+- `DisplayName` / `GetDisplayName()`
+- `NativeMapId` / `GetNativeMapId()`
+- `SourceKind` / `GetSourceKind()`
+- `ModIdentity` / `GetModIdentity()`
+- `ResolvedPath` / `GetResolvedPath()`
+- `CatalogGeneration` / `GetCatalogGeneration()`
+
+Sources are copied values. Old generations remain safe to inspect but are rejected by `SetRandomMapSource()`. CONTROL does not deploy RMS files, and catalog refresh only exposes sources that the game itself enumerates. Direct-path and inline factories are not exposed because native ownership, include resolution, cache invalidation, and authoritative readback are not sufficiently durable.
 
 ### Player
 

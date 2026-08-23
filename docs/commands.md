@@ -39,10 +39,10 @@ For a deeper guide to match startup, save loading, and pre-game setup, see [Auto
 
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
-| `DispatchStartGame` | `()` | `boolean` | Starts the currently configured session. |
+| `DispatchStartGame` | `()` | `boolean` | Starts the configured session; after an ended ordinary single-player match, queues a native clean teardown and fresh match while preserving exposed setup state. |
 | `DispatchRestartGame` | `()` | `boolean` | Restarts the current single-player session when supported. |
 | `DispatchResignGame` | `()` | `boolean` | Resigns the current game. |
-| `DispatchQuitGame` | `()` | `boolean` | Exits the current game flow when supported. |
+| `DispatchQuitGame` | `()` | `boolean` | Queues the game's native full-match teardown and return-to-menu transaction when supported. |
 | `DispatchLoadGame` | `(saveGameFileName)` | `boolean` | Loads a file from the current load-game list by file name. |
 | `GetAvailableSaveFiles` | `()` | `string[]` | Returns the file names currently exposed by the game's load-game list. |
 | `GetCurrentGameOptions` | `()` | `GameOptions \| nil` | Returns the current session setup object when available. |

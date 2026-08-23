@@ -72,6 +72,11 @@ Notes:
 | `GetLocation()` | `OptionsLocation` | Returns the selected map or location id. |
 | `SetLocation(location)` | `boolean` | Sets the selected map or location id. |
 | `SetRandomMapPoolLocations(locations)` | `boolean` | Sets a custom random map pool from a Lua array of `OptionsLocation` values. |
+| `GetRandomMapSeed()` | `number \| nil` | Returns the requested unsigned 32-bit fixed seed. `nil` means game-selected randomness. |
+| `SetRandomMapSeed(seed)` | `boolean` | Stages an exact unsigned 32-bit fixed seed from `0` through `4294967295`. |
+| `ClearRandomMapSeed()` | `boolean` | Returns the request to game-selected randomness. |
+| `GetRandomMapSource()` | `RandomMapSource \| nil` | Returns the currently selected source as an immutable copied catalog value. |
+| `SetRandomMapSource(source)` | `boolean` | Selects a current-generation game-visible source. Rejects stale or forged values. |
 | `GetPlayersCount()` | `number` | Returns the configured player-slot count. |
 | `SetPlayersCount(playersCount)` | `boolean` | Sets the configured player-slot count. |
 | `GetTreatyLength()` | `number` | Returns the treaty length. |
@@ -99,6 +104,9 @@ Notes:
 
 - `SetAssignedPlayerCivilization()` uses the current module instance's assigned player id and requires that id to be a regular player slot from `1` to `8`.
 - Most `GameOptions` methods are blocked while **Tournament Mode** is enabled. `SetAssignedPlayerCivilization()` remains available in the current Lua API.
+- Random-map seed/source mutators are also rejected in multiplayer and while a match is active. Check [Random Map Control](session-control.md#random-map-control) capabilities before using them.
+- A source is tied to its catalog generation. Refreshing the catalog makes every earlier source stale for selection, although its copied properties remain safe to read.
+- An ended ordinary single-player match can be followed by `DispatchStartGame()` to create a fresh world with all exposed options, source, and seed preserved through native teardown/setup reconstruction. `DispatchRestartGame()` retains its explicit same-session restart meaning.
 
 ## Example
 

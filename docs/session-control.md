@@ -20,10 +20,10 @@ CONTROL exposes a small set of functions for engine and menu automation. These f
 
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
-| `DispatchStartGame` | `()` | `boolean` | Starts the currently configured session. If an ended session is already on an end screen, CONTROL attempts a restart. |
+| `DispatchStartGame` | `()` | `boolean` | Starts the currently configured session. After an ended ordinary single-player match, queues a clean teardown and a genuinely fresh match with the current exposed setup state. Replay end screens retain restart behavior. |
 | `DispatchRestartGame` | `()` | `boolean` | Restarts the current single-player session when the game state supports it. |
 | `DispatchResignGame` | `()` | `boolean` | Resigns the current game. |
-| `DispatchQuitGame` | `()` | `boolean` | Exits the current game flow back toward menus when supported. |
+| `DispatchQuitGame` | `()` | `boolean` | Queues the game's native full-match teardown and return-to-menu transaction when supported. `true` means the asynchronous transaction was accepted. |
 | `DispatchLoadGame` | `(saveGameFileName)` | `boolean` | Loads a file from the current load-game list by file name. The file name must match one of the entries returned by `GetAvailableSaveFiles()`. |
 | `GetAvailableSaveFiles` | `()` | `string[]` | Returns the file names currently exposed by the game's load-game list. |
 | `GetCurrentGameOptions` | `()` | `GameOptions \| nil` | Returns the current session setup object when available. |
@@ -43,6 +43,37 @@ Important rules:
 - `GetCurrentGameOptions()` can return `nil`, so guard it before use.
 - `GameOptions` setter methods return `false` while already in game.
 - Player-slot methods accept slot indexes `0` to `7`.
+
+## Random Map Control
+
+Random-map control is capability-gated. Query `GetRandomMapControlCapabilities()` at runtime instead of assuming that an update-sensitive native feature is available.
+
+| Function | Returns | Description |
+|----------|---------|-------------|
+| `GetRandomMapControlCapabilities()` | `table` | Returns API version `1` and the capability flags described below. |
+| `RefreshRandomMapSources()` | `number \| nil` | Asks the game to refresh its visible random-map catalog and returns the new catalog generation. Returns `nil` when refresh is unavailable, the lifecycle rejects it, or the native catalog is invalid. |
+| `GetAvailableRandomMapSources()` | `RandomMapSource[]` | Returns immutable copied values from the current game-visible catalog. |
+| `GetEffectiveRandomMapSeed()` | `number \| nil` | Returns the authoritative unsigned 32-bit seed for a running random-map world, or `nil` until that state exists. |
+| `GetEffectiveRandomMapSource()` | `RandomMapSource \| nil` | Returns the authoritative catalog source for a running random-map world, or `nil` until that state exists. |
+
+The capability table contains `apiVersion`, `freshStart`, `requestedSeed`, `effectiveSeed`, `sourceCatalog`, `refresh`, `selection`, `effectiveSource`, `directPath`, and `inlineSource`.
+
+On the current supported AoE2DE build, `freshStart` and the seed/game-catalog capabilities are available when all of their focused signatures resolve. `directPath` and `inlineSource` are deliberately `false`:
+
+- Direct-path and inline RMS loading are not exposed because native parser ownership, include resolution, cache invalidation, and authoritative readback are not sufficiently durable.
+
+`RandomMapSource` has read-only `DisplayName`, `NativeMapId`, `SourceKind`, `ModIdentity`, `ResolvedPath`, and `CatalogGeneration` properties, with matching `Get...()` methods. `ModIdentity` and `ResolvedPath` can be `nil` when the native catalog does not provide them. Values are copies rather than native-pointer wrappers. Old-generation values remain safe to inspect, but `GameOptions:SetRandomMapSource()` rejects them.
+
+Lifecycle and failure rules:
+
+- Refresh, requested-seed mutation, and source selection are rejected during an active match and for multiplayer setup.
+- CONTROL never copies or deploys RMS files. A caller or IDE owns deployment; CONTROL only refreshes and selects sources that the game's native catalog actually exposes. Refresh does not promise that an arbitrary mod file or same-name built-in override will become a catalog source.
+- Missing or deleted content can make refresh return `nil` or remove a source from the next generation. A previously returned source then becomes stale.
+- Mutation methods return `false` and write a precise rejection to the CONTROL log. Effective getters return `nil` until authoritative running-world state exists.
+- `DispatchStartGame()` rejects an active match. On an ended ordinary non-replay single-player match it preserves the complete exposed `GameOptions` state plus the requested source/seed, runs the native clean teardown, reconstructs the single-player setup, and starts a fresh world without replacing the game process or CONTROL engine. The Boolean result reports whether that asynchronous route was accepted; later native failure or timeout is logged precisely.
+- `DispatchRestartGame()` remains an explicit same-session restart. Replay end-screen behavior is unchanged and continues to use restart rather than the RMS fresh-match route.
+- `DispatchQuitGame()` uses the same native teardown task and rejects a second lifecycle request while one is pending.
+- Public signatures target only the current supported game build. A failed RMS signature degrades the related flags without disabling unrelated CONTROL functionality.
 
 ## Example: Configure And Start A Match
 
