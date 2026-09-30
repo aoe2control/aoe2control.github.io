@@ -93,7 +93,7 @@ Possible terminal failure lines include:
 
 - `Process not found`
 - `Startup validation failed`
-- `Offset Error`
+- `Offset Error: game version <version> is not supported (rows <numbers>). Wait for a CONTROL update. Details: ...`. CONTROL does not support this game version yet. The row numbers identify what failed when you report it.
 - `Render Hook Failed`
 - override errors such as missing files, invalid paths, or `CONTROL is already running in the game. Restart the game to apply overrides`
 
