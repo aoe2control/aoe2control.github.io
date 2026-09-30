@@ -20,7 +20,7 @@ Multiplayer is allowed when cheats are enabled.
 
 - Large projects may need optimization. The Lua interpreter handles scripts of varying size; scripters are responsible for performance.
 - Avoid heavy work in `Render()` — it runs every frame.
-- The Debug menu's **Module Telemetry** view samples `Update()` and `Render()` cost against a sampled baseline frame cost.
+- `GetClockMs()` and `GetModuleTelemetry()` measure a module's own cost. The Debug menu's **Module Telemetry** view shows every module and CONTROL's share of the frame.
 - In **Tournament Mode**, update execution above `20 ms` adds delay to the effective update interval.
 - In **Multithreading** mode, module execution is detached from the game's render thread and `Render()` is disabled. `ResourceTracker`, `VillagerOccupation` and `ConstructionPlacement` read the live game and raise an error, `CheckPlacement` and `CanPlaceObject` return `nil`, and `MapTile:IsBuildable()` returns `nil`.
 - `ConstructionPlacement` caches map tile state internally to reduce repeated placement overhead.

@@ -27,6 +27,8 @@ This page mirrors the `Facts` block in `BindGameAPI()`. Most facts read game sta
 | `GetObjectsByTypes` | `(unitTypes)` | `Object[]` | Returns matching world objects for any listed type. Loot-bearing dead huntables and livestock are included. |
 | `GetObjectsByClass` | `(unitClass)` | `Object[]` | Returns matching world objects of a class, not just owned objects. Loot-bearing dead huntables and livestock are included. |
 | `GetGameTime` | `()` | `number` | Returns the current match time in seconds. |
+| `GetClockMs` | `()` | `number` | Returns milliseconds on a monotonic high-resolution clock with an arbitrary start. Subtract two values to measure a duration. |
+| `GetModuleTelemetry` | `()` | `table` | Returns the calling module instance's timing: `update` and `render` tables with `count`, `totalMs`, `sampleCount`, `averageMs`, `p50Ms`, `p95Ms` and `maxMs` (over the last 256 calls), plus `lateUpdates` (updates that ran a full interval or more late), `skippedIntervals` (update intervals dropped because of that) and `deferredUpdates` (Multithreading: an update came due while the previous one was still running). Returns `nil` outside a module callback. |
 | `GetAllChatMessages` | `()` | `string[]` | Returns the current chat buffer as plain message strings. |
 | `GetNewChatMessages` | `()` | `string[]` | Returns chat messages that became visible since this module instance last called the function. |
 | `GetLastChatMessage` | `()` | `string \| nil` | Returns the newest chat message, or `nil` if the chat buffer is empty. |

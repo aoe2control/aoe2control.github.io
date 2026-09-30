@@ -93,16 +93,17 @@ Open a player section to configure that player's module slot. If no module is as
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| **Module Telemetry** | Off | Shows sampled `Update()` and `Render()` cost for active modules. |
+| **Module Telemetry** | Off | Shows `Update()` and `Render()` cost for active modules and CONTROL's share of each frame. |
 
 The Debug submenu also provides a button to show or hide the log window.
 
 When **Module Telemetry** is enabled, the Debug menu shows:
 
-- active modules only
-- a sampled **Baseline Frame** value, which represents host frame cost after subtracting sampled module time
-- per-module `Upd` and `Rnd` entries with both sampled milliseconds and relative `x base` values
-- samples spread across multiple frames each second rather than every frame
+- how many milliseconds CONTROL spends per frame, the time between game frames, and CONTROL's share of it
+- a **Baseline Frame** value: CONTROL's frame cost without module callbacks
+- per active module, the `Update()` and `Render()` mean, 95th percentile and maximum over the last 256 calls, and the mean relative to the baseline
+
+Modules can read their own numbers with `GetModuleTelemetry()` whether or not the setting is on. `diagnostics/latest.json` includes the same report under `moduleTelemetry`.
 
 In multithreading mode, `Render()` is disabled and the baseline frame view is hidden.
 
