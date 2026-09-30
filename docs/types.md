@@ -4,8 +4,8 @@ CONTROL exposes math helpers, game objects, and strategic helper classes to Lua.
 
 Pre-game setup access through `GetCurrentGameOptions()` is documented on the dedicated [GameOptions](game-options.md) page.
 
-!!! note "Lua signatures are strict"
-    If a method parameter is listed here, pass it explicitly unless a separate overload is shown.
+!!! note "Arguments"
+    Optional arguments are shown with `?` in the VS Code definitions; every other argument is required. Whole-number parameters (ids, counts, enums) also accept a float with a whole value such as `10.0`, but not `10.5`.
 
 ## Math Types
 

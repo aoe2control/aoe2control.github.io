@@ -5,8 +5,8 @@ This page mirrors the `Facts` block in `BindGameAPI()`. Most facts read game sta
 !!! warning "Game must be running"
     Calling these APIs before the game starts logs an error.
 
-!!! note "Lua signatures are strict"
-    Pass every argument shown below. A C++ default value does not make the parameter optional in Lua unless a separate overload is bound.
+!!! note "Arguments"
+    Optional arguments are shown with `?` in the VS Code definitions; every other argument is required. Whole-number parameters (ids, counts, enums) also accept a float with a whole value such as `10.0`, but not `10.5`.
 
 ## Reference
 
