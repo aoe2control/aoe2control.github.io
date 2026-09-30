@@ -181,6 +181,8 @@ Returned by `GetAssignedPlayer`, `GetPlayerById`, and `GetVictoryPlayer`.
 | `GetObjectsByMostCommonType(unitTypes)` | `Object[]` | Returns owned objects for the most common matching type. |
 | `GetObjectsByClass(unitClass)` | `Object[]` | Returns owned objects in a class. |
 | `GetObjectsByClassDeadInclusive(unitClass)` | `Object[]` | Returns owned objects in a class, including dead objects. |
+| `CountObjectsByTypes(unitTypes)` | `number` | Returns how many objects `GetObjectsByTypes(unitTypes)` returns, without building the list. |
+| `CountObjectsByClass(unitClass)` | `number` | Returns how many objects `GetObjectsByClass(unitClass)` returns, without building the list. |
 | `GetTownCenters()` | `Object[]` | Returns owned town centers. |
 
 Player-state access follows the same visibility restrictions as the rest of the API:
