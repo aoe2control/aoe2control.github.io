@@ -41,18 +41,25 @@ The launcher accepts both styles for option values:
 
 ## Override Behavior
 
+The launcher applies overrides after it finds the game and before it starts CONTROL.
+
+- If the game is not running, nothing is copied.
+- If CONTROL is already running in the game, the launcher refuses the overrides and exits with code `3`. Restart the game first.
+- If any override fails, the launcher restores the previous files.
+
 ### `--override-settings`
 
 - The source must be a file.
 - The target is always `%appdata%\CONTROL\AoE2Control\settings.ini`.
-- Existing `settings.ini` is removed first and then replaced.
+- An existing `settings.ini` is replaced.
 
 ### `--override-module`
 
 - The source can be a single file or a folder.
 - If the source is a file, it is copied to `%appdata%\CONTROL\AoE2Control\modules\<filename>`.
-- If the source is a folder, it is copied to `%appdata%\CONTROL\AoE2Control\modules\<folder-name>\...`.
-- Existing targets with the same name are replaced first.
+- If the source is a folder, it is copied to `%appdata%\CONTROL\AoE2Control\modules\<folder-name>\...`. A trailing `\` or `\.` is ignored, so `C:\temp\my_module\` installs as `my_module`.
+- An existing file or folder with the same name is replaced. Other modules are not touched.
+- The launcher refuses a source folder that contains the modules folder, and a target that is a link or junction.
 
 See [Config Location](config-location.md) for the destination layout.
 
@@ -88,7 +95,7 @@ Possible terminal failure lines include:
 - `Startup validation failed`
 - `Offset Error`
 - `Render Hook Failed`
-- override copy errors such as missing files or invalid paths
+- override errors such as missing files, invalid paths, or `CONTROL is already running in the game. Restart the game to apply overrides`
 
 ## Exit Codes
 
@@ -97,7 +104,7 @@ Possible terminal failure lines include:
 | `0` | Success. This also includes the `Already Running!` engine-attached status. |
 | `1` | Another launcher instance is already running. |
 | `2` | Invalid command-line arguments. |
-| `3` | An override file or folder could not be applied. |
+| `3` | An override could not be applied, or CONTROL was already running in the game. |
 | `4` | Startup failed. |
 
 ## Examples
