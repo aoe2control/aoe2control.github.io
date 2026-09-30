@@ -420,6 +420,17 @@ See the [community Technologies Table](https://airef.github.io/tables/techs.html
 | NO_ATTACK | 2 |
 | STAND_GROUND | 3 |
 
+### Formation
+
+Used by `SetFormation()`.
+
+| Value | Description |
+|-------|-------------|
+| LINE | 2 |
+| BOX | 4 |
+| STAGGERED | 7 |
+| FLANK | 8 |
+
 ### Fact
 
 Fact ids for `GetFact`. Examples:

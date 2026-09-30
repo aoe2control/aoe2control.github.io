@@ -88,6 +88,7 @@ For a deeper guide to match startup, save loading, and pre-game setup, see [Auto
 | `SetUnitStanceUngarrison` | `(sourceObjects, unit)` | `nil` | Ungarrisons an owned unit from owned source buildings. |
 | `SetUnitStanceSeekShelter` | `(units)` | `nil` | Orders owned units to seek shelter. |
 | `SetUnitCombatStance` | `(units, stance)` | `nil` | Sets the combat stance of owned units using `UnitCombatStance`. |
+| `SetFormation` | `(units, formation)` | `nil` | Sets the formation of owned units using `Formation`, as the game's formation buttons do. It takes effect when the units next move together. `ObjectData.FORMATION_ID` does not report it. |
 
 ## Examples
 
