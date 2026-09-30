@@ -13,6 +13,12 @@ CONTROL scans `modules/` recursively for:
 
 **Depth limit:** 3 levels below `modules/`.
 
+The module name is the file name before `.main.`. When two files have the same module name:
+
+- The file closer to `modules/` is used.
+- In the same folder, `.main.lua` is used over `.main.module`.
+- Files at the same depth in different folders make the name ambiguous. The module stays in the list, but loading it fails with an error that names both files. Remove or rename one of them.
+
 ## MODULES Submenu
 
 | Setting | Default | Description |
