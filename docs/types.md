@@ -104,7 +104,8 @@ Returned by `GetObjectsByType`, `GetObjectsByTypes`, `GetObjectsByClass`, and `G
 | `GetId()` | `number` | Returns the object's id. |
 | `GetName()` | `string` | Returns the name of the object's current graphic, such as `Villager Male (Idle)`. It changes with the object's activity. |
 | `GetInternalName()` | `string` | Returns the file name of the object's current graphic, such as `u_vil_male_villager_idleA_x1`. |
-| `GetMasterName()` | `string` | Compatibility alias for `GetName()`. It no longer reads the master/static definition directly. |
+| `GetTypeName()` | `string` | Returns the name the game shows for the object's type, such as `Villager` or `Town Center`, in the game's language. Returns `""` for types without one. |
+| `GetMasterName()` | `string` | Deprecated. Same as `GetName()`. Use `GetTypeName()` for the type's name. |
 | `GetObjectType()` | `ObjectType` | Returns the high-level object type. |
 | `GetOwningPlayer()` | `Player` | Returns the owning player. |
 | `GetGarrisonObject()` | `Object` | Returns the current garrison container. |
@@ -114,13 +115,14 @@ Returned by `GetObjectsByType`, `GetObjectsByTypes`, `GetObjectsByClass`, and `G
 | `GetDirection()` | `Vector3` | Returns the current facing vector. |
 | `IsVisible()` | `boolean` | Returns whether the object is visible on the assigned player's current map tile visibility. |
 | `IsExplored()` | `boolean` | Returns whether the object's location has been explored by the assigned player. |
-| `IsAlive()` | `boolean` | Returns whether the object is alive. |
+| `IsAlive()` | `boolean` | Returns whether the object is alive. Foundations are not alive. |
+| `IsFoundation()` | `boolean` | Returns whether the object is a building that is not finished yet (`ObjectData.STATUS` 0). |
 | `GetUnitObjectType()` | `UnitObjectType` | Returns the unit or building type id. |
 | `GetClass()` | `UnitClass` | Returns the unit class id. |
 | `GetAttribute(attribute, damageType)` | `number` | Returns an `ObjectAttribute` value for this object. |
 | `GetObjectData(objectData)` | `number` | Returns an object data field. |
 | `IsIdle()` | `boolean` | Returns whether the object is idle. |
-| `IsMoving()` | `boolean` | Returns whether the object is moving. It checks for a 30-frame current graphic, so it is wrong for units whose walking graphic has another frame count. |
+| `IsMoving()` | `boolean` | Returns whether the unit is following a path. False for buildings and other static objects. |
 | `GetSprite()` | `table` or `nil` | Returns the object's current graphic: `name`, `fileName`, `facet`, `facetCount`, `frameCount` and `frameDuration`. See [Sprites](#sprites). Returns `nil` when the object has no graphic. |
 | `IsScouting()` | `boolean` | Returns whether the object is auto-scouting. |
 | `GetHitpoints()` | `number` | Returns current hitpoints. |
@@ -197,6 +199,7 @@ Returned by `GetAssignedPlayer`, `GetPlayerById`, and `GetVictoryPlayer`.
 | `GetObjectsByMostCommonType(unitTypes)` | `Object[]` | Returns owned objects for the most common matching type. |
 | `GetObjectsByClass(unitClass)` | `Object[]` | Returns owned objects in a class. |
 | `GetObjectsByClassDeadInclusive(unitClass)` | `Object[]` | Returns owned objects in a class, including dead objects. |
+| `GetFoundations()` | `Object[]` | Returns the player's buildings that are not finished yet. The other object lists leave them out. |
 | `CountObjectsByTypes(unitTypes)` | `number` | Returns how many objects `GetObjectsByTypes(unitTypes)` returns, without building the list. |
 | `CountObjectsByClass(unitClass)` | `number` | Returns how many objects `GetObjectsByClass(unitClass)` returns, without building the list. |
 | `GetTownCenters()` | `Object[]` | Returns owned town centers. |
@@ -401,7 +404,8 @@ end
 - `Object:IsVisible()` is the safe visibility check for cached objects and uses map-tile visibility.
 - Explored animals and resources can still be returned even when they are not currently visible.
 - On those non-visible explored object references, only `Object:IsVisible()`, `Object:IsExplored()`, `Object:GetId()`, `Object:GetPosition()`, `Object:GetClass()`, and `Object:GetUnitObjectType()` are safe until visibility returns.
-- `Object:GetName()` and `Object:GetInternalName()` return empty strings when the underlying name data is unavailable. `Object:GetMasterName()` is kept for compatibility and currently mirrors `GetName()`.
+- `Object:GetName()` and `Object:GetInternalName()` return empty strings when the underlying name data is unavailable. `Object:GetMasterName()` is deprecated and mirrors `GetName()`.
+- Object lists (`GetObjectsByTypes`, `GetObjectsByClass`, `GetObjectsInArea` and the counts) contain finished objects only. Use `Player:GetFoundations()` for buildings under construction.
 - Use `MapTile:GetPosition()` instead of `GetPosX()` / `GetPosY()`.
 - `MapTile:IsWalkable()` uses the game's own record of blocked tiles. A Town Center blocks only the tiles under its centre, so units can walk on the rest of its footprint; `IsBuildable()` is still `false` on the whole footprint.
 - `MapTile:GetObjectCount()` and `MapTile:GetObjects()` only expose data for tiles that are currently `TileVisibility.VISIBLE`.
