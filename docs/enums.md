@@ -485,7 +485,7 @@ ObjectData entries use names without the `OBJECT_DATA_` prefix. For example, use
 
 ### Key
 
-Virtual key codes for keybinds (for example `Key.Add`, `Key.F`, `Key.SPACE`).
+Virtual key codes for keybinds (for example `Key.Add`, `Key.F`, `Key.Space`). The names match Windows virtual-key names: `Enter`, `Backspace`, `Escape`, `Numpad0`-`Numpad9`, `F1`-`F12` and so on.
 
 ```lua
 Settings.AddKeybind("Hotkey", Key.Add)
