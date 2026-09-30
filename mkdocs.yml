@@ -73,6 +73,7 @@ nav:
     - settings-api.md
     - render-api-impl.md
     - ipc-api.md
+    - agent-bridge.md
   - Reference:
     - ai-agent-reference.md
     - limits.md

@@ -32,6 +32,7 @@ The module name is the file name before `.main.`. When two files have the same m
 | **Tournament Mode** | Off | Blocks Lua game commands outside `Update()` and restricts selected engine, menu, replay, render, and `GameOptions` APIs. |
 | **Multithreading** | Off | Runs module execution outside the game's render thread. `Render()` is disabled, and selected menu, replay, render, and IPC wait APIs are blocked. |
 | **Modules See Everything** | Off | If enabled, Lua modules ignore fog-of-war and cross-player data restrictions when reading map tiles, objects, and player state. |
+| **Agent Bridge** | Off | Lets a module open the [Agent Bridge](agent-bridge.md) pipe. Any program running under your Windows user can then read the module player's view and send it commands. Not available in multiplayer. |
 
 The update interval is clamped to `0.1` seconds in the UI and `0.01` seconds when loaded from `settings.ini`.
 

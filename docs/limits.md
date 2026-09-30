@@ -13,6 +13,8 @@ Multiplayer is allowed when cheats are enabled.
 
 - Single-player remains supported as before.
 - In multiplayer, enable cheats before using CONTROL.
+- If CONTROL cannot tell whether a running match is multiplayer, it treats it as multiplayer.
+- The [Agent Bridge](agent-bridge.md) is not available in multiplayer, even with cheats enabled.
 
 ## Performance
 
