@@ -103,9 +103,8 @@ Returned by `GetObjectsByType`, `GetObjectsByTypes`, `GetObjectsByClass`, and `G
 |--------|---------|-------------|
 | `GetId()` | `number` | Returns the object's id. |
 | `GetName()` | `string` | Returns the name of the object's current graphic, such as `Villager Male (Idle)`. It changes with the object's activity. |
-| `GetInternalName()` | `string` | Returns the file name of the object's current graphic, such as `u_vil_male_villager_idleA_x1`. |
+| `GetGraphicFileName()` | `string` | Returns the file name of the object's current graphic, such as `u_vil_male_villager_idleA_x1`. |
 | `GetTypeName()` | `string` | Returns the name the game shows for the object's type, such as `Villager` or `Town Center`, in the game's language. Returns `""` for types without one. |
-| `GetMasterName()` | `string` | Deprecated. Same as `GetName()`. Use `GetTypeName()` for the type's name. |
 | `GetObjectType()` | `ObjectType` | Returns the high-level object type. |
 | `GetOwningPlayer()` | `Player` | Returns the owning player. |
 | `GetGarrisonObject()` | `Object` | Returns the current garrison container. |
@@ -139,7 +138,7 @@ Returned by `GetObjectsByType`, `GetObjectsByTypes`, `GetObjectsByClass`, and `G
 | Field | Type | Description |
 |-------|------|-------------|
 | `name` | `string` | The graphic's name, such as `Villager Male (Walk)`. Same as `GetName()`. |
-| `fileName` | `string` | The graphic's file name, such as `u_vil_male_villager_walkA_x1`. Same as `GetInternalName()`. |
+| `fileName` | `string` | The graphic's file name, such as `u_vil_male_villager_walkA_x1`. Same as `GetGraphicFileName()`. |
 | `facet` | `number` | The direction the object faces, from `0`. Walking villagers use `0` to `15`. Ignore it when `facetCount` is `1`. |
 | `facetCount` | `number` | How many directions the graphic has: `16` for a villager, `1` for a town center. |
 | `frameCount` | `number` | Frames in one animation cycle of one direction. |
@@ -404,7 +403,7 @@ end
 - `Object:IsVisible()` is the safe visibility check for cached objects and uses map-tile visibility.
 - Explored animals and resources can still be returned even when they are not currently visible.
 - On those non-visible explored object references, only `Object:IsVisible()`, `Object:IsExplored()`, `Object:GetId()`, `Object:GetPosition()`, `Object:GetClass()`, and `Object:GetUnitObjectType()` are safe until visibility returns.
-- `Object:GetName()` and `Object:GetInternalName()` return empty strings when the underlying name data is unavailable. `Object:GetMasterName()` is deprecated and mirrors `GetName()`.
+- `Object:GetName()` and `Object:GetGraphicFileName()` return empty strings when the underlying name data is unavailable.
 - Object lists (`GetObjectsByTypes`, `GetObjectsByClass`, `GetObjectsInArea` and the counts) contain finished objects only. Use `Player:GetFoundations()` for buildings under construction.
 - Use `MapTile:GetPosition()` instead of `GetPosX()` / `GetPosY()`.
 - `MapTile:IsWalkable()` uses the game's own record of blocked tiles. A Town Center blocks only the tiles under its centre, so units can walk on the rest of its footprint; `IsBuildable()` is still `false` on the whole footprint.
