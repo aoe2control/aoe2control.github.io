@@ -102,8 +102,8 @@ Returned by `GetObjectsByType`, `GetObjectsByTypes`, `GetObjectsByClass`, and `G
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `GetId()` | `number` | Returns the object's id. |
-| `GetName()` | `string` | Returns the object's display name. |
-| `GetInternalName()` | `string` | Returns the object's internal engine name. |
+| `GetName()` | `string` | Returns the name of the object's current graphic, such as `Villager Male (Idle)`. It changes with the object's activity. |
+| `GetInternalName()` | `string` | Returns the file name of the object's current graphic, such as `u_vil_male_villager_idleA_x1`. |
 | `GetMasterName()` | `string` | Compatibility alias for `GetName()`. It no longer reads the master/static definition directly. |
 | `GetObjectType()` | `ObjectType` | Returns the high-level object type. |
 | `GetOwningPlayer()` | `Player` | Returns the owning player. |
@@ -120,7 +120,8 @@ Returned by `GetObjectsByType`, `GetObjectsByTypes`, `GetObjectsByClass`, and `G
 | `GetAttribute(attribute, damageType)` | `number` | Returns an `ObjectAttribute` value for this object. |
 | `GetObjectData(objectData)` | `number` | Returns an object data field. |
 | `IsIdle()` | `boolean` | Returns whether the object is idle. |
-| `IsMoving()` | `boolean` | Returns whether the object is moving. |
+| `IsMoving()` | `boolean` | Returns whether the object is moving. It checks for a 30-frame current graphic, so it is wrong for units whose walking graphic has another frame count. |
+| `GetSprite()` | `table` or `nil` | Returns the object's current graphic: `name`, `fileName`, `facet`, `facetCount`, `frameCount` and `frameDuration`. See [Sprites](#sprites). Returns `nil` when the object has no graphic. |
 | `IsScouting()` | `boolean` | Returns whether the object is auto-scouting. |
 | `GetHitpoints()` | `number` | Returns current hitpoints. |
 | `GetMaxHitpoints()` | `number` | Returns max hitpoints. |
@@ -128,6 +129,21 @@ Returned by `GetObjectsByType`, `GetObjectsByTypes`, `GetObjectsByClass`, and `G
 | `GetCurrentMapTile()` | `MapTile` | Returns the map tile the object is currently standing on. |
 | `GetPath()` | `Vector3[]` | Returns the object's current native path waypoints. |
 | `CalculatePath(targetPos)` | `Vector3[]` | Calculates a native path from the object's current position to a `Vector3` target using the object's game-reported radius when available. |
+
+### Sprites
+
+`Object:GetSprite()` describes the graphic the game draws for the object now. The graphic changes with the object's activity: a villager switches between idle, walking and work graphics.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | `string` | The graphic's name, such as `Villager Male (Walk)`. Same as `GetName()`. |
+| `fileName` | `string` | The graphic's file name, such as `u_vil_male_villager_walkA_x1`. Same as `GetInternalName()`. |
+| `facet` | `number` | The direction the object faces, from `0`. Walking villagers use `0` to `15`. Ignore it when `facetCount` is `1`. |
+| `facetCount` | `number` | How many directions the graphic has: `16` for a villager, `1` for a town center. |
+| `frameCount` | `number` | Frames in one animation cycle of one direction. |
+| `frameDuration` | `number` | Seconds per frame at normal game speed. `0` for graphics without animation. |
+
+The current animation frame is not available.
 
 ### MapTile
 
