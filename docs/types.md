@@ -139,9 +139,9 @@ Returned by `GetMapTile`, `GetAllMapTiles`, and `Object:GetCurrentMapTile()`.
 | `GetTerrain()` | `Terrain` | Returns the tile terrain id. Returns `Terrain.UNKNOWN` for unexplored tiles. |
 | `GetElevation()` | `number` | Returns the tile elevation. Returns `0` for unexplored tiles. |
 | `GetTileVisibility()` | `TileVisibility` | Returns the assigned player's visibility state for the tile. |
-| `IsBuildable()` | `boolean` | Returns whether the tile is flat and walkable enough for building placement. Unexplored tiles return `false`. |
-| `IsWalkable()` | `boolean` | Returns whether the tile is walkable. The result is collision-aware, and unexplored tiles return `false`. |
-| `IsNavigatable()` | `boolean` | Returns whether the tile is navigatable for pathing. Unexplored tiles return `false`. |
+| `IsBuildable()` | `boolean` | Returns whether the game would let the assigned player place a 1x1 building (an outpost) on the tile now: terrain, slope and objects, including units, are checked. Unexplored tiles return `false`. With Multithreading on, returns `nil`. For a real building type, use `CheckPlacement`. |
+| `IsWalkable()` | `boolean` | Returns whether land units can be on the tile: its terrain is navigatable and the game marks no blocking object on it (buildings, trees, mines). Units standing there do not count. Unexplored tiles return `false`. |
+| `IsNavigatable()` | `boolean` | Returns whether the tile's terrain lets land units move, whatever stands on it. Water returns `false`. Unexplored tiles return `false`. |
 | `GetObjectCount()` | `number` | Returns the count of currently visible objects on the tile. Only populated for visible tiles. |
 | `GetObjects()` | `Object[]` | Returns currently visible objects on the tile. Returns an empty list unless the tile is visible. |
 
@@ -385,5 +385,5 @@ end
 - On those non-visible explored object references, only `Object:IsVisible()`, `Object:IsExplored()`, `Object:GetId()`, `Object:GetPosition()`, `Object:GetClass()`, and `Object:GetUnitObjectType()` are safe until visibility returns.
 - `Object:GetName()` and `Object:GetInternalName()` return empty strings when the underlying name data is unavailable. `Object:GetMasterName()` is kept for compatibility and currently mirrors `GetName()`.
 - Use `MapTile:GetPosition()` instead of `GetPosX()` / `GetPosY()`.
-- `MapTile:IsWalkable()` reads the collision grid, so moving units and other blockers can affect the result.
+- `MapTile:IsWalkable()` uses the game's own record of blocked tiles. A Town Center blocks only the tiles under its centre, so units can walk on the rest of its footprint; `IsBuildable()` is still `false` on the whole footprint.
 - `MapTile:GetObjectCount()` and `MapTile:GetObjects()` only expose data for tiles that are currently `TileVisibility.VISIBLE`.

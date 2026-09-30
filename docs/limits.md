@@ -22,7 +22,7 @@ Multiplayer is allowed when cheats are enabled.
 - Avoid heavy work in `Render()` — it runs every frame.
 - The Debug menu's **Module Telemetry** view samples `Update()` and `Render()` cost against a sampled baseline frame cost.
 - In **Tournament Mode**, update execution above `20 ms` adds delay to the effective update interval.
-- In **Multithreading** mode, module execution is detached from the game's render thread and `Render()` is disabled.
+- In **Multithreading** mode, module execution is detached from the game's render thread and `Render()` is disabled. `ResourceTracker`, `VillagerOccupation` and `ConstructionPlacement` read the live game and raise an error, `CheckPlacement` and `CanPlaceObject` return `nil`, and `MapTile:IsBuildable()` returns `nil`.
 - `ConstructionPlacement` caches map tile state internally to reduce repeated placement overhead.
 
 ## Sandbox

@@ -357,6 +357,21 @@ Used by `MapTile:GetTileVisibility()`.
 | VISIBLE | 15. The tile is currently visible. |
 | EXPLORED | 128. The tile was seen earlier but is not currently visible. |
 
+### PlacementResult
+
+Returned by `CheckPlacement()`.
+
+| Value | Description |
+|-------|-------------|
+| CAN_PLACE | 0. The object can be placed there. |
+| TERRAIN_EDGE | 1. The terrain under the centre or edge does not fit the type. |
+| TERRAIN | 2. The terrain is not allowed for the type. |
+| SLOPE | 3. The ground is too steep. |
+| UNEXPLORED | 5. None of the footprint is explored. |
+| BLOCKED | 6. An object is in the way. |
+| OUTSIDE_MAP | 7. The footprint leaves the map. |
+| MAP_BOUNDARY | 11. A game-mode boundary refuses the spot. |
+
 ### ObjectAttribute
 
 Used by `Object:GetAttribute()` and `GetObjectTypeAttribute()`.

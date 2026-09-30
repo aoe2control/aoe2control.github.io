@@ -39,6 +39,8 @@ This page mirrors the `Facts` block in `BindGameAPI()`. Most facts read game sta
 | `GetMapTile` | `(x, y)` | `MapTile` | Overload: returns the tile at integer map coordinates, or `nil` if out of bounds. |
 | `GetMapTile` | `(position)` | `MapTile` | Overload: floors a `Vector2` world/tile position to a map tile lookup. |
 | `GetAllMapTiles` | `()` | `MapTile[]` | Returns all map tiles. Individual tile methods still respect fog-aware visibility. |
+| `CheckPlacement` | `(objectTypeId, position)` | `PlacementResult, number?` | Runs the game's own placement check of an object type for the assigned player, centred on a `Vector2` or `Vector3` position. Returns the `PlacementResult`, plus the blocking object's id for `BLOCKED`. Unexplored ground is refused unless Modules See Everything is on. Returns `nil` with Multithreading on. |
+| `CanPlaceObject` | `(objectTypeId, position)` | `boolean` | `true` when `CheckPlacement` returns `CAN_PLACE`; `nil` with Multithreading on. |
 | `CalculatePath` | `(startPos, targetPos)` | `Vector3[]` | Calculates a native path between two `Vector3` positions. |
 | `CalculatePath` | `(startPos, targetPos, collisionRadius)` | `Vector3[]` | Overload: calculates a native path between two `Vector3` positions with an explicit collision radius. |
 | `GetObjectsInArea` | `(pos1, pos2)` | `Object[]` | Returns objects whose current tile lies inside the rectangular area between two `Vector2` positions. Loot-bearing dead huntables and livestock are included. |
