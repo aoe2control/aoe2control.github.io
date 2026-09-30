@@ -51,18 +51,21 @@ Random-map control is capability-gated. Query `GetRandomMapControlCapabilities()
 | Function | Returns | Description |
 |----------|---------|-------------|
 | `GetRandomMapControlCapabilities()` | `table` | Returns API version `1` and the capability flags described below. |
+| `GetRandomMapStartStatus()` | `table` | Returns structured lifecycle state, capability revision, requested/effective seed and source, and the current catalog generation. Use it to distinguish unavailable, staged, starting, running, and ended states. |
 | `RefreshRandomMapSources()` | `number \| nil` | Asks the game to refresh its visible random-map catalog and returns the new catalog generation. Returns `nil` when refresh is unavailable, the lifecycle rejects it, or the native catalog is invalid. |
 | `GetAvailableRandomMapSources()` | `RandomMapSource[]` | Returns immutable copied values from the current game-visible catalog. |
 | `GetEffectiveRandomMapSeed()` | `number \| nil` | Returns the authoritative unsigned 32-bit seed for a running random-map world, or `nil` until that state exists. |
 | `GetEffectiveRandomMapSource()` | `RandomMapSource \| nil` | Returns the authoritative catalog source for a running random-map world, or `nil` until that state exists. |
 
-The capability table contains `apiVersion`, `freshStart`, `requestedSeed`, `effectiveSeed`, `sourceCatalog`, `refresh`, `selection`, `effectiveSource`, `directPath`, and `inlineSource`.
+The capability table contains `apiVersion`, `capabilityRevision`, `freshStart`, `requestedSeed`, `effectiveSeed`, `sourceCatalog`, `refresh`, `selection`, `effectiveSource`, `managedLocalMod`, `directPath`, and `inlineSource`.
 
 On the current supported AoE2DE build, `freshStart` and the seed/game-catalog capabilities are available when all of their focused signatures resolve. `directPath` and `inlineSource` are deliberately `false`:
 
 - Direct-path and inline RMS loading are not exposed because native parser ownership, include resolution, cache invalidation, and authoritative readback are not sufficiently durable.
 
-`RandomMapSource` has read-only `DisplayName`, `NativeMapId`, `SourceKind`, `ModIdentity`, `ResolvedPath`, and `CatalogGeneration` properties, with matching `Get...()` methods. `ModIdentity` and `ResolvedPath` can be `nil` when the native catalog does not provide them. Values are copies rather than native-pointer wrappers. Old-generation values remain safe to inspect, but `GameOptions:SetRandomMapSource()` rejects them.
+`RandomMapSource` has read-only `DisplayName`, `NativeMapId`, `SourceKind`, `ModIdentity`, `ResolvedPath`, `SourceIdentity`, `AuthoredSourceSha256`, and `CatalogGeneration` properties, with matching `Get...()` methods. Optional metadata can be `nil` when the native catalog does not provide it. `SourceIdentity` is stable catalog identity; `AuthoredSourceSha256` is populated only when CONTROL can safely hash the bounded authored source. Values are copies rather than native-pointer wrappers. Old-generation values remain safe to inspect, but `GameOptions:SetRandomMapSource()` rejects them.
+
+Lua deliberately keeps `GameOptions` as the single casual-user setup surface. Request IDs, typed `SetupContext` JSON, transaction rollback evidence, match epochs, and canonical bulk final-world snapshots belong to the separate versioned RMS IDE named-pipe endpoint and are not duplicated as Lua tables. The final-world response contains bounded terrain/elevation and directly validated object ID, kind, owner, tile, and XY position data; unit type IDs and Z positions are explicitly unavailable because resolving them would require broader mutable native queries. Direct-path, inline-source, parser/RNG trace, and intermediate generation-stage APIs are not exposed in Lua.
 
 Lifecycle and failure rules:
 

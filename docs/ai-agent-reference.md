@@ -70,3 +70,9 @@ To start coding immediately, place both downloaded files in the root of your Lua
 Use `CONTROL_LUA_ENGINE_REFERENCE.md` as the API contract and behavior reference. Point your editor, coding agent, or workspace instructions at `CONTROL_LUA_AGENT_INSTRUCTIONS.md` so the tool knows how to use the reference correctly in your project context.
 
 Which file you reference directly depends on the editor or AI workflow you use. In setups with a dedicated instruction field, use the agent instructions there and keep the full reference alongside it in the project root for lookup.
+
+## RMS setup boundary
+
+For Lua modules, use the existing `GameOptions` methods, `GetRandomMapControlCapabilities()`, `GetRandomMapStartStatus()`, and immutable `RandomMapSource` values. Do not invent a second table-shaped setup API. `SourceIdentity` and `AuthoredSourceSha256` are read-only correlation metadata; source selection still requires a current catalog generation.
+
+The typed `SetupContext` transaction, request identities, rollback evidence, match epochs, and bulk final-world snapshot are headless/IDE features rather than Lua functions. Direct-path and inline RMS execution remain unavailable, and no public surface exposes parser decisions, RNG checkpoints, or intermediate generation stages.
