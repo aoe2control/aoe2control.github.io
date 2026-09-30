@@ -85,7 +85,7 @@ Possible terminal success lines include:
 - `Ready - Diagnostics pending`
 - `Ready - Partially outdated`
 - `Ready - Requires update`
-- `Already Running!`
+- `Already Running!`: CONTROL of the same version is already running in the game.
 
 The graphical launcher may first show `Ready - Diagnostics pending` while match-only checks are waiting to run. After passive diagnostics finish, the displayed status refreshes to `Ready` or the applicable update warning. Headless mode treats the first typed ready status as startup success and exits with code `0`.
 
@@ -95,17 +95,27 @@ Possible terminal failure lines include:
 - `Startup validation failed`
 - `Offset Error: game version <version> is not supported (rows <numbers>). Wait for a CONTROL update. Details: ...`. CONTROL does not support this game version yet. The row numbers identify what failed when you report it.
 - `Render Hook Failed`
+- `CONTROL <version> is already running in this game. Restart the game to use version <version>`
+- `CONTROL failed to start in this game (<reason>). Restart the game`: an earlier start failed and could not fully stop.
+- `Timed out waiting for startup status`
 - override errors such as missing files, invalid paths, or `CONTROL is already running in the game. Restart the game to apply overrides`
 
 ## Exit Codes
 
 | Exit Code | Meaning |
 |----------:|---------|
-| `0` | Success. This also includes the `Already Running!` engine-attached status. |
+| `0` | Success. This also includes `Already Running!`. |
 | `1` | Another launcher instance is already running. |
 | `2` | Invalid command-line arguments. |
 | `3` | An override could not be applied, or CONTROL was already running in the game. |
-| `4` | Startup failed. |
+| `4` | Startup failed for another reason, for example `Offset Error` or `Render Hook Failed`. |
+| `5` | CONTROL in the game has another version or failed earlier. Restart the game. |
+| `6` | The game is not running. |
+| `7` | The game window is not ready yet. |
+| `8` | Injection failed. |
+| `9` | Timed out waiting for startup. |
+
+Codes 5 to 9 were added in 1.1.0. Earlier versions report those cases as `4`, and report `Already Running!` with `0` even when CONTROL in the game had another version or had failed.
 
 ## Examples
 
