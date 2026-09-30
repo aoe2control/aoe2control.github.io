@@ -11,8 +11,9 @@ The IPC API connects Lua modules to external processes through Windows named pip
 | `IPC.Send` | `(message)` | `boolean` | Sends a string or Lua value to all connected pipe clients. Non-string values are serialized to JSON automatically. |
 | `IPC.HasMessages` | `()` | `boolean` | Returns whether queued messages are waiting for this module instance. |
 | `IPC.GetMessages` | `()` | `string[]` | Returns queued messages for this module instance. |
-| `IPC.WaitForMessage` | `()` | `string \| nil` | Waits for one queued message and returns `nil` if the endpoint stops first. |
-| `IPC.WaitForMessage` | `(timeoutMs)` | `string \| nil` | Waits up to `timeoutMs` milliseconds for one queued message and returns `nil` on timeout. |
+| `IPC.WaitForMessage` | `()` | `string \| nil` | Waits up to 500 ms for one queued message. Returns `nil` on timeout or if the endpoint stops. |
+| `IPC.WaitForMessage` | `(timeoutMs)` | `string \| nil` | Waits up to `timeoutMs` milliseconds, at most 500, for one queued message. Returns `nil` on timeout. |
+| `IPC.GetStats` | `()` | `table \| nil` | Returns this module instance's delivery counters (see [Limits](#limits)), or `nil` without a server. |
 
 ## Connection Security
 
@@ -64,6 +65,27 @@ When routing fields are present, CONTROL only delivers the message to matching m
 ```
 
 If the original message is plain text instead of JSON, the payload stays a string. If you pass a Lua table or other non-string Lua value, CONTROL serializes it to JSON first.
+
+## Messages
+
+- Each `IPC.Send` is one pipe message: the envelope as JSON, followed by `\n`.
+- Each pipe message a client writes is one inbound message. Empty messages are ignored.
+- Clients should open the pipe in message read mode and keep reading while `ReadFile` reports `ERROR_MORE_DATA` (234), as in the [Python example](#python-example). A client that reads in byte mode must keep everything after each `\n`.
+
+## Limits
+
+| Limit | Value | What happens when it is reached |
+|-------|-------|---------------------------------|
+| Outbound envelope size | 1 MiB | `IPC.Send` returns `false`. |
+| Messages waiting for one client | 1024 messages or 8 MiB | `IPC.Send` returns `false`; clients with room still get the message. |
+| Client that stops reading | 5 s per message | The client is disconnected. |
+| Inbound message size | 1 MiB | The client is disconnected. |
+| Inbound messages waiting for Lua | 1024 per module instance | Further messages are dropped until Lua reads the queue. |
+| Clients per pipe | 16 | Further clients wait until one disconnects. |
+
+`IPC.Send` returns `true` when the message was queued for every connected client. It does not wait for delivery, and returns `false` when no client is connected.
+
+`IPC.GetStats()` returns these counters for the current module instance: `connectedClients`, `sentMessages`, `sentBytes`, `sendFailedNoClient`, `sendFailedTooLarge`, `sendFailedQueueFull`, `receivedMessages`, `receiveDroppedQueueFull`, `receiveDroppedTooLarge`, `receiveDroppedInvalidRouting` and `slowClientDisconnects`. The last three are counted for the whole pipe.
 
 ## Snapshot Buffers For IPC / ML
 
@@ -222,13 +244,14 @@ import json
 import time
 import pywintypes
 import win32file
+import win32pipe
 
 PIPE_NAME = r"\\.\pipe\AoE_ML_Pipe"
 
 def connect():
     while True:
         try:
-            return win32file.CreateFile(
+            handle = win32file.CreateFile(
                 PIPE_NAME,
                 win32file.GENERIC_READ | win32file.GENERIC_WRITE,
                 0,
@@ -242,6 +265,18 @@ def connect():
                 time.sleep(0.5)
                 continue
             raise
+        # Message mode: each read returns (part of) exactly one message.
+        win32pipe.SetNamedPipeHandleState(handle, win32pipe.PIPE_READMODE_MESSAGE, None, None)
+        return handle
+
+def read_message(handle):
+    """Reads one whole message from CONTROL, however large."""
+    parts = []
+    while True:
+        result, data = win32file.ReadFile(handle, 64 * 1024)
+        parts.append(data)
+        if result == 0:  # 234 (ERROR_MORE_DATA) means the message continues
+            return json.loads(b"".join(parts).decode("utf-8"))
 
 handle = connect()
 
@@ -255,20 +290,21 @@ targeted_ping = {
     }
 }
 
-win32file.WriteFile(handle, (json.dumps(targeted_ping) + "\n").encode("utf-8"))
-result, data = win32file.ReadFile(handle, 4096)
-print(data.decode("utf-8"))
+# One WriteFile is one message for Lua.
+win32file.WriteFile(handle, json.dumps(targeted_ping).encode("utf-8"))
+while True:
+    envelope = read_message(handle)
+    print(envelope["payload"])
 ```
 
 ## Notes
 
-- Pipe names are normalized automatically. Passing `"AoE_ML_Pipe"` is enough.
-- `IPC.Send` returns `false` if no client is connected.
+- Pipe names are normalized automatically. Passing `"AoE_ML_Pipe"` is enough. Names containing `\` or `/`, and names starting with `AoE2Control`, are refused.
+- Calling `IPC.StartServer` again with the same name keeps the server and its queued messages.
 - `IPC.HasMessages()` is useful when polling every update and you want to skip empty queue drains.
 - `IPC.GetMessages()` returns strings. Use `ParseJSON()` when you expect JSON payloads.
-- `IPC.WaitForMessage()` returns one message at a time. With no timeout, it waits indefinitely until a message arrives or the endpoint stops.
-- `IPC.WaitForMessage(timeoutMs)` clamps negative values to an indefinite wait and returns `nil` on timeout.
-- `IPC.Send()` and `IPC.GetMessages()` are safe to poll continuously; they return without waiting for a pipe close event.
+- `IPC.WaitForMessage()` returns one message at a time and waits at most 500 ms, because it blocks the callback that calls it.
+- `IPC.Send()` and `IPC.GetMessages()` never wait for the client; they are safe to call every update.
 - `IPC.WaitForMessage()` is blocked while **Multithreading** is enabled.
 - `GetMapTilesPtr()` and `GetObjectsPtr()` are intended for high-throughput IPC / ML workflows, not normal in-Lua iteration.
 - Explicit `IPC.StopServer()` in `Unload()` is optional in practice because CONTROL also stops the server automatically after module unload.
