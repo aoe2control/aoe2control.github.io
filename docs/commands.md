@@ -107,12 +107,12 @@ These functions work at any time, in menus as well as in a match.
 | `DestroyBuilding` | `(building)` | `nil` | Deletes one of the player's buildings. Same game command as `DeleteUnit`. |
 | `SetGatherPoint` | `(buildings, targetPosition)` | `nil` | Sets the gather point of the player's buildings to a `Vector3` position. |
 | `RingTownBell` | `(building, isCallingIn)` | `nil` | `true` rings the town bell at the building so villagers take shelter; `false` sends them back out. |
-| `SendBackToWork` | `(building)` | `nil` | Not supported on the current game build. Logs this once per module load and does nothing. |
-| `SendAllBackToWork` | `(building)` | `nil` | Not supported on the current game build. Logs this once per module load and does nothing. |
+| `SendBackToWork` | `(building)` | `nil` | Sends the villagers garrisoned in one of the player's buildings back to work, as the building's back-to-work button does. |
+| `SendAllBackToWork` | `(building)` | `nil` | Sends the villagers garrisoned in all of the player's buildings back to work, as the game's all-back-to-work button does. `building` must be one of the player's buildings; which one does not matter. |
 | `SetUnitStanceAutoScout` | `(units)` | `nil` | Sets the player's units to auto-scout. |
 | `SetUnitStancePatrol` | `(units, targetPosition)` | `nil` | Orders the player's units to patrol to a `Vector3` position. |
-| `SetUnitStanceGuard` | `(units, targetObject)` | `nil` | Not supported on the current game build. Logs this once per module load and does nothing. |
-| `SetUnitStanceFollow` | `(units, targetObject)` | `nil` | Not supported on the current game build. Logs this once per module load and does nothing. |
+| `SetUnitStanceGuard` | `(units, targetObject)` | `nil` | Orders the player's units to guard an object. They stay close to it when it moves. |
+| `SetUnitStanceFollow` | `(units, targetObject)` | `nil` | Orders the player's units to follow an object. |
 | `SetUnitStanceAttackMove` | `(units, targetPosition)` | `nil` | Orders the player's units to attack-move to a `Vector3` position. |
 | `SetUnitStanceGarrison` | `(units, targetObject)` | `nil` | Orders the player's units to garrison in an object. |
 | `SetUnitStanceUngarrison` | `(sourceObjects, unit)` | `nil` | Ungarrisons one of the player's units from the player's buildings in `sourceObjects`. |

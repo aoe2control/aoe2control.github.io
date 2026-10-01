@@ -196,12 +196,12 @@ Select a map and seed with the `GameOptions` methods `SetRandomMapSource()` and 
 | `DestroyBuilding` | `(building)` | `nil` | Deletes one of the player's buildings. |
 | `SetGatherPoint` | `(buildings, targetPosition)` | `nil` | Sets the gather point of buildings to a `Vector3` position. |
 | `RingTownBell` | `(building, isCallingIn)` | `nil` | `true` rings the town bell so villagers take shelter; `false` sends them back out. |
-| `SendBackToWork` | `(building)` | `nil` | Does nothing on the current game build; logs this once per module load. |
-| `SendAllBackToWork` | `(building)` | `nil` | Does nothing on the current game build; logs this once per module load. |
+| `SendBackToWork` | `(building)` | `nil` | Sends the villagers garrisoned in the building back to work. |
+| `SendAllBackToWork` | `(building)` | `nil` | Sends the villagers garrisoned in all of the player's buildings back to work; `building` is any of the player's buildings. |
 | `SetUnitStanceAutoScout` | `(units)` | `nil` | Sets units to auto-scout. |
 | `SetUnitStancePatrol` | `(units, targetPosition)` | `nil` | Orders units to patrol to a `Vector3` position. |
-| `SetUnitStanceGuard` | `(units, targetObject)` | `nil` | Does nothing on the current game build; logs this once per module load. |
-| `SetUnitStanceFollow` | `(units, targetObject)` | `nil` | Does nothing on the current game build; logs this once per module load. |
+| `SetUnitStanceGuard` | `(units, targetObject)` | `nil` | Orders units to guard an object. |
+| `SetUnitStanceFollow` | `(units, targetObject)` | `nil` | Orders units to follow an object. |
 | `SetUnitStanceAttackMove` | `(units, targetPosition)` | `nil` | Orders units to attack-move to a `Vector3` position. |
 | `SetUnitStanceGarrison` | `(units, targetObject)` | `nil` | Orders units to garrison in an object. |
 | `SetUnitStanceUngarrison` | `(sourceObjects, unit)` | `nil` | Ungarrisons a unit from the player's buildings in `sourceObjects`. |
