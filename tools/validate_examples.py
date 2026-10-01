@@ -21,7 +21,7 @@ GLOBAL_CALL = re.compile(r"(?<![.:\w])([A-Z][A-Za-z0-9_]*)\s*\(")
 DEFINED_FUNCTION = re.compile(r"\bfunction\s+([A-Z][A-Za-z0-9_]*)\s*\(")
 TABLE_CALL = re.compile(r"\b(Settings|IPC)\.([A-Za-z_][A-Za-z0-9_]*)\s*\(")
 METHOD_CALL = re.compile(r":([A-Z][A-Za-z0-9_]*)\s*\(")
-CONSTRUCTOR_CALL = re.compile(r"\b([A-Z][A-Za-z0-9_]*):new\s*\(")
+CONSTRUCTOR_CALL = re.compile(r"\b([A-Z][A-Za-z0-9_]*)[:.]new\s*\(")
 ENUM_VALUE = re.compile(r"\b([A-Z][A-Za-z0-9_]*)\.([A-Za-z_][A-Za-z0-9_]*)\b")
 
 
@@ -152,7 +152,14 @@ def validate_contract(
         name for name, value in usertypes.items()
         if int(value.get("constructors", 0)) > 0
     }
-    permitted_globals = global_functions | lifecycle_callbacks | constructors | defined_functions
+    # Calling the type itself (Vector3(1, 2, 3)) works only where the engine
+    # binds a call constructor; other types need Type.new(...). Manifests
+    # without the field fall back to any constructor.
+    callable_types = {
+        name for name, value in usertypes.items()
+        if value.get("callConstructor", int(value.get("constructors", 0)) > 0)
+    }
+    permitted_globals = global_functions | lifecycle_callbacks | callable_types | defined_functions
     for name in sorted(set(GLOBAL_CALL.findall(block.source)) - permitted_globals):
         errors.append(f"unknown Lua global function or constructor '{name}'")
 
@@ -173,6 +180,11 @@ def validate_contract(
 
     for enum_name, member_name in sorted(set(ENUM_VALUE.findall(block.source))):
         if enum_name not in enum_names:
+            # Type.new and static members such as Color.HSV are not enums.
+            if enum_name in usertypes:
+                members = usertypes[enum_name].get("members", {})
+                if member_name in members or (member_name == "new" and enum_name in constructors):
+                    continue
             if enum_name not in tables:
                 errors.append(f"unknown Lua enum table '{enum_name}'")
         elif enum_name in enum_members and member_name not in enum_members[enum_name]:

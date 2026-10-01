@@ -789,15 +789,6 @@ Used by `VillagerOccupation:RequestVillagers(amount, position, urgency)`.
 | `MEDIUM` | `1` |
 | `HIGH` | `2` |
 
-### BuildingPosition
-
-No Lua function takes this enum.
-
-| Name | Value |
-|------|-------|
-| `TOWN_CENTER` | `0` |
-| `AGGRESSIVE` | `1` |
-
 ### VillagerProfession
 
 Used by `VillagerOccupation:GetVillagerCount(profession)`.

@@ -676,7 +676,7 @@ A request is dropped after 45 seconds of scouting or 60 seconds in total. A new 
 
 Enums are global tables of names to numbers: `UnitClass.VILLAGER`. Functions return the number; compare with `==`. Never guess a name or value; look it up at https://aoe2control.github.io/enums/ or https://aoe2control.github.io/game-options/#option-enums, or list a table at run time with `for name, value in pairs(UnitObjectType) do ... end`.
 
-Enum tables: `Age`, `BuildingPosition`, `BuildingRequestPriority`, `Fact`, `Formation`, `Key`, `ObjectAttribute`, `ObjectData`, `ObjectType`, `OptionsAIDifficulty`, `OptionsAge`, `OptionsCivilization`, `OptionsCivilizationSet`, `OptionsGameMode`, `OptionsLocation`, `OptionsMapSize`, `OptionsResources`, `OptionsRevealMap`, `OptionsVictory`, `PlacementDirection`, `PlacementResult`, `PlayerAttribute`, `PlayerType`, `ProjectileType`, `ReplaySpeed`, `ResearchState`, `ResourceType`, `Technology`, `Terrain`, `TileVisibility`, `UnitClass`, `UnitCombatStance`, `UnitObjectType`, `UrgencyLevel`, `VictoryCondition`, `VillagerProfession`.
+Enum tables: `Age`, `BuildingRequestPriority`, `Fact`, `Formation`, `Key`, `ObjectAttribute`, `ObjectData`, `ObjectType`, `OptionsAIDifficulty`, `OptionsAge`, `OptionsCivilization`, `OptionsCivilizationSet`, `OptionsGameMode`, `OptionsLocation`, `OptionsMapSize`, `OptionsResources`, `OptionsRevealMap`, `OptionsVictory`, `PlacementDirection`, `PlacementResult`, `PlayerAttribute`, `PlayerType`, `ProjectileType`, `ReplaySpeed`, `ResearchState`, `ResourceType`, `Technology`, `Terrain`, `TileVisibility`, `UnitClass`, `UnitCombatStance`, `UnitObjectType`, `UrgencyLevel`, `VictoryCondition`, `VillagerProfession`.
 
 | Enum | Values |
 |------|--------|
@@ -695,7 +695,6 @@ Enum tables: `Age`, `BuildingPosition`, `BuildingRequestPriority`, `Fact`, `Form
 | `VillagerProfession` | `WOOD` 0, `FOOD` 1, `STONE` 2, `GOLD` 3 |
 | `PlacementDirection` | `Center` 0, `North` 1, `NorthEast` 2, `East` 3, `SouthEast` 4, `South` 5, `SouthWest` 6, `West` 7, `NorthWest` 8 |
 | `BuildingRequestPriority` | `LOW` 0, `MEDIUM` 1, `HIGH` 2, `CRITICAL` 3 |
-| `BuildingPosition` | `TOWN_CENTER` 0, `AGGRESSIVE` 1 (no function takes it) |
 
 Notes:
 
