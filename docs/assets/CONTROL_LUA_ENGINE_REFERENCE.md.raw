@@ -1,29 +1,36 @@
-# CONTROL Lua Engine — AI Agent Reference
+# CONTROL Lua Engine Reference
 
-**Purpose:** Provide this file to coding agents that need an accurate description of CONTROL's Lua API and runtime behavior.
+This file describes the Lua API of CONTROL (AoE2Control) 1.1.0 for coding agents that write CONTROL modules. Use only the functions, methods, tables and enums listed here. CONTROL is not the AoE2 `.per` AI scripting language, and it has no other game-engine API.
 
-**Rule:** Treat the signatures below as strict Lua signatures. A C++ default argument is not optional in Lua unless a separate overload is explicitly listed.
+Full documentation: [AoE2Control Documentation](https://aoe2control.github.io/). If this file and the site disagree, the site is correct.
 
-**Scope:** Treat this file as the primary contract for Lua function names, signatures, lifecycle behavior, and sandbox restrictions. Do not assume standard AoE2 `.per` AI syntax or generic game-engine APIs unless they are documented here or on the official CONTROL docs.
-
-**When incomplete:** If a needed behavior is missing here or appears outdated, confirm it before shipping code on the official documentation hub: [AoE2Control Documentation](https://aoe2control.github.io/).
+**Signatures:** arguments marked `?` are optional; every other argument is required. When an optional argument has a default, the description gives it. Whole-number parameters (ids, counts, enums) also accept a float with a whole value such as `10.0`, but not `10.5`.
 
 ---
 
 ## 1. Overview
 
-- Windows only
-- Intended primarily for single-player use; multiplayer is allowed when cheats are enabled
-- Config root: `%appdata%\CONTROL\AoE2Control\`
-- Modules root: `%appdata%\CONTROL\AoE2Control\modules\`
-- Module entries: `{moduleName}.main.lua` or `{moduleName}.main.module`
-- CONTROL supports multiple module instances, each assigned to a player slot
+- Windows only. CONTROL runs inside Age of Empires II: Definitive Edition.
+- Multiplayer: modules run only when the match has cheats enabled. Without cheats, `Init()`, `Update()` and `Render()` are not called. A match whose type CONTROL cannot tell counts as multiplayer.
+- Config folder: `%appdata%\CONTROL\AoE2Control\`. It holds `settings.ini`, `menu.ini` (menu window layout), `modules\` and `diagnostics\`.
+- Each of the 8 player slots can run its own module. Each slot has its own Lua state; two slots that run the same module share no variables.
+- Shift opens and closes the CONTROL menu. Delete unloads CONTROL.
 
 ---
 
 ## 2. Module System
 
-Folder layout:
+### Entry files
+
+| File | Contents |
+|------|----------|
+| `{moduleName}.main.lua` | Lua source. |
+| `{moduleName}.main.module` | Packaged module. |
+
+- The module name is the part before `.main.`: letters, digits and underscores, starting with a letter or underscore. Other names (`my-bot.main.lua`) are ignored.
+- CONTROL looks for entry files in `modules\` and up to three folders below it.
+- When two entry files have the same name, the one closest to `modules\` wins. In the same folder, `.main.lua` wins over `.main.module`. Two files with the same name at the same depth make loading fail with an error.
+- Put each module in its own folder:
 
 ```text
 modules/
@@ -33,710 +40,695 @@ modules/
         └── logger.lua
 ```
 
-Rules:
+### require
 
-- Keep the module entry file thin; move reusable logic into required submodules
-- `require("utils.logger")` loads `utils/logger.lua` relative to the module root
-- Dot notation becomes path separators
-- `require` depth limit: 3
-- `..` traversal is blocked
-- Modules are cached by path
-- `load`, `loadfile`, `dofile`, `module`, and `collectgarbage` are removed from the sandbox
+`require` is CONTROL's own function.
+
+- Paths are relative to the folder of the entry file. Each dot is a folder: `require("utils.logger")` loads `utils/logger.lua`, or `utils/logger.module` if the `.lua` file does not exist.
+- A name has one to four dot-separated parts and at most 127 characters. Each part uses letters, digits and underscores and starts with a letter or underscore. `require("../x")` and five-part names are refused.
+- A file cannot reach outside the module folder.
+- The first `require` of a name runs the file and stores its return value; later calls return the stored value. A file that returns nothing gives `true`.
+- An invalid name, a missing file, a file with an error, or two files requiring each other make `require` return `nil` and log the reason.
+- Reloading the module clears the stored values.
+
+### Sandbox
+
+- Libraries: `base`, `string`, `table`, `math` (Lua 5.4). `io`, `os`, `debug`, `coroutine`, `utf8` and `package` are not available.
+- Removed base functions: `load`, `loadfile`, `dofile`, `module`, `collectgarbage`.
+- Use `Log()` for output. `print()` does not write to the log window.
 
 ---
 
 ## 3. Lifecycle
 
-All callbacks are optional.
+A module defines up to six callbacks. All are optional. CONTROL looks them up after the entry file's top-level code has run, so they must be globals: `function Update()`, not `local function Update()`.
 
-| Callback | When | Notes |
-|----------|------|-------|
-| `Load(playerId)` | Instance is loaded or re-enabled | Use for `Settings.Add*` and setup that only needs the assigned player id. `GetAssignedPlayerId()` is also available here. |
-| `Init()` | Match becomes ready, world changes, or instance reloads | Per-instance setup. |
-| `Update()` | Every configured update interval while a match is running | Main logic. |
-| `Render()` | Every frame while a match is running | Overlay rendering. Not called while multithreading is enabled. |
-| `End(hasWon)` | Once when the match or replay ends, including manual match exit | `hasWon` refers to the assigned player. Manual exit reports `false`. |
-| `Unload()` | Instance unload, disable, replace, or engine eject | Cleanup that should run even without normal match end. |
-
-Read-only game API calls are valid during `Init`, `Update`, or `Render`. Facts and other end-state reads are also available in `End()`. Game commands belong in `Update()`.
-
-- In **Tournament Mode**, update execution above `20 ms` adds delay to the effective update interval
-
----
-
-## 4. Commands
-
-This section follows the same grouping as `BindGameAPI()` in `module_bindings.cpp`.
-
-### Engine
-
-| Function | Signature | Returns | Description |
-|----------|-----------|---------|-------------|
-| `Log` | `(message)` | `nil` | Write to CONTROL's log window. |
-| `SetEngineUIVisibility` | `(visible)` | `nil` | Show or hide the CONTROL overlay. |
-| `UnloadEngine` | `()` | `nil` | Detach CONTROL from the game process. |
-| `GetAssignedPlayerId` | `()` | `number` | Assigned player id for this module instance. Available in `Load`. |
-| `AssignAndLoadModule` | `(playerId, moduleName)` | `boolean` | Assign a discovered module entry to a player slot and load or reload it. |
-
-- `AssignAndLoadModule()` accepts player ids `1` to `8`
-- `moduleName` must match a discovered module entry name
-- Calls made from inside a running module callback are queued and applied safely by the module manager
-
-### Menu / UI
-
-| Function | Signature | Returns | Description |
-|----------|-----------|---------|-------------|
-| `DispatchStartGame` | `()` | `boolean` | Start the currently configured session. |
-| `DispatchRestartGame` | `()` | `boolean` | Restart the current single-player session when supported. |
-| `DispatchResignGame` | `()` | `boolean` | Resign the current game. |
-| `DispatchQuitGame` | `()` | `boolean` | Exit the current game flow when supported. |
-| `DispatchLoadGame` | `(saveGameFileName)` | `boolean` | Load a file from the current load-game list by file name. |
-| `GetAvailableSaveFiles` | `()` | `string[]` | File names currently exposed by the game's load-game list. |
-| `GetCurrentGameOptions` | `()` | `GameOptions \| nil` | Current session setup object when available. |
-| `GetRandomMapControlCapabilities` | `()` | `table` | RMS API version and capability flags. |
-| `GetRandomMapStartStatus` | `()` | `table` | Structured RMS lifecycle, capability revision, source/seed, and catalog status. |
-| `RefreshRandomMapSources` | `()` | `number \| nil` | Refresh the game-visible RMS catalog and return its generation. |
-| `GetAvailableRandomMapSources` | `()` | `RandomMapSource[]` | Immutable copied game-catalog sources. |
-| `GetEffectiveRandomMapSeed` | `()` | `number \| nil` | Authoritative unsigned 32-bit running-world seed. |
-| `GetEffectiveRandomMapSource` | `()` | `RandomMapSource \| nil` | Authoritative running-world RMS catalog source. |
-| `IsGamePaused` | `()` | `boolean` | Whether the current game or replay is paused. |
-| `IsMenuOpen` | `()` | `boolean` | Whether the game UI is currently in a menu state. Also works during replays. |
-
-### Replays
-
-| Function | Signature | Returns | Description |
-|----------|-----------|---------|-------------|
-| `SetGameSpeedMultiplier` | `(multiplier)` | `nil` | Change the current game or replay speed multiplier. |
-| `SetGamePaused` | `(paused)` | `nil` | Pause or resume the active replay. |
-| `SetReplaySpeed` | `(speed)` | `nil` | Set replay playback speed using `ReplaySpeed`. |
-| `GetCurrentReplayFileName` | `()` | `string` | Current replay file name while a replay is active. |
-
-### Commands
-
-Command functions usually filter input objects to ones owned by the assigned player.
-
-| Function | Signature | Returns | Description |
-|----------|-----------|---------|-------------|
-| `SetCameraPosition` | `(position)` | `nil` | Move the camera to a `Vector2` world position. |
-| `SendChatMessage` | `(message)` | `nil` | Send chat text as the assigned player. |
-| `TrainUnit` | `(unitId)` | `boolean` | Train one unit by automatically selecting a matching source type for the assigned player. |
-| `TrainUnit` | `(unitId, amount)` | `boolean` | Train units by automatically selecting a matching source type for the assigned player. |
-| `TrainUnit` | `(trainSources, unitId)` | `boolean` | Train one unit from the assigned player's most common matching source type from the provided source list. |
-| `TrainUnit` | `(trainSources, unitId, amount)` | `boolean` | Train units from the assigned player's most common matching source type from the provided source list. |
-| `UnitsTargetObject` | `(units, target)` | `boolean` | Order owned units to target an object. |
-| `UnitsBuildStructure` | `(builders, structureId, position)` | `boolean` | Order owned builders to construct a building. |
-| `UnitsMove` | `(units, position)` | `boolean` | Order owned units to move. |
-| `SetFormation` | `(units, formation)` | `nil` | Sets the formation of owned units using `Formation`, as the game's formation buttons do. It takes effect when the units next move together. `ObjectData.FORMATION_ID` does not report it. |
-| `EnableScouting` | `()` | `boolean` | Enable auto-scouting on an idle assigned scout-line unit. |
-| `ResearchTechnology` | `(technology)` | `boolean` | Research a technology from the assigned player's most common matching source type automatically. |
-| `DeleteUnit` | `(unit)` | `nil` | Delete an owned unit. |
-| `DestroyBuilding` | `(building)` | `nil` | Destroy an owned building. |
-| `SetGatherPoint` | `(buildings, targetPosition)` | `nil` | Set gather point on owned buildings. |
-| `RingTownBell` | `(building, isCallingIn)` | `nil` | Ring or release the town bell on an owned building. |
-| `SendBackToWork` | `(building)` | `nil` | Send workers from an owned building back to work. |
-| `SendAllBackToWork` | `(building)` | `nil` | Send all workers from an owned building back to work. |
-| `SetUnitStanceAutoScout` | `(units)` | `nil` | Set owned units to auto-scout. |
-| `SetUnitStancePatrol` | `(units, targetPosition)` | `nil` | Set owned units to patrol. |
-| `SetUnitStanceGuard` | `(units, targetObject)` | `nil` | Set owned units to guard. |
-| `SetUnitStanceFollow` | `(units, targetObject)` | `nil` | Set owned units to follow. |
-| `SetUnitStanceAttackMove` | `(units, targetPosition)` | `nil` | Set owned units to attack-move. |
-| `SetUnitStanceGarrison` | `(units, targetObject)` | `nil` | Garrison owned units. |
-| `SetUnitStanceUngarrison` | `(sourceObjects, unit)` | `nil` | Ungarrison an owned unit from owned source buildings. |
-| `SetUnitStanceSeekShelter` | `(units)` | `nil` | Send owned units to shelter. |
-| `SetUnitCombatStance` | `(units, stance)` | `nil` | Set combat stance on owned units. |
+| Callback | When | Use for |
+|----------|------|---------|
+| `Load(playerId)` | When the slot becomes active: slot on, **Enabled** on, assigned player present (outside a match every player counts as present). Can run in the main menu. `playerId` is `1` to `8`. | `Settings.Add*`, `AgentBridge.Start()`, setup that needs only the player id. |
+| `Init()` | Once per match, when the match runs and game time is above 0. Again for the next match, and at once when the module is reloaded during a match. | Per-match setup: reset caches, read the map, `IPC.StartServer()`, create strategic components. |
+| `Update()` | Every **Update Interval** seconds of game time (default `1.0`) while a match runs. Not while paused. Missed intervals are dropped, not run back to back. | Decisions and game commands. |
+| `Render()` | Every frame while a match runs, after `Init()`. Not called with **Multithreading** on. | Drawing with `Render*` functions. |
+| `End(hasWon)` | Once per match: when the match or replay ends, or the player leaves a running match. `hasWon` is `false` when the player leaves and at the end of a replay. | Final reads. Game commands do nothing here. |
+| `Unload()` | When the module stops in its slot: slot or **Enabled** turned off, assigned player not in the match, another module selected, the module reloaded or removed, CONTROL unloaded. Can run without `End()`. | Cleanup: `IPC.StopServer()`, `AgentBridge.Stop()`. |
 
 Rules:
 
-- Only the **Commands** subsection is subject to replay blocking, outside-`Update()` warnings, and `Sequential Actions`
-- **Tournament Mode** also blocks selected engine, menu, replay, render, and `GameOptions` APIs
-- **Multithreading** also blocks selected menu, replay, render, and IPC wait APIs, and disables `Render()`
-- Most unit and building commands filter inputs to objects owned by the assigned player
-- `SetCameraPosition` and `SendChatMessage` are game commands, but they are not ownership-filtered
-- `Log()`, `SetEngineUIVisibility()`, and `UnloadEngine()` are not in-match game commands, but **Tournament Mode** can still restrict selected engine APIs
-- If `Sequential Actions` is enabled, only the first successful command per tick executes
+- The top-level code runs when the module is loaded (selected, CONTROL started with it assigned, or reloaded). Top-level `require` calls run then too.
+- Most game functions need a running match. Outside one (for example in `Load()` in the main menu) they log `Game API function called before the game started` and return `nil` or a default value.
+- **Time limit:** a callback, including top-level code, that runs longer than 1 second is stopped with the error `callback ran longer than the 1000 ms limit`. Time inside a single CONTROL function call is not interrupted. The game waits for callbacks that run on its thread, so keep `Update()` and `Render()` short.
+- **Errors:** a Lua error in top-level code, `Load()`, `Update()` or `Render()` is shown in the slot's section of the CONTROL menu and logged. After an error in `Update()` or `Render()`, CONTROL stops calling that function until the module is reloaded.
+- **Commands outside Update():** game commands belong in `Update()`. From another callback they still run and log a warning once per module load; with **Tournament Mode** on they are refused. During a replay they are refused.
+- **Drawing:** `Render*` functions raise an error outside `Render()`.
 
 ---
 
-## 5. Facts
+## 4. Modes
+
+### Tournament Mode (menu setting, off by default)
+
+- Game commands outside `Update()` are refused.
+- The part of an `Update()` call above 20 ms is added to the next update interval.
+- These functions do nothing and return `nil`, `false` or an empty value; CONTROL logs `Tournament Mode blocked ...` once per function and module load:
+
+| Group | Functions |
+|-------|-----------|
+| Engine | `Log`, `SendChatMessage`, `SetCameraPosition`, `SetEngineUIVisibility`, `UnloadEngine`, `AssignAndLoadModule` |
+| Menu and session | `DispatchStartGame`, `DispatchRestartGame`, `DispatchResignGame`, `DispatchQuitGame`, `DispatchLoadGame`, `GetAvailableSaveFiles`, `IsGamePaused`, `IsMenuOpen` |
+| Random maps | `GetRandomMapControlCapabilities`, `GetRandomMapStartStatus`, `RefreshRandomMapSources`, `GetAvailableRandomMapSources`, `GetEffectiveRandomMapSeed`, `GetEffectiveRandomMapSource` |
+| Replays and speed | `SetGamePaused`, `SetReplaySpeed`, `GetCurrentReplayFileName`, `SetGameSpeedMultiplier` |
+| Rendering | All `Render*` functions (`Render()` still runs, but draws nothing), `GetScreenSize`, `IsOnScreen`, `IsWorldPosOnScreen`, `WorldToScreen`, `WorldToMinimap`, `GetZoom`, `GetCameraPosition` |
+| Game options | Every `GameOptions` method except `SetAssignedPlayerCivilization` |
+
+`GetAssignedPlayerId` and `GetCurrentGameOptions` stay available.
+
+### Multithreading (menu setting, off by default)
+
+- Each module runs on its own thread. Game commands are queued and run on the game's thread.
+- `Render()` is not called.
+- These functions do nothing and return `nil`, `false` or an empty value; CONTROL logs `Multithreading blocked ...` once per function and module load: `DispatchStartGame`, `DispatchRestartGame`, `DispatchResignGame`, `DispatchQuitGame`, `DispatchLoadGame`, `RefreshRandomMapSources`, `SetGamePaused`, `SetReplaySpeed`, `SetGameSpeedMultiplier`, `IPC.WaitForMessage`, `GetScreenSize`, `IsOnScreen`, `IsWorldPosOnScreen`, `WorldToScreen`, `WorldToMinimap`, `GetZoom`, `GetCameraPosition`.
+- `ResourceTracker`, `VillagerOccupation` and `ConstructionPlacement` need the live game; their `Update()` raises an error.
+
+### Game-state copy (Multithreading on, or an Agent Bridge running)
+
+With **Multithreading** on, and while the Agent Bridge runs, every module reads a copy of the game state taken once per frame instead of the live game. Tournament Mode does not do this.
+
+- `GetFact`, `Player:GetFact`, `Object:GetObjectData` return `nil` for values the copy does not hold. `Object:GetAttribute` returns `nil` for every attribute except `HITPOINTS`, `RADIUS_X` and `RADIUS_Y`.
+- `GetObjectTypeData` returns `nil` for every field except `ObjectData.TRAIN_SITE`. `GetObjectTypeAttribute` returns `nil` for every attribute except `ObjectAttribute.RADIUS_X` and `ObjectAttribute.RADIUS_Y`.
+- `CheckPlacement()`, `CanPlaceObject()` and `MapTile:IsBuildable()` return `nil`.
+- `GetObjectsInArea` compares the object's exact position, not its tile.
+- Commands go into a queue that the game runs on its next frame. `true` means queued, not succeeded. A command refused at the call returns `false` and logs `<Call> was not sent: <reason>`. A queued command can still fail when it runs.
+
+---
+
+## 5. Engine, Menu and Replay Functions
+
+### Engine (work at any time, in menus and in a match)
 
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
-| `GetFact` | `(fact)` | `number` | Read a fact for the assigned player with parameter `0`. |
-| `GetFact` | `(fact, parameter)` | `number` | Read a fact for the assigned player. |
-| `IsObjectTypeAvailable` | `(unitObjectType)` | `boolean` | Check whether the assigned player currently has access to a unit or building type. |
-| `GetUnitTypeCount` | `(unitId)` | `number` | Count a unit type for the assigned player. |
-| `GetAttribute` | `(attribute)` | `number` | Read a `PlayerAttribute` for the assigned player. |
-| `CanAfford` | `(unitId, isBuilding)` | `boolean` | Check whether the assigned player meets the item's resource and population cost; availability is separate. |
-| `GetTechCost` | `(technology)` | `{ resourceId = ResourceType, amount = number }[]` | Current technology cost entries for the assigned player. |
-| `GetObjectCost` | `(unitObjectType)` | `{ resourceId = ResourceType, amount = number }[]` | Current object cost entries for the assigned player with multiplier `1.0`. |
-| `GetObjectCost` | `(unitObjectType, costMultiplier)` | `{ resourceId = ResourceType, amount = number }[]` | Current object cost entries for the assigned player with the given multiplier applied. |
-| `CanResearch` | `(technology)` | `boolean` | Check whether the assigned player can research a technology. |
-| `IsTechnologyResearched` | `(technology)` | `boolean` | Check whether the assigned player has researched a technology. |
-| `GetObjectsByType` | `(unitType)` | `Object[]` | Scan matching world objects by type. Not restricted to owned objects. Loot-bearing dead huntables and livestock are included. |
-| `GetObjectsByTypes` | `(unitTypes)` | `Object[]` | Scan matching world objects by any listed type. Loot-bearing dead huntables and livestock are included. |
-| `GetObjectsByClass` | `(unitClass)` | `Object[]` | Scan matching world objects by class. Not restricted to owned objects. Loot-bearing dead huntables and livestock are included. |
-| `GetObjectsByClasses` | `(unitClasses)` | `Object[]` | Returns matching world objects of any listed class, not just owned objects. Loot-bearing dead huntables and livestock are included. |
+| `Log` | `(message)` | `nil` | Writes `[MODULE] <message>` to the CONTROL log window. |
+| `SetEngineUIVisibility` | `(visible)` | `nil` | Opens (`true`) or closes (`false`) the CONTROL menu. |
+| `UnloadEngine` | `()` | `nil` | Unloads CONTROL from the game. |
+| `GetAssignedPlayerId` | `()` | `number` | Player id (`1` to `8`) of this module instance. Works in `Load()`. |
+| `AssignAndLoadModule` | `(playerId, moduleName)` | `boolean` | Assigns a module (name without `.main.lua`/`.main.module`) to player `1` to `8` and loads it, or reloads it. Applied after the current callback returns. `false` for a bad player id or malformed name; an unknown name is ignored. |
+
+### Menu and session
+
+| Function | Signature | Returns | Description |
+|----------|-----------|---------|-------------|
+| `IsGamePaused` | `()` | `boolean` | Whether the match or replay is paused. Needs a match, replay or end screen; elsewhere logs an error and returns `false`. |
+| `IsMenuOpen` | `()` | `boolean` | Whether the game's in-match menu is open. Same requirement as `IsGamePaused`. |
+| `DispatchStartGame` | `()` | `boolean` | In the menu: starts a single-player match with the current `GameOptions`. On a single-player end screen: starts a new match with the same options, map source and seed request. On a replay end screen: plays the replay again. `false` while a match runs, in multiplayer, when `GetCurrentGameOptions()` is `nil`, or while a start or quit is in progress. |
+| `DispatchRestartGame` | `()` | `boolean` | Restarts the current single-player match or replay. `false` in multiplayer or without a running match, ended match or replay end screen. |
+| `DispatchResignGame` | `()` | `boolean` | Resigns the current match. `false` without a running match or during a replay. |
+| `DispatchQuitGame` | `()` | `boolean` | Leaves the current single-player match and returns to the menu. `false` in the menu, in multiplayer, in a replay, or while a start or quit is in progress. |
+| `DispatchLoadGame` | `(saveGameFileName)` | `boolean` | Loads a save or replay by a file name exactly as `GetAvailableSaveFiles()` returns it (not a path). `.aoe2record` files load as replays. `false` while a match runs, in multiplayer, or for an unknown name. |
+| `GetAvailableSaveFiles` | `()` | `string[]` | File names in the game's load list, such as `"MyGame.aoe2spg"` or `"MyMatch.aoe2record"`. |
+| `GetCurrentGameOptions` | `()` | `GameOptions \| nil` | Setup of the next or current match. See [GameOptions](#gameoptions). |
+
+`true` from a `Dispatch*` function means the game accepted the request. The change happens over the next frames; check the result in a later callback.
+
+### Pause, speed and replays
+
+| Function | Signature | Returns | Description |
+|----------|-----------|---------|-------------|
+| `SetGamePaused` | `(paused)` | `nil` | Pauses or resumes the match or replay. Needs a match, replay or end screen. |
+| `SetGameSpeedMultiplier` | `(multiplier)` | `boolean` | Changes the global **Game Speed Multiplier** setting. Works at any time and stays in effect for later matches and replays. `multiplier <= 0` restores the game's default speed. Returns `true`. |
+| `SetReplaySpeed` | `(speed)` | `nil` | Sets replay playback speed to a `ReplaySpeed` value. Does nothing outside a replay. |
+| `GetCurrentReplayFileName` | `()` | `string` | File name of the running replay, or `""`. |
+
+### Random map control
+
+Select a map and seed with the `GameOptions` methods `SetRandomMapSource()` and `SetRandomMapSeed()`.
+
+| Function | Signature | Returns | Description |
+|----------|-----------|---------|-------------|
+| `GetRandomMapControlCapabilities` | `()` | `table` | Flags for the random-map features that work on this game build (fields below). |
+| `GetRandomMapStartStatus` | `()` | `table` | Whether a new match can start now, and why not (fields below). |
+| `RefreshRandomMapSources` | `()` | `number \| nil` | Makes the game reload its random-map list; returns the new catalog generation. Works only in the menus or on an end screen; `nil` while a match runs, with a replay loaded, in multiplayer, during a start or quit, or when the list cannot be read. |
+| `GetAvailableRandomMapSources` | `()` | `RandomMapSource[]` | Random maps in the current list. |
+| `GetEffectiveRandomMapSeed` | `()` | `number \| nil` | Map seed of the running match. `nil` without a running match, including on the end screen. |
+| `GetEffectiveRandomMapSource` | `()` | `RandomMapSource \| nil` | Random map of the running match. `nil` without a running match. |
+
+`GetRandomMapControlCapabilities()` fields: `apiVersion` (`1`), `capabilityRevision` (`2`), `freshStart`, `requestedSeed`, `effectiveSeed`, `sourceCatalog`, `refresh`, `selection`, `effectiveSource`, `sourceIdentity`, `authoredSourceHash`, `explicitQuitThenStart`, `structuredStartStatus` (always `true`), `directPath`, `inlineSource`, `atomicFreshStart` (always `false`). A flag is `false` when the feature does not work on this game build. Lua cannot load a map script from a path or a string.
+
+`GetRandomMapStartStatus()` fields: `canStart`, `code`, `optionsAvailable`, `sessionActive`, `multiplayer`, `replay`, `lifecycleTransitionPending`, `cleanStartContract` (`"explicit-quit-then-start"`), `capabilityRevision` (`2`). `code` is `"ready"`, `"fresh_start_capability_unavailable"`, `"game_options_unavailable"`, `"multiplayer_not_supported"`, `"replay_not_supported"`, `"explicit_clean_end_required"` (a match runs: call `DispatchQuitGame()` first), `"lifecycle_transition_pending"`, `"rms_session_safety_unknown"` or `"rms_session_safety_changing"` (try again later).
+
+---
+
+## 6. Commands
+
+| Function | Signature | Returns | Description |
+|----------|-----------|---------|-------------|
+| `SetCameraPosition` | `(position)` | `nil` | Moves the camera to a `Vector2` world position. |
+| `SendChatMessage` | `(message)` | `nil` | Sends a chat message in the assigned player's color. |
+| `TrainUnit` | `(unitId)` | `boolean` | Trains one unit of type `unitId`. Trains nothing while one unit of that type is in production. |
+| `TrainUnit` | `(unitId, amount)` | `boolean` | Makes sure `amount` units of type `unitId` are in production: trains the difference, or returns `false` if enough are in production. |
+| `TrainUnit` | `(trainSources, unitId)` | `boolean` | Like `TrainUnit(unitId)`, using only buildings whose `UnitObjectType` is in the array `trainSources`. |
+| `TrainUnit` | `(trainSources, unitId, amount)` | `boolean` | Like `TrainUnit(unitId, amount)`, using only buildings of the types in `trainSources`. |
+| `UnitsTargetObject` | `(units, target)` | `boolean` | Orders units to act on an object: attack, gather, repair and so on. |
+| `UnitsBuildStructure` | `(builders, structureId, position)` | `boolean` | Orders builders to build a structure at a `Vector3` position. `false` when the player cannot afford it. Does not check the position; use `CheckPlacement` first. |
+| `UnitsMove` | `(units, position)` | `boolean` | Orders units to move to a `Vector3` position. |
+| `EnableScouting` | `()` | `boolean` | Sets idle Scout Cavalry, Camel Scouts and Eagle Scouts that are not scouting to auto-scout. `false` when there are none. |
+| `ResearchTechnology` | `(technology)` | `boolean` | Researches a `Technology` at a building that can research it. `false` when it cannot be researched now or the player cannot afford it. |
+| `DeleteUnit` | `(unit)` | `nil` | Deletes one of the player's units. |
+| `DestroyBuilding` | `(building)` | `nil` | Deletes one of the player's buildings. |
+| `SetGatherPoint` | `(buildings, targetPosition)` | `nil` | Sets the gather point of buildings to a `Vector3` position. |
+| `RingTownBell` | `(building, isCallingIn)` | `nil` | `true` rings the town bell so villagers take shelter; `false` sends them back out. |
+| `SendBackToWork` | `(building)` | `nil` | Does nothing on the current game build; logs this once per module load. |
+| `SendAllBackToWork` | `(building)` | `nil` | Does nothing on the current game build; logs this once per module load. |
+| `SetUnitStanceAutoScout` | `(units)` | `nil` | Sets units to auto-scout. |
+| `SetUnitStancePatrol` | `(units, targetPosition)` | `nil` | Orders units to patrol to a `Vector3` position. |
+| `SetUnitStanceGuard` | `(units, targetObject)` | `nil` | Does nothing on the current game build; logs this once per module load. |
+| `SetUnitStanceFollow` | `(units, targetObject)` | `nil` | Does nothing on the current game build; logs this once per module load. |
+| `SetUnitStanceAttackMove` | `(units, targetPosition)` | `nil` | Orders units to attack-move to a `Vector3` position. |
+| `SetUnitStanceGarrison` | `(units, targetObject)` | `nil` | Orders units to garrison in an object. |
+| `SetUnitStanceUngarrison` | `(sourceObjects, unit)` | `nil` | Ungarrisons a unit from the player's buildings in `sourceObjects`. |
+| `SetUnitStanceSeekShelter` | `(units)` | `nil` | Orders units to seek shelter. |
+| `SetUnitCombatStance` | `(units, stance)` | `nil` | Sets a `UnitCombatStance`. |
+| `SetFormation` | `(units, formation)` | `nil` | Sets a `Formation`, as the game's formation buttons do. Takes effect when the units next move together. `ObjectData.FORMATION_ID` does not report it. |
+
+Command rules:
+
+- Commands need a running match. Before it starts or after it ends they log an error and return `false` or nothing. In a replay they are refused.
+- Call commands from `Update()` (see [Lifecycle](#3-lifecycle)).
+- Commands act for the assigned player. Units and buildings this player does not own are dropped from the list; if none are left, the command does nothing and returns `false`.
+- **Sequential Actions** (on by default) allows one command per `Update()`. Further commands in that update do nothing and return `false`.
+- **Auto Move Camera** (on by default) moves the camera to each command's target. Only one module moves the camera: the one on the local player's slot, or else the one with the lowest player id.
+- Object lists are Lua arrays of `Object` values with no gaps, such as `{ villager1, villager2 }`. Anything else raises a Lua error.
+- A `nil` return gives no result; read the game state on a later update to see whether the command worked.
+- `TrainUnit` uses the building type of which the player owns the most, and returns `false` when the player cannot afford the unit or owns no such building.
+- `SetCameraPosition` and `SendChatMessage` also work in replays and on end screens, from any callback, and do not count toward **Sequential Actions**.
+
+---
+
+## 7. Facts and Queries
+
+These functions read the match and do not change it. Call them from `Init`, `Update`, `Render` or `End`. Outside a match or its end screen they log an error and return `nil`, `0`, `false` or an empty list.
+
+| Function | Signature | Returns | Description |
+|----------|-----------|---------|-------------|
+| `GetFact` | `(fact, parameter?)` | `number \| nil` | `Fact` value for the assigned player. `parameter` (default `0`) is the fact's argument, such as a unit type id for `Fact.UNIT_TYPE_COUNT`. |
+| `IsObjectTypeAvailable` | `(unitObjectType)` | `boolean` | Whether the assigned player can currently get a unit or building type. |
+| `GetUnitTypeCount` | `(unitId)` | `number` | How many objects of a unit type the assigned player has. |
+| `GetAttribute` | `(attribute)` | `number` | `PlayerAttribute` value for the assigned player. |
+| `CanAfford` | `(unitId, isBuilding?)` | `boolean` | Whether the assigned player has the resources and free population for one unit of the type. `isBuilding = true` skips the population check. Does not check availability. |
+| `GetTechCost` | `(technology)` | cost list | Current cost of a technology for the assigned player. |
+| `GetObjectCost` | `(unitObjectType, costMultiplier?)` | cost list | Current cost of a unit or building type, times `costMultiplier` (default `1.0`). |
+| `CanResearch` | `(technology)` | `boolean` | Whether the technology is available and affordable now. |
+| `IsTechnologyResearched` | `(technology)` | `boolean` | Whether the assigned player has researched it. |
+| `GetObjectsByType` | `(unitType)` | `Object[]` | Objects of a `UnitObjectType`, any owner. |
+| `GetObjectsByTypes` | `(unitTypes)` | `Object[]` | Objects of any type in an array of `UnitObjectType`. |
+| `GetObjectsByClass` | `(unitClass)` | `Object[]` | Objects of a `UnitClass`, any owner. |
+| `GetObjectsByClasses` | `(unitClasses)` | `Object[]` | Objects of any class in an array of `UnitClass`. |
+| `GetObjectsInArea` | `(pos1, pos2)` | `Object[]` | Objects whose tile lies in the rectangle with `Vector2` corners `pos1` and `pos2`, edges included. |
+| `GetObjectsInArea` | `(pos1, pos2, unitClass, owner)` | `Object[]` | Same, filtered by `unitClass` and owner player id. Pass `nil` to skip a filter. |
+| `GetObjectById` | `(id)` | `Object \| nil` | Object by id; `nil` if it does not exist or the module cannot see it. |
+| `GetObjectStates` | `(objects)` | `table` | Reads several objects in one call (see below). |
+| `GetObjectChanges` | `()` | `{ created, destroyed, damaged }` | Ids of the assigned player's objects that appeared, disappeared or lost hitpoints since the last call (see below). |
+| `GetProjectileById` | `(id)` | `Object \| nil` | Projectile by id, if the module can see it. |
+| `GetAllProjectiles` | `()` | `Object[]` | Projectiles the module can see. |
+| `GetProjectilesByType` | `(projectileType)` | `Object[]` | Visible projectiles of a `ProjectileType`. |
+| `GetObjectTypeData` | `(objectTypeId, objectData)` | `number \| nil` | `ObjectData` value of a unit type with the assigned player's technologies and bonuses. |
+| `GetObjectTypeAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number \| nil` | `ObjectAttribute` value of a unit type for the assigned player. `damageType` is the armor or attack class for `ARMOR` and `WEAPON`; pass `0` otherwise. |
+| `CheckPlacement` | `(objectTypeId, position)` | `PlacementResult, number?` | The game's placement check for the assigned player, centred on a `Vector2` or `Vector3`. Second value: the blocking object's id for `PlacementResult.BLOCKED`. Unexplored ground gives `UNEXPLORED` unless **Modules See Everything** is on. `nil` for an unknown type. |
+| `CanPlaceObject` | `(objectTypeId, position)` | `boolean \| nil` | `true` when `CheckPlacement` returns `CAN_PLACE`; `nil` when it returns `nil`. |
+| `CalculatePath` | `(startPos, targetPos, collisionRadius?)` | `Vector3[]` | The game's path between two `Vector3` positions for a unit of `collisionRadius` (default `0`). Empty when there is no path. |
 | `GetGameTime` | `()` | `number` | Match time in seconds. |
-| `GetClockMs` | `()` | `number` | Returns milliseconds on a monotonic high-resolution clock with an arbitrary start. Subtract two values to measure a duration. |
-| `GetModuleTelemetry` | `()` | `table` | Returns the calling module instance's timing: `update` and `render` tables with `count`, `totalMs`, `sampleCount`, `averageMs`, `p50Ms`, `p95Ms` and `maxMs` (over the last 256 calls), plus `lateUpdates` (updates that ran a full interval or more late), `skippedIntervals` (update intervals dropped because of that) and `deferredUpdates` (Multithreading: an update came due while the previous one was still running). With the Debug setting **API Profiling** on, `api` lists the module's calls into native functions as `{ name, count, totalMs }`, longest total first; otherwise it is empty. Returns `nil` outside a module callback. |
-| `GetAllChatMessages` | `()` | `string[]` | Current chat buffer as plain message strings. |
-| `GetNewChatMessages` | `()` | `string[]` | Chat messages that became visible since this module instance last called the function. |
-| `GetLastChatMessage` | `()` | `string \| nil` | Newest chat message, or `nil` when the chat buffer is empty. |
-| `GetAssignedPlayer` | `()` | `Player` | Player currently assigned to this module instance. |
-| `GetPlayerById` | `(id)` | `Player` | Player by list index. Gaia is usually `0`. |
-| `GetPlayerCount` | `()` | `number` | Size of the player list. |
-| `GetMapTilesPtr` | `()` | `number, number` | Returns `(ptr, count)` for an engine-owned packed tile snapshot buffer. Intended for IPC / RPM readers. |
-| `GetMapWidth` | `()` | `number` | Current map width in tiles. |
-| `GetMapHeight` | `()` | `number` | Current map height in tiles. |
-| `GetMapTile` | `(x, y)` | `MapTile` | Overload: tile at integer map coordinates, or `nil` if out of bounds. |
-| `GetMapTile` | `(position)` | `MapTile` | Overload: floors a `Vector2` position to a tile lookup. |
-| `GetAllMapTiles` | `()` | `MapTile[]` | Full map tile list. Tile methods still respect fog-aware visibility. |
-| `CalculatePath` | `(startPos, targetPos)` | `Vector3[]` | Calculate a native path between two `Vector3` positions. |
-| `CalculatePath` | `(startPos, targetPos, collisionRadius)` | `Vector3[]` | Calculate a native path between two `Vector3` positions with an explicit collision radius. |
-| `GetObjectsInArea` | `(pos1, pos2)` | `Object[]` | Objects inside the rectangle defined by two `Vector2` positions. Loot-bearing dead huntables and livestock are included. |
-| `GetObjectsInArea` | `(pos1, pos2, unitClass, owner)` | `Object[]` | Overload: returns the objects of `GetObjectsInArea(pos1, pos2)` that are in `unitClass` and owned by player id `owner`. Pass `nil` for either filter to skip it. |
-| `GetObjectStates` | `(objects)` | `table` | Reads several objects in one call. Returns a table of arrays `id`, `unitType`, `playerId`, `x`, `y`, `hitpoints`, `targetId` and `alive`; index `i` of every array describes the same object. `targetId` is `-1` without a visible target and `playerId` is `-1` without an owner. Skips `nil` entries, objects that no longer exist and objects that are not visible, so use the `id` array to match results to objects. |
-| `GetObjectChanges` | `()` | `{ created = integer[], destroyed = integer[], damaged = integer[] }` | Compares the assigned player's objects (the set `GetAssignedPlayer():GetPlayerObjects()` returns) with the previous call from this module instance. `damaged` lists objects with fewer hitpoints than at that call. Ids are in ascending order. The first call after a module load reports every object as created. Returns empty lists, and keeps the previous state, when the assigned player is unavailable. |
-| `CheckPlacement` | `(objectTypeId, position)` | `PlacementResult, number?` | Runs the game's own placement check of an object type for the assigned player, centred on a `Vector2` or `Vector3` position. Returns the `PlacementResult`, plus the blocking object's id for `BLOCKED`. Unexplored ground is refused unless Modules See Everything is on. Returns `nil` with Multithreading on. |
-| `CanPlaceObject` | `(objectTypeId, position)` | `boolean` | `true` when `CheckPlacement` returns `CAN_PLACE`; `nil` with Multithreading on. |
-| `GetObjectsPtr` | `()` | `number, number` | Returns `(ptr, count)` for an engine-owned packed object snapshot buffer. Intended for IPC / RPM readers. |
-| `GetObjectTypeData` | `(objectTypeId, objectData)` | `number` | Game-resolved object-type data lookup for a `UnitObjectType`. |
-| `GetObjectTypeAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number` | Game-resolved object-type attribute lookup for a `UnitObjectType`. |
-| `IsEnemyPlayer` | `(player)` | `boolean` | Whether `player` is an enemy of the assigned player. |
-| `GetObjectById` | `(id)` | `Object` | Object by id. |
-| `GetProjectileById` | `(id)` | `Object` | Projectile object by id. |
-| `GetAllProjectiles` | `()` | `Object[]` | Visible projectile objects. |
-| `GetProjectilesByType` | `(projectileType)` | `Object[]` | Projectile objects matching a `ProjectileType`. |
-| `GetVictoryCondition` | `()` | `VictoryCondition` | Current victory condition. |
-| `GetVictoryPlayer` | `()` | `Player` | Winning player after game end, else `nil`. |
+| `GetClockMs` | `()` | `number` | Milliseconds on a monotonic clock with an arbitrary start. Subtract two values for a duration. |
+| `GetModuleTelemetry` | `()` | `table \| nil` | This module instance's timing (see below). `nil` outside a module callback. |
+| `GetAllChatMessages` | `()` | `string[]` | Messages in the chat buffer. |
+| `GetNewChatMessages` | `()` | `string[]` | Messages that appeared since this module instance last called it. The first call after a load returns the whole buffer. |
+| `GetLastChatMessage` | `()` | `string \| nil` | Newest chat message, or `nil`. |
+| `GetAssignedPlayer` | `()` | `Player` | This module instance's player. |
+| `GetPlayerById` | `(id)` | `Player \| nil` | `0` is Gaia, `1` to `8` are players. `nil` for no such player. |
+| `GetPlayerCount` | `()` | `number` | Player slots including Gaia. Ids run from `0` to `GetPlayerCount() - 1`. |
+| `IsEnemyPlayer` | `(player)` | `boolean` | Whether a `Player` is an enemy of the assigned player. |
+| `GetMapWidth` | `()` | `number` | Map width in tiles. |
+| `GetMapHeight` | `()` | `number` | Map height in tiles. |
+| `GetMapTile` | `(x, y)` | `MapTile \| nil` | Tile at integer coordinates; `nil` outside the map. |
+| `GetMapTile` | `(position)` | `MapTile \| nil` | Tile at a `Vector2`, rounded down. |
+| `GetAllMapTiles` | `()` | `MapTile[]` | Every tile of the map. |
+| `GetMapTilesPtr` | `()` | `number, number` | `(pointer, count)` of a packed tile buffer for external readers (see [IPC](#9-ipc)). |
+| `GetObjectsPtr` | `()` | `number, number` | `(pointer, count)` of a packed object buffer for external readers. |
+| `GetVictoryCondition` | `()` | `VictoryCondition` | The match's victory condition. |
+| `GetVictoryPlayer` | `()` | `Player \| nil` | The winner after the match ends, otherwise `nil`. |
 
-Notes:
+A cost list is an array of `{ resourceId = ResourceType, amount = number }`.
 
-- Use `GetAssignedPlayer()`, not `GetLocalPlayer()`.
-- `GetAssignedPlayerId()` is documented in the Engine subsection above because it is available before the match starts and can be used from `Load(playerId)`.
-- `GetMapTile(position)` floors `position.x` and `position.y`.
-- `CalculatePath()` uses the game's native pathfinding, accepts `Vector3` start and target positions, and returns an empty list when no path is available.
-- `GetObjectsInArea(pos1, pos2)` uses the same object filter as the other scan APIs. Loot-bearing dead huntables and livestock are included, and fog-aware visibility still applies.
-- `GetObjectsByType()`, `GetObjectsByTypes()`, `GetObjectsByClass()`, `GetObjectsInArea()`, and `GetObjectById()` can still return explored animals or resources outside active vision
-- On those non-visible explored object references, only `IsVisible()`, `IsExplored()`, `GetId()`, `GetPosition()`, `GetClass()`, and `GetUnitObjectType()` are safe
-- `GetTechCost()` and `GetObjectCost()` return arrays of resource-cost entries. Use `entry.resourceId` and `entry.amount`; numeric indexes `entry[1]` and `entry[2]` mirror the same values.
-- `GetAllChatMessages()` and `GetLastChatMessage()` read from the game's current chat buffer.
-- `GetNewChatMessages()` tracks unread chat state per module instance; the first call after load or reload returns the currently visible buffer.
-- Projectile lookup functions return normal `Object` references whose `ObjectType` is `ObjectType.PROJECTILE` and follow the same visibility restrictions as other object queries.
-- Object retrieval follows the assigned player's fog-of-war when **Modules See Everything** is disabled, except for the explored animal and resource exception above. This includes `GetObjectById()`.
-- With **Modules See Everything** disabled, player-state methods on other `Player` objects return neutral values for resources, facts, tech state, and object availability.
-- `GetAllMapTiles()` returns the full grid, but each `MapTile` only exposes data allowed by the current fog state.
-- `GetMapTilesPtr()` and `GetObjectsPtr()` return `(ptr, count)`, where `count` is an element count, not a byte count.
-- `GetObjectsPtr()` is dead-inclusive.
-- `CanAfford(unitId, isBuilding)` forwards the `isBuilding` flag to the engine affordability helper. It does not imply `IsObjectTypeAvailable(unitId)`; check both before issuing a train/build command.
+**Object lists.** `GetObjectsByType(s)`, `GetObjectsByClass(es)` and `GetObjectsInArea` return objects of every owner: living units, buildings, resources, and dead animals that still carry food. Unfinished buildings (foundations) are left out; `Player:GetFoundations()` returns them.
 
-### Enum Lookup Discipline
+**Visibility.** With **Modules See Everything** off (the default), object lookups (including `GetObjectById` and the projectile functions) return what the assigned player can see, plus animals and resources on explored tiles outside its vision. `MapTile` methods and other players' resources, facts and technologies are limited the same way.
 
-- CONTROL exposes enums as global Lua tables such as `Fact.WOOD_AMOUNT`
-- Never guess enum member names or numeric values; wrong ids can fail at runtime or silently target the wrong system
-- Use authoritative sources in this order:
-  - [Enums](https://aoe2control.github.io/enums/) for most in-match tables such as `Fact`, `Age`, `Technology`, `UnitObjectType`, `UnitClass`, `PlayerAttribute`, and `ResourceType`
-  - [GameOptions](https://aoe2control.github.io/game-options/) for setup-only tables such as `OptionsAge`, `OptionsLocation`, `OptionsGameMode`, and the `GameOptions` API
-  - [Facts](https://aoe2control.github.io/facts/) when confirming which readers use `Fact` or `PlayerAttribute`
-- Lookup workflow:
-  - Identify the exact enum table expected by the API or by the symbol prefix before the dot
-  - Copy the documented member spelling exactly
-  - When comparing ages or similar tiers, verify which table the value came from before comparing or mapping it, especially `Age` vs `OptionsAge`
-  - If the live docs and this file disagree on enum members or numeric values, prefer the published site and refresh the local copy
-- Optional local mirror: if the AoE2Control Lua extension is installed, `definitions/control-api.d.lua` can speed up lookups, but reconcile with the published docs when precision matters
-- Anti-patterns:
-  - Hard-coding magic numbers for facts, units, technologies, or ages
-  - Using `OptionsAge` values to interpret `Fact.CURRENT_AGE`, or the reverse, without confirming they match in the current engine version
-  - Copying large enum tables into project docs instead of linking to the authoritative pages
+**Keeping references.** An `Object`, `Player` or `MapTile` is valid during the callback that returned it. Keep ids or positions across callbacks and look objects up again.
+
+**GetObjectStates(objects)** takes an array of `Object` values and returns a table of arrays `id`, `unitType`, `playerId`, `x`, `y`, `hitpoints`, `targetId`, `alive`; index `i` of every array is the same object. `playerId` is `-1` without an owner; `targetId` is `-1` without a visible target. `nil` entries, objects that no longer exist and objects the module cannot see are skipped, so match results by `id`. A value that is not an `Object` raises an error.
+
+**GetObjectChanges()** compares the assigned player's objects (as `GetAssignedPlayer():GetPlayerObjects()` returns them) with the previous call from this module instance. `created`, `destroyed` and `damaged` (lower hitpoints) are integer id arrays sorted by id. The first call after a load reports every object as created. When the player cannot be read, it returns empty lists and keeps the previous state.
+
+**GetModuleTelemetry()** returns `update` and `render` tables (`count`, `totalMs` over all calls; `sampleCount`, `averageMs`, `p50Ms`, `p95Ms`, `maxMs` over the last 256 calls), `lateUpdates`, `skippedIntervals`, `deferredUpdates` (Multithreading only) and `api`. `api` lists `{ name, count, totalMs }` per called function, highest `totalMs` first, when the DEBUG setting **API Profiling** was on when the module loaded; otherwise it is empty.
 
 ---
 
-## 6. Render API
+## 8. Render API
 
-All parameters shown are required in Lua.
+- Draw functions (`Render*`) work only inside `Render()`. Elsewhere they raise an error such as `RenderLine can only be called from Render() (called during Update).`
+- Query functions (`GetScreenSize`, `IsOnScreen`, `IsWorldPosOnScreen`, `WorldToScreen`, `WorldToMinimap`, `GetZoom`, `GetCameraPosition`) work in any callback.
+- With **Multithreading** or **Tournament Mode** on the Render API does not work: queries return zero values (`false` for `IsOnScreen` and `IsWorldPosOnScreen`); with Multithreading `Render()` is not called, with Tournament Mode draw calls draw nothing.
+- Colors are `Color(r, g, b, a)` with components `0` to `255` (see [Color](#color)).
+- Screen positions are `Vector2` pixels, `(0, 0)` at the top-left of the game window. World positions are `Vector3` in tiles, as `Object:GetPosition()` returns; `z` is height.
 
-| Function | Signature |
-|----------|-----------|
-| `GetScreenSize` | `()` |
-| `IsOnScreen` | `(position)` |
-| `RenderText` | `(text, position, size, color, center, border)` |
-| `RenderLine` | `(from, to, color, thickness)` |
-| `RenderCircle` | `(position, radius, color, thickness, segments)` |
-| `RenderCircleFilled` | `(position, radius, color, segments)` |
-| `RenderRect` | `(from, to, color, rounding, roundingCornersFlags, thickness)` |
-| `RenderRectFilled` | `(from, to, color, rounding, roundingCornersFlags)` |
-| `IsWorldPosOnScreen` | `(worldPos)` |
-| `WorldToScreen` | `(worldPos)` |
-| `WorldToMinimap` | `(worldPos)` |
-| `GetZoom` | `()` |
-| `GetCameraPosition` | `()` |
-| `RenderWorldLine` | `(from, to, color, thickness)` |
-| `RenderWorldRect` | `(worldPos, width, height, color, thickness)` |
-| `RenderWorldRectFilled` | `(worldPos, width, height, color)` |
-| `RenderWorldCircle` | `(worldPos, radius, color, thickness, segments)` |
-| `RenderWorldCircleFilled` | `(worldPos, radius, color, segments)` |
-| `RenderWorldText` | `(text, worldPos, size, color, center, border)` |
-| `RenderObjectBounds` | `(object, color, thickness)` |
-| `RenderObjectBoundsFilled` | `(object, color)` |
-| `RenderMinimapDot` | `(worldPos, radius, color)` |
-| `RenderMinimapLine` | `(worldPosFrom, worldPosTo, thickness, color)` |
-| `RenderMinimapRect` | `(worldPos, width, height, color, thickness)` |
-| `RenderMinimapRectFilled` | `(worldPos, width, height, color)` |
+### Screen space
 
----
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `GetScreenSize` | `()` | Game window size in pixels as `Vector2`. |
+| `IsOnScreen` | `(position)` | Whether a `Vector2` screen position is inside the window. |
+| `RenderText` | `(text, position, size, color, center, border?)` | Text of `size` pixels, centered vertically on `position.y`; `center = true` also centers it horizontally. `border` (default `true`) adds a black outline. |
+| `RenderLine` | `(from, to, color, thickness)` | Line. |
+| `RenderCircle` | `(position, radius, color, thickness, segments?)` | Circle outline. Without `segments`, or with `0`, the count follows the radius. |
+| `RenderCircleFilled` | `(position, radius, color, segments?)` | Filled circle. |
+| `RenderRect` | `(from, to, color, rounding, roundingCornersFlags, thickness)` | Rectangle outline between two corners. `rounding` is the corner radius in pixels. |
+| `RenderRectFilled` | `(from, to, color, rounding, roundingCornersFlags)` | Filled rectangle. |
 
-## 7. Settings API
+`roundingCornersFlags`: `0` for all corners, or the sum of `1` (top-left), `2` (top-right), `4` (bottom-left), `8` (bottom-right).
 
-Use `Settings.Add*` only in `Load(playerId)`.
+### World and minimap
 
-| Function | Signature |
-|----------|-----------|
-| `Settings.AddBool` | `(key, defaultValue)` |
-| `Settings.AddInt` | `(key, defaultValue, minValue, maxValue)` |
-| `Settings.AddFloat` | `(key, defaultValue, minValue, maxValue)` |
-| `Settings.AddDropdown` | `(key, defaultValue, options)` |
-| `Settings.AddKeybind` | `(key, defaultVkCode)` |
-| `Settings.AddTooltip` | `(key, tooltip)` |
-| `Settings.AddColor` | `(key, defaultColor)` |
-| `Settings.GetBool` | `(key, defaultValue)` |
-| `Settings.GetInt` | `(key, defaultValue)` |
-| `Settings.GetFloat` | `(key, defaultValue)` |
-| `Settings.GetString` | `(key, defaultValue)` |
-| `Settings.GetKeybind` | `(key, defaultVkCode)` |
-| `Settings.GetColor` | `(key, defaultColor)` |
-| `IsKeyPressed` | `(vkCode)` |
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `IsWorldPosOnScreen` | `(worldPos)` | Whether a world position is inside the window. |
+| `WorldToScreen` | `(worldPos)` | World position to screen position. |
+| `WorldToMinimap` | `(worldPos)` | World position to the screen position of that point on the minimap. Ignores `z`. |
+| `GetZoom` | `()` | Camera zoom factor. |
+| `GetCameraPosition` | `()` | World position at the screen center as `Vector2` (tiles). |
+| `RenderWorldLine` | `(from, to, color, thickness?)` | Line between world positions. `thickness` defaults to `2`. Skipped when both ends are off screen. |
+| `RenderWorldRect` | `(worldPos, width, height, color, thickness?)` | Rectangle outline on the ground centered on `worldPos`; `width`, `height` in tiles. `thickness` defaults to `2`. |
+| `RenderWorldRectFilled` | `(worldPos, width, height, color)` | Filled ground rectangle. |
+| `RenderWorldCircle` | `(worldPos, radius, color, thickness?, segments?)` | Circle outline, round on screen; `radius` in tile widths. Defaults: `thickness` `2`, `segments` `16`. Skipped when the center is off screen. |
+| `RenderWorldCircleFilled` | `(worldPos, radius, color, segments?)` | Filled circle. `segments` defaults to `16`. |
+| `RenderWorldText` | `(text, worldPos, size, color, center?, border?)` | Text at a world position. `center` and `border` default to `true`. |
+| `RenderObjectBounds` | `(object, color, thickness?)` | Outline of the object's footprint (`2 × RADIUS_X` by `2 × RADIUS_Y` tiles). `thickness` defaults to `2`. |
+| `RenderObjectBoundsFilled` | `(object, color)` | Filled footprint. |
+| `RenderMinimapDot` | `(worldPos, radius, color)` | Dot on the minimap; `radius` in pixels. |
+| `RenderMinimapLine` | `(worldPosFrom, worldPosTo, thickness, color)` | Line on the minimap. `thickness` comes before `color`. |
+| `RenderMinimapRect` | `(worldPos, width, height, color, thickness)` | Rectangle outline on the minimap, centered on `worldPos`, size in tiles. |
+| `RenderMinimapRectFilled` | `(worldPos, width, height, color)` | Filled rectangle on the minimap. |
 
-Custom module settings may be per-player or profile-shared depending on whether **Sync Settings** is enabled in the UI.
+World line thickness, `RenderWorldCircle` radii and `RenderWorldText` sizes scale with zoom. Minimap sizes do not.
 
 ---
 
-## 8. IPC API
+## 9. Settings API
+
+Each module instance has its own settings group, shown as a submenu such as `MYBOT [P2]` (or `MYBOT [S1]` for a shared **Sync** profile). Values are saved in `settings.ini`.
+
+Call the `Add` functions in `Load(playerId)`. The menu shows settings in the order they are added. Adding an existing key keeps its saved value.
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `Settings.AddBool` | `(key, defaultValue)` | Checkbox. |
+| `Settings.AddInt` | `(key, defaultValue, minValue, maxValue)` | Integer slider. |
+| `Settings.AddFloat` | `(key, defaultValue, minValue, maxValue)` | Float slider. |
+| `Settings.AddDropdown` | `(key, defaultValue, options)` | Dropdown. `options` is an array of strings with no gaps; `defaultValue` is one of them. |
+| `Settings.AddKeybind` | `(key, defaultVkCode)` | Keybind picker; the value is a virtual-key code such as `Key.Tab`. |
+| `Settings.AddTooltip` | `(key, tooltip)` | Tooltip for setting `key`. |
+| `Settings.AddColor` | `(key, defaultColor)` | Color picker. `defaultColor` must be a `Color`. |
+
+Get functions work in any callback and return `defaultValue` when the key does not exist. Without `defaultValue` the fallback is `false`, `0`, `0.0`, `""`, `0` or `Color(0, 0, 0, 0)`.
 
 | Function | Signature | Returns |
 |----------|-----------|---------|
-| `IPC.StartServer` | `(pipeName)` | `boolean` |
-| `IPC.StopServer` | `()` | `nil` |
-| `IPC.Send` | `(message)` | `boolean` |
-| `IPC.HasMessages` | `()` | `boolean` |
-| `IPC.GetMessages` | `()` | `string[]` |
-| `IPC.WaitForMessage` | `()` | `string \| nil` |
-| `IPC.WaitForMessage` | `(timeoutMs)` | `string \| nil` |
-| `ParseJSON` | `(str)` | `table` |
-| `ToJSON` | `(obj)` | `string` |
+| `Settings.GetBool` | `(key, defaultValue?)` | `boolean` |
+| `Settings.GetInt` | `(key, defaultValue?)` | `number` |
+| `Settings.GetFloat` | `(key, defaultValue?)` | `number` |
+| `Settings.GetString` | `(key, defaultValue?)` | `string` (selected dropdown option) |
+| `Settings.GetKeybind` | `(key, defaultVkCode?)` | `number` |
+| `Settings.GetColor` | `(key, defaultColor?)` | `Color` |
+| `IsKeyPressed` | `(vkCode)` | `boolean`: key held down now. Reads the Windows key state, so it is also `true` while another window has focus. |
 
-Behavior:
+`Update()` runs once per update interval and can miss a short key press; check keys in `Render()`.
 
-- Named pipes are newline-delimited
-- Multiple module instances can share one pipe
-- Incoming messages can route by `instanceId`, `assignedPlayerId`, `moduleName`, or `settingsGroup`
-- Routing fields can appear at the root or under a root `target` object
-- `IPC.Send` accepts strings or Lua values; non-string values are serialized to JSON automatically
-- `IPC.Send` wraps payloads in an envelope with source metadata
-- `IPC.HasMessages()` reports whether this module instance has queued messages
-- `IPC.GetMessages` returns strings; use `ParseJSON` when expecting JSON
-- `IPC.WaitForMessage()` returns one message at a time and waits indefinitely until a message arrives or the endpoint stops
-- `IPC.WaitForMessage(timeoutMs)` returns `nil` on timeout and treats negative values as an indefinite wait
-- `IPC.Send` and `IPC.GetMessages` can be polled continuously without waiting for a pipe close event
-- `IPC.WaitForMessage()` is blocked while **Multithreading** is enabled
-- `GetMapTilesPtr()` and `GetObjectsPtr()` are meant for high-throughput IPC / ML readers
-- Snapshot buffers are engine-owned, rebuilt on demand, and should be copied immediately
-- Snapshot byte size is `count * sizeof(Tile)` or `count * sizeof(Object)`
-- Explicit `IPC.StopServer()` in `Unload()` is optional in practice because CONTROL also stops the server automatically after module unload
+---
 
-Snapshot layouts:
+## 10. IPC
 
-```cpp
-#pragma pack(push, 1)
-namespace game::snapshot {
-    struct Tile {
-        uint16_t x;
-        uint16_t y;
-        uint8_t terrain;
-        uint8_t elevation;
-        uint8_t isVisible;
-        uint8_t flags;
-    };
+A module runs a Windows named-pipe server; external programs on the same PC, running as the same Windows user, connect as clients.
 
-    struct Object {
-        uint32_t id;
-        uint16_t unitObjectType;
-        uint16_t x;
-        uint16_t y;
-        uint8_t playerId;
-        uint8_t flags;
-    };
-}
-#pragma pack(pop)
-```
+| Function | Signature | Returns | Description |
+|----------|-----------|---------|-------------|
+| `IPC.StartServer` | `(pipeName)` | `boolean` | Opens `\\.\pipe\<pipeName>` for this module instance. `false` for an empty name, more than 200 characters, `\` or `/`, or a name starting with `AoE2Control` (any case). Calling it again with the same name keeps the server; another name stops the old server first. |
+| `IPC.StopServer` | `()` | `nil` | Stops the server and drops unread messages. Done for you when the module unloads. |
+| `IPC.Send` | `(message)` | `boolean` | Sends to every connected client, wrapped in an envelope. A string is sent as is; other values are converted with `ToJSON`. `false` for `nil`, without a connected client, or when a limit is reached. |
+| `IPC.HasMessages` | `()` | `boolean` | Whether messages are waiting. |
+| `IPC.GetMessages` | `()` | `string[]` | All waiting messages, oldest first; removes them. |
+| `IPC.WaitForMessage` | `(timeoutMs?)` | `string \| nil` | Oldest waiting message, or waits up to `timeoutMs` (default and maximum `500`) for one. `nil` on timeout, without a server, and with **Multithreading** on. The wait counts toward the 1-second callback limit. |
+| `IPC.GetStats` | `()` | `table \| nil` | Counters: `connectedClients`, `sentMessages`, `sentBytes`, `sendFailedNoClient`, `sendFailedTooLarge`, `sendFailedQueueFull`, `receivedMessages`, `receiveDroppedQueueFull`, `receiveDroppedTooLarge`, `receiveDroppedInvalidRouting`, `slowClientDisconnects`. `nil` without a server. |
+| `ParseJSON` | `(str)` | `any` | JSON to Lua values (`null` becomes `nil`). `nil` for invalid JSON. |
+| `ToJSON` | `(value)` | `string` | Lua value to JSON. A non-empty table with keys `1` to `n` becomes an array; other tables, including empty ones, become objects. `"{}"` when the value cannot be converted. |
 
-Flags:
+- Several module instances can share a pipe name. An incoming message goes to every instance on the pipe unless it names a target with `instanceId`/`assignedInstanceId`, `assignedPlayerId`/`playerId`, `moduleName` or `settingsGroup`, in a root `target` object or at the root. A message reaches the instances that match every field it sets.
+- If the incoming root object has a `payload` field, Lua receives only the payload (a string as is, anything else as JSON text). Otherwise Lua receives the object as JSON text without the routing fields. Non-JSON text is delivered unchanged to every instance.
+- `IPC.Send` wraps the message as `{"type": "module_message", "pipeName": ..., "source": {"instanceId", "assignedPlayerId", "moduleName", "settingsGroup"}, "payload": ...}`, followed by `\n`. A string that is valid JSON is sent as parsed JSON in `payload`.
+- Limits: outbound envelope 1 MiB; 1024 messages or 8 MiB waiting per client; a client that does not read a message within 5 s is disconnected; inbound message 1 MiB (larger ones are dropped and the client disconnected); 1024 inbound messages waiting per module instance; 16 clients per pipe.
 
-- `Tile.flags` bit `0`: walkable
-- `Tile.flags` bit `1`: navigatable
-- `Object.flags` bit `0`: alive
+**Packed buffers.** `GetMapTilesPtr()` and `GetObjectsPtr()` return `(ptr, count)`: an address in the game process and an entry count (not bytes), or `0, 0`. A client reads them with `ReadProcessMemory`. Each call builds a new buffer; buffers stay valid until the module instance requests a buffer in a later callback, or unloads. Unexplored tiles are left out. `GetObjectsPtr()` includes dead objects. Entries are packed, little-endian:
+
+| Tile (8 bytes) | Object (12 bytes) |
+|----------------|-------------------|
+| `uint16 x`, `uint16 y`, `uint8 terrain`, `uint8 elevation`, `uint8 isVisible` (1 visible, 0 fogged), `uint8 flags` (bit 0 walkable, bit 1 passable terrain for land units) | `uint32 id`, `uint16 unitObjectType`, `uint16 x`, `uint16 y` (tile), `uint8 playerId` (`255` without owner), `uint8 flags` (bit 0 alive) |
 
 ### Agent Bridge
 
-Off by default; enable **Modules > Agent Bridge**. It lets an outside program read the module player's view and send commands over `\\.\pipe\AoE2ControlAgentV1`. Refused in multiplayer.
+The Agent Bridge lets an external program read the module player's view and send it commands over `\\.\pipe\AoE2ControlAgentV1`, with no protocol code in the module. It is off by default: turn on **Modules > Agent Bridge** (`Agent Bridge=true` under `[modules]` in `settings.ini`). It does not work in multiplayer, even with cheats. While it runs, all modules read the [game-state copy](#game-state-copy-multithreading-on-or-an-agent-bridge-running).
 
 | Function | Returns | Description |
 |----------|---------|-------------|
-| `AgentBridge.Start()` | `boolean` | Opens the pipe for this module instance. Call it in `Load()`. |
-| `AgentBridge.Tick()` | `boolean` | Publishes an observation and applies a pending action. Call it in `Update()`. |
-| `AgentBridge.Stop()` | `nil` | Closes the pipe. Call it in `Unload()`. |
+| `AgentBridge.Start()` | `boolean` | Opens the pipe. Call it in `Load()`. `false` outside `Load()`, with the setting off, in multiplayer, or when another module instance runs the bridge. |
+| `AgentBridge.Tick()` | `boolean` | Publishes an observation and applies a pending action. Call it in `Update()`. `false` when nothing was published. |
+| `AgentBridge.Stop()` | `nil` | Closes the pipe. Call it in `Unload()`; until then a reloaded module cannot start the bridge again. |
+
+The pipe protocol (`negotiate`, `observe`, `act`) is described at https://aoe2control.github.io/agent-bridge/.
 
 ---
 
-## 9. Types
+## 11. Types
 
-### Vector2
+### Vector2, Vector3, Vector4
 
-- Constructors: `Vector2()`, `Vector2(x, y)`, `Vector2(scalar)`
-- Fields: `x`, `y`
-- Methods: `LengthSqr`, `Length`, `Normalize`, `Normalized`
-- Overloads: `Dot(other)` / `Dot(a, b)`, `Cross(other)` / `Cross(a, b)`
-- Other methods: `IsNearlyZero`, `Lerp`, `Distance`
-- Operators: `+`, `-`, `*`, `/`, unary `-`, `==`
-
-### Vector3
-
-- Constructors: `Vector3()`, `Vector3(x, y, z)`, `Vector3(scalar)`
-- Fields: `x`, `y`, `z`
-- Methods: `LengthSqr`, `Length`, `Normalize`, `Normalized`
-- Overloads: `Dot(other)` / `Dot(a, b)`, `Cross(other)` / `Cross(a, b)`
-- Other methods: `IsNearlyZero`, `Lerp`, `Distance`
-- Operators: `+`, `-`, `*`, `/`, unary `-`, `==`
-
-### Vector4
-
-- Constructors: `Vector4()`, `Vector4(x, y, z, w)`, `Vector4(scalar)`
-- Fields: `x`, `y`, `z`, `w`
-- Methods: `LengthSqr`, `Length`, `Normalize`, `Normalized`
-- Overloads: `Dot(other)` / `Dot(a, b)`
-- Other methods: `IsNearlyZero`, `Lerp`, `Distance`
-- Operators: `+`, `-`, `*`, `/`, unary `-`, `==`
+- Constructors: `Vector3.new()` (zero), `Vector3.new(x, y, z)`, `Vector3.new(value)` (all components). `Vector3(...)` is the same as `Vector3.new(...)`. Same for `Vector2(x, y)` and `Vector4(x, y, z, w)`.
+- Fields: `x`, `y` (`z`, `w`).
+- Methods: `LengthSqr()`, `Length()`, `Normalize()` (in place; vectors shorter than `0.00001` are left unchanged), `Normalized()`, `Dot(other)`, `IsNearlyZero()` (every component closer to `0` than `0.000001`), `Lerp(target, alpha)`, `Distance(other)`.
+- `Cross(other)`: `Vector2` returns a number (`x * other.y - y * other.x`); `Vector3` returns a `Vector3`. `Vector4` has no `Cross`.
+- Static calls work: `Vector3.Dot(a, b)`, `Vector3.Cross(a, b)`.
+- Operators: `Vector2`: `+`, `-` with a `Vector2`; `*` with a `Vector2` or a number on either side; `/` with a `Vector2` or a number on the right. `Vector3`: `+`, `-`, `*`, `/` with a `Vector3` or a number on either side. `Vector4`: `+`, `-`, `*`, `/` with a `Vector4` or a number on either side. All: unary `-`, `==`.
 
 ### Color
 
-- Constructors: `Color()`, `Color(r, g, b)`, `Color(r, g, b, a)`, float RGB/RGBA variants, `Color(hexString)`
-- Static methods: `Color.Parse`, `Color.HSV`
+| Constructor | Result |
+|-------------|--------|
+| `Color()` | Transparent black. |
+| `Color(r, g, b, a?)` with integers | Every argument an integer (`255`): `0` to `255`; `a` defaults to `255`. |
+| `Color(r, g, b, a?)` with floats | Any argument a float (`1.0`, `0.5`, `x / 2`): `0` to `1`; `a` defaults to `1`. |
+| `Color(hex)` | `"#RRGGBB"` or `"#RRGGBBAA"`, `#` optional. Any other string gives opaque white. |
+
+- `Color(...)` is the same as `Color.new(...)`.
+- `Color(255, 255, 255)` and `Color(1.0, 1.0, 1.0)` are white; `Color(1, 1, 1)` is almost black.
+- `Color.Parse(hex)`: same as `Color(hex)`. `Color.HSV(h, s, v, a?)`: hue, saturation, value in `0` to `1`; `a` defaults to `1`.
 
 ### Object
 
-Methods:
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `GetId()` | `number` | Object id. |
+| `GetName()` | `string` | Name of the current graphic, such as `Villager Male (Idle)`. Changes with the activity. `""` without a graphic. |
+| `GetGraphicFileName()` | `string` | File name of the current graphic, such as `u_vil_male_villager_idleA_x1`. `""` without a graphic. |
+| `GetTypeName()` | `string` | In-game name of the type, such as `Villager`, in the game's language. `""` for types without one. |
+| `GetObjectType()` | `ObjectType` | Category: resource, building, projectile and so on. |
+| `GetOwningPlayer()` | `Player` | Owner. |
+| `GetGarrisonObject()` | `Object \| nil` | Object this one is garrisoned in. |
+| `GetTargetPosition()` | `Vector3` | Unit AI target position, `z = 0`. `(0, 0, 0)` without a unit AI. |
+| `GetTargetObject()` | `Object \| nil` | Unit AI target object. |
+| `GetActionTargetPosition()` | `Vector3 \| nil` | Target position of the current action, such as where a projectile lands. `nil` without an action. |
+| `GetDirection()` | `Vector3` | Facing direction, `z = 0`. |
+| `IsVisible()` | `boolean` | Whether the object's tile is visible to the assigned player. Always `true` with Modules See Everything. `false` for an object that no longer exists. Never raises an error. |
+| `IsExplored()` | `boolean` | Whether the tile is explored or visible. Never raises an error. |
+| `IsAlive()` | `boolean` | Finished and alive. Foundations and dead units return `false`. |
+| `IsFoundation()` | `boolean` | A building that is not finished yet. |
+| `GetUnitObjectType()` | `UnitObjectType` | Type id. |
+| `GetClass()` | `UnitClass` | Class id. |
+| `GetAttribute(attribute, damageType?)` | `number` | Current `ObjectAttribute` value. `damageType` defaults to `0`. |
+| `GetObjectData(objectData)` | `number` | An `ObjectData` field. |
+| `IsIdle()` | `boolean` | The game marks the object idle. |
+| `IsMoving()` | `boolean` | The unit follows a path. `false` for buildings. |
+| `IsScouting()` | `boolean` | The unit is auto-scouting. |
+| `GetHitpoints()` | `number` | Current hit points. |
+| `GetMaxHitpoints()` | `number` | Maximum hit points. |
+| `GetPosition()` | `Vector3` | World position. |
+| `GetCurrentMapTile()` | `MapTile \| nil` | Tile under the object. |
+| `GetPath()` | `Vector3[]` | Waypoints of the current path; empty when not moving. |
+| `CalculatePath(targetPos)` | `Vector3[]` | Path from the object to a `Vector3`, sized for the object. |
+| `GetSprite()` | `table \| nil` | Current graphic: `name` (as `GetName()`), `fileName` (as `GetGraphicFileName()`), `facet`, `facetCount`, `frameCount`, `frameDuration` (seconds per frame at normal speed, `0` without animation). `nil` without a graphic. The current frame is not available. |
 
-- `GetId()`
-- `GetObjectType()`
-- `GetOwningPlayer()`
-- `GetGarrisonObject()`
-- `GetTargetPosition()`
-- `GetTargetObject()`
-- `GetActionTargetPosition()`
-- `GetDirection()`
-- `IsVisible()`
-- `IsExplored()`
-- `IsAlive()`
-- `IsFoundation()`
-- `GetUnitObjectType()`
-- `GetClass()`
-- `GetAttribute(attribute, damageType)`
-- `GetObjectData(objectData)`
-- `IsIdle()`
-- `IsMoving()`
-- `IsScouting()`
-- `GetHitpoints()`
-- `GetMaxHitpoints()`
-- `GetPosition()`
-- `GetCurrentMapTile()`
-- `GetPath()`
-- `GetName()`
-- `GetGraphicFileName()`
-- `GetTypeName()`
-- `GetSprite()`
-- `CalculatePath(targetPos)`
-
-Behavior:
-
-- `IsVisible()` uses map-tile visibility
-- Cached objects can throw a Lua error on most method calls after they become invisible
-- Explored animals and resources can still be returned even when they are not currently visible
-- On those non-visible explored object references, only `IsVisible()`, `IsExplored()`, `GetId()`, `GetPosition()`, `GetClass()`, and `GetUnitObjectType()` are safe
-- `GetName()` and `GetGraphicFileName()` describe the object's current graphic (`Villager Male (Idle)`, `u_vil_male_villager_idleA_x1`) and change with its activity; `GetTypeName()` is the type's in-game name (`Villager`). They return empty strings when the data is unavailable
-- `GetSprite()` returns `{ name, fileName, facet, facetCount, frameCount, frameDuration }` or `nil`
-- `IsMoving()` is true while a unit follows a path; `IsFoundation()` is true for an unfinished building, which object lists leave out
-- Re-fetch object references in the current frame when fog-aware mode is active
+- Resources and other objects that cannot move (`ObjectType.RESOURCE_OR_EYE_CANDY`, `ObjectType.ANIMATED_MAP_OBJECT`) return `(0, 0, 0)` from `GetDirection()`, an empty list from `GetPath()` and `nil` from `GetActionTargetPosition()`.
+- A kept `Object` that went into the fog or stopped existing raises a Lua error on most method calls. Check `IsVisible()` first, or fetch objects again.
+- Animals and resources on explored but not visible tiles allow only `IsVisible()`, `IsExplored()`, `GetId()`, `GetPosition()`, `GetClass()` and `GetUnitObjectType()`.
 
 ### MapTile
 
-Methods:
-
-- `GetPosition()`
-- `GetTerrain()`
-- `GetElevation()`
-- `GetTileVisibility()`
-- `IsBuildable()`
-- `IsWalkable()`
-- `IsNavigatable()`
-- `GetObjectCount()`
-- `GetObjects()`
-
-Behavior:
-
-- `GetTerrain()` returns `Terrain.UNKNOWN` for unexplored tiles
-- `GetElevation()` returns `0` for unexplored tiles
-- `IsBuildable()` requires a flat, walkable tile
-- `IsWalkable()` returns `false` for unexplored tiles and uses the collision grid for walkability
-- `GetObjectCount()` and `GetObjects()` only expose currently visible tiles
-
-Enum notes:
-
-- `ReplaySpeed` values: `SLOW`, `NORMAL`, `FAST`, `FASTEST`
-- `ProjectileType` is exposed to Lua for `GetProjectilesByType()` filtering
-- `ResourceType` exposes additional engine-defined ids; common values include `FOOD`, `WOOD`, `STONE`, `GOLD`, `POPULATION`
-- `Terrain.UNKNOWN = -1`
-- `TileVisibility.UNEXPLORED = 0`
-- `TileVisibility.VISIBLE = 15`
-- `TileVisibility.EXPLORED = 128`
-- Use `ObjectAttribute` instead of `UnitAttribute`
-- `ObjectData` entries use names without the `OBJECT_DATA_` prefix
-
-### GameOptions
-
-Obtained from `GetCurrentGameOptions()`.
-
-Global setup methods:
-
-- `GetAIDifficulty()` / `SetAIDifficulty(difficulty)`
-- `GetCivilizationSet()` / `SetCivilizationSet(civilizationSet)`
-- `GetGameMode()` / `SetGameMode(gameMode)`
-- `GetMapSize()` / `SetMapSize(mapSize)`
-- `GetStartingAge()` / `SetStartingAge(age)`
-- `GetEndingAge()` / `SetEndingAge(age)`
-- `GetGameSpeed()` / `SetGameSpeed(gameSpeed)`
-- `GetRevealMap()` / `SetRevealMap(revealMap)`
-- `GetVictory()` / `SetVictory(victory)`
-- `GetVictoryLimit()` / `SetVictoryLimit(victoryLimit)`
-- `GetResources()` / `SetResources(resources)`
-- `GetPopulation()` / `SetPopulation(population)`
-- `GetTeamsNotTogether()` / `SetTeamsNotTogether(teamsNotTogether)`
-- `GetRecordGame()` / `SetRecordGame(recordGame)`
-- `GetTeamPositions()` / `SetTeamPositions(teamPositions)`
-- `GetFullTechTree()` / `SetFullTechTree(fullTechTree)`
-- `GetLockTeams()` / `SetLockTeams(lockTeams)`
-- `GetLockSpeed()` / `SetLockSpeed(lockSpeed)`
-- `GetTurboMode()` / `SetTurboMode(turboMode)`
-- `GetAntiquityMode()` / `SetAntiquityMode(antiquityMode)`
-- `GetLocation()` / `SetLocation(location)`
-- `SetRandomMapPoolLocations(locations)`
-- `GetRandomMapSeed()` / `SetRandomMapSeed(seed)` / `ClearRandomMapSeed()`
-- `GetRandomMapSource()` / `SetRandomMapSource(source)`
-- `GetPlayersCount()` / `SetPlayersCount(playersCount)`
-- `GetTreatyLength()` / `SetTreatyLength(treatyLength)`
-- `GetHandicap()` / `SetHandicap(handicap)`
-
-Player-slot methods:
-
-- `GetPlayerTeam(playerIndex)` / `SetPlayerTeam(playerIndex, team)`
-- `GetPlayerHandicapPercentage(playerIndex)` / `SetPlayerHandicapPercentage(playerIndex, handicapPercentage)`
-- `GetPlayerColor(playerIndex)` / `SetPlayerColor(playerIndex, color)`
-- `GetPlayerCivilization(playerIndex)` / `SetPlayerCivilization(playerIndex, civilization)`
-- `SetAssignedPlayerCivilization(civilization)`
-
-Behavior:
-
-- `GetCurrentGameOptions()` can return `nil`
-- Setter methods return `false` while already in game
-- Player-slot methods accept indexes `0` to `7`
-- `SetAssignedPlayerCivilization()` uses the current module instance's assigned player slot and requires a valid player id from `1` to `8`
-- `SetRandomMapPoolLocations()` accepts a Lua array of `OptionsLocation` values; one entry behaves like `SetLocation()`, while multiple entries switch the location to `OptionsLocation.CUSTOM_MAP_POOL`
-- Most `GameOptions` methods are blocked while **Tournament Mode** is enabled; `SetAssignedPlayerCivilization()` remains available in the current Lua API
-- RMS seed/source mutators are rejected during active matches and for multiplayer setup
-- Fixed RMS seeds cover the complete unsigned 32-bit range; `nil` means game-selected randomness
-- `GetRandomMapControlCapabilities()` reports API version `1`, a versioned `capabilityRevision`, and independent flags including `managedLocalMod`; `freshStart` is available on the current supported build when its focused native dependencies resolve, while `directPath` and `inlineSource` are deliberately false
-- `GetRandomMapStartStatus()` distinguishes unavailable, staged, starting, running, and ended states and reports requested/effective seed and source metadata without adding a second setup API
-- `DispatchStartGame()` rejects active matches; after an ended ordinary non-replay single-player match it queues native teardown/setup reconstruction and creates a fresh world while preserving every exposed option plus the requested source/seed
-- `DispatchRestartGame()` remains an explicit same-session restart, and replay end-screen routing is unchanged
-- The associated enum tables are `OptionsAIDifficulty`, `OptionsCivilizationSet`, `OptionsGameMode`, `OptionsMapSize`, `OptionsAge`, `OptionsRevealMap`, `OptionsVictory`, `OptionsResources`, `OptionsLocation`, and `OptionsCivilization`
-
-### RandomMapSource
-
-Read-only properties and matching getters:
-
-- `DisplayName` / `GetDisplayName()`
-- `NativeMapId` / `GetNativeMapId()`
-- `SourceKind` / `GetSourceKind()`
-- `ModIdentity` / `GetModIdentity()`
-- `ResolvedPath` / `GetResolvedPath()`
-- `SourceIdentity` / `GetSourceIdentity()`
-- `AuthoredSourceSha256` / `GetAuthoredSourceSha256()`
-- `CatalogGeneration` / `GetCatalogGeneration()`
-
-Sources are copied values. Old generations remain safe to inspect but are rejected by `SetRandomMapSource()`. Stable source identity and bounded authored-source SHA-256 are read-only correlation metadata when available. CONTROL does not deploy RMS files, and catalog refresh only exposes sources that the game itself enumerates. Direct-path and inline factories are not exposed because native ownership, include resolution, cache invalidation, and authoritative readback are not sufficiently durable. Typed setup JSON, request IDs, rollback evidence, match epochs, bulk snapshots, parser/RNG traces, and intermediate generation stages are headless/private concerns rather than duplicate Lua APIs.
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `GetPosition()` | `Vector2` | Tile coordinates. |
+| `GetTerrain()` | `Terrain` | Terrain id; `Terrain.UNKNOWN` (`-1`) for unexplored tiles. |
+| `GetElevation()` | `number` | Elevation; `0` for unexplored tiles. |
+| `GetTileVisibility()` | `TileVisibility` | The assigned player's visibility of the tile. |
+| `IsBuildable()` | `boolean` | Whether a 1x1 building could be placed now (terrain, slope, objects and units checked). `false` when unexplored. For a real building type, use `CheckPlacement`. |
+| `IsWalkable()` | `boolean` | Navigatable terrain with no blocking object (buildings, trees, mines); units do not count. `false` when unexplored. |
+| `IsNavigatable()` | `boolean` | Terrain lets land units move, whatever stands on it. Water is `false`. `false` when unexplored. |
+| `GetObjectCount()` | `number` | Objects on the tile; `0` unless the tile is `VISIBLE`. |
+| `GetObjects()` | `Object[]` | Objects on the tile; empty unless the tile is `VISIBLE`. |
 
 ### Player
 
-Methods:
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `GetId()` | `number` | Player id. |
+| `GetPlayerType()` | `PlayerType` | Player type. |
+| `GetPlayerObjects()` | `Object[]` | The player's objects. |
+| `GetCameraPosition()` | `Vector2` | The player's camera position. |
+| `GetMouseHoveredObject()` | `Object \| nil` | Object under the player's mouse. |
+| `GetSelectedObject()` | `Object \| nil` | Object the player selected last. |
+| `GetSelectedObjectCount()` | `number` | Number of selected objects. |
+| `GetPlayerName()` | `string` | Player name. |
+| `GetCivilizationId()` | `number` | Civilization id, `0` when unknown. |
+| `GetCivilizationName()` | `string` | Civilization name, `""` when unknown. |
+| `HasWon()` | `boolean` | The game or replay has ended and this player won. |
+| `IsAlliedWith(player)` | `boolean` | Allied with another `Player`. |
+| `IsEnemyTo(player)` | `boolean` | Enemy of another `Player`. |
+| `GetColor()` | `Color` | Player color. |
+| `GetAttribute(attribute)` | `number` | `PlayerAttribute` value. |
+| `GetUnitTypeCount(id)` | `number` | Units of a type id. |
+| `GetFact(fact, parameter?)` | `number \| nil` | `Fact` value; `parameter` defaults to `0`. |
+| `IsObjectTypeAvailable(unitObjectType)` | `boolean` | The player can currently get the type. |
+| `CanAfford(id, isBuilding?)` | `boolean` | Resources and, unless `isBuilding` is `true`, population room. Does not check availability. |
+| `GetResearchState(technology)` | `ResearchState` | Research state. |
+| `GetTechCost(technology)` | cost list | Current technology cost. |
+| `GetObjectCost(unitObjectType, costMultiplier?)` | cost list | Current object cost times `costMultiplier` (default `1.0`). |
+| `CanAffordResearch(technology)` | `boolean` | The player can pay for it. |
+| `CanResearch(technology)` | `boolean` | Researchable now and affordable. |
+| `IsTechnologyResearched(technology)` | `boolean` | Researched. |
+| `GetObjectsByTypes(unitTypes)` | `Object[]` | The player's objects of any type in the array. |
+| `GetObjectsByMostCommonType(unitTypes)` | `Object[]` | The player's objects of the type in `unitTypes` the player has most of. |
+| `GetObjectsByClass(unitClass)` | `Object[]` | The player's objects of a class. |
+| `GetObjectsByClassDeadInclusive(unitClass)` | `Object[]` | Same, plus objects of the class that are not alive, such as dead livestock. |
+| `GetFoundations()` | `Object[]` | The player's unfinished buildings. Other object lists leave them out. |
+| `CountObjectsByTypes(unitTypes)` | `number` | Count of `GetObjectsByTypes(unitTypes)`. |
+| `CountObjectsByClass(unitClass)` | `number` | Count of `GetObjectsByClass(unitClass)`. |
+| `GetTownCenters()` | `Object[]` | The player's town centers. |
 
-- `GetId()`
-- `GetPlayerType()`
-- `GetPlayerObjects()`
-- `GetCameraPosition()`
-- `GetMouseHoveredObject()`
-- `GetSelectedObject()`
-- `GetSelectedObjectCount()`
-- `GetPlayerName()`
-- `GetCivilizationId()`
-- `GetCivilizationName()`
-- `HasWon()`
-- `IsAlliedWith(player)`
-- `IsEnemyTo(player)`
-- `GetColor()`
-- `GetAttribute(attribute)`
-- `GetUnitTypeCount(id)`
-- `GetFact(fact, parameter)`
-- `IsObjectTypeAvailable(unitObjectType)`
-- `CanAfford(id, isBuilding)` — checks resource/population cost; query availability separately.
-- `GetResearchState(technology)`
-- `GetTechCost(technology)`
-- `GetObjectCost(unitObjectType)`
-- `GetObjectCost(unitObjectType, costMultiplier)`
-- `CanAffordResearch(technology)`
-- `CanResearch(technology)`
-- `IsTechnologyResearched(technology)`
-- `GetObjectsByTypes(unitTypes)`
-- `GetObjectsByMostCommonType(unitTypes)`
-- `GetObjectsByClass(unitClass)`
-- `GetObjectsByClassDeadInclusive(unitClass)`
-- `GetFoundations()`
-- `CountObjectsByTypes(unitTypes)`
-- `CountObjectsByClass(unitClass)`
-- `GetTownCenters()`
+With **Modules See Everything** off, attribute, fact, count, cost, research and availability methods return real data only for the assigned player; for other players they return `0`, `false`, an empty list or `ResearchState.NOT_AVAILABLE`.
 
-Behavior:
+### GameOptions
 
-- With **Modules See Everything** off, resource, fact, tech, and object-availability methods only expose the assigned player's data
-- Object lists from other players still depend on object visibility
+`GetCurrentGameOptions()` returns the setup of the next match (before a match) or of the running match (read-only), or `nil`. Use `:` to call methods: `options:SetLocation(OptionsLocation.ARENA)`.
+
+- Every `Set...` returns `true` when it wrote the value. Setters return `false` while a match runs.
+- With **Tournament Mode** on every method except `SetAssignedPlayerCivilization()` is blocked.
+
+| Getter | Setter | Value |
+|--------|--------|-------|
+| `GetAIDifficulty()` | `SetAIDifficulty(difficulty)` | `OptionsAIDifficulty` |
+| `GetCivilizationSet()` | `SetCivilizationSet(civilizationSet)` | `OptionsCivilizationSet` |
+| `GetGameMode()` | `SetGameMode(gameMode)` | `OptionsGameMode`. The getter returns `UNAVAILABLE` for a mode without a value; the setter rejects `UNAVAILABLE`. |
+| `GetMapSize()` | `SetMapSize(mapSize)` | `OptionsMapSize` |
+| `GetStartingAge()` | `SetStartingAge(age)` | `OptionsAge` |
+| `GetEndingAge()` | `SetEndingAge(age)` | `OptionsAge` |
+| `GetGameSpeed()` | `SetGameSpeed(gameSpeed)` | `number` |
+| `GetRevealMap()` | `SetRevealMap(revealMap)` | `OptionsRevealMap` |
+| `GetVictory()` | `SetVictory(victory)` | `OptionsVictory` |
+| `GetVictoryLimit()` | `SetVictoryLimit(victoryLimit)` | `number` |
+| `GetResources()` | `SetResources(resources)` | `OptionsResources` |
+| `GetPopulation()` | `SetPopulation(population)` | `number` |
+| `GetTreatyLength()` | `SetTreatyLength(treatyLength)` | `number` |
+| `GetPlayersCount()` | `SetPlayersCount(playersCount)` | `number` of player slots in use |
+| `GetLocation()` | `SetLocation(location)` | `OptionsLocation`. The setter also clears a custom map pool. |
+| — | `SetRandomMapPoolLocations(locations)` | Array of 1 to 256 `OptionsLocation` values. One entry acts like `SetLocation()`; two or more set the location to `OptionsLocation.CUSTOM_MAP_POOL`. |
+| `GetTeamsNotTogether()` | `SetTeamsNotTogether(value)` | `boolean` (`true` when Team Together is off) |
+| `GetRecordGame()` | `SetRecordGame(value)` | `boolean` |
+| `GetTeamPositions()` | `SetTeamPositions(value)` | `boolean` |
+| `GetFullTechTree()` | `SetFullTechTree(value)` | `boolean` |
+| `GetLockTeams()` | `SetLockTeams(value)` | `boolean` |
+| `GetLockSpeed()` | `SetLockSpeed(value)` | `boolean` |
+| `GetTurboMode()` | `SetTurboMode(value)` | `boolean` |
+| `GetAntiquityMode()` | `SetAntiquityMode(value)` | `boolean` |
+| `GetHandicap()` | `SetHandicap(value)` | `boolean` |
+| `GetRandomMapSeed()` | `SetRandomMapSeed(seed)` | `number \| nil`: fixed seed `0` to `4294967295`; `nil` when the game picks it. `ClearRandomMapSeed()` removes the fixed seed. |
+| `GetRandomMapSource()` | `SetRandomMapSource(source)` | `RandomMapSource \| nil`, from `GetAvailableRandomMapSources()`. |
+
+Player slots: `playerIndex` is `0` to `7` (slot `0` is player 1). Out of range: setters return `false`, getters `0`.
+
+| Getter | Setter | Value |
+|--------|--------|-------|
+| `GetPlayerTeam(playerIndex)` | `SetPlayerTeam(playerIndex, team)` | Team number |
+| `GetPlayerHandicapPercentage(playerIndex)` | `SetPlayerHandicapPercentage(playerIndex, handicapPercentage)` | Handicap percentage |
+| `GetPlayerColor(playerIndex)` | `SetPlayerColor(playerIndex, color)` | Color index |
+| `GetPlayerCivilization(playerIndex)` | `SetPlayerCivilization(playerIndex, civilization)` | `OptionsCivilization`; the setter turns off random civilization |
+| — | `SetAssignedPlayerCivilization(civilization)` | Writes the slot of `GetAssignedPlayerId()`. `false` when that id is not `1` to `8`. Not blocked by Tournament Mode. |
+
+`SetRandomMapSeed()`, `ClearRandomMapSeed()` and `SetRandomMapSource()` work only in single-player setup: they return `false` during a match, in multiplayer, in a replay, while a match starts or quits, and when the capability flag (`requestedSeed` or `selection`) is `false`. `SetRandomMapSource()` also rejects a source from an older catalog generation; call `GetAvailableRandomMapSources()` again after `RefreshRandomMapSources()`.
+
+### RandomMapSource
+
+Read-only properties. Each has a matching method: `GetDisplayName()`, `GetNativeMapId()`, `GetSourceKind()`, `GetModIdentity()`, `GetResolvedPath()`, `GetSourceIdentity()`, `GetAuthoredSourceSha256()`, `GetCatalogGeneration()`. `source.DisplayName` and `source:GetDisplayName()` return the same value.
+
+| Property | Type | Meaning |
+|----------|------|---------|
+| `DisplayName` | `string` | Map name; for a local mod file, the file name without `.rms`. |
+| `NativeMapId` | `number` | The game's map id. |
+| `SourceKind` | `string` | `"game-catalog"` or `"local-mod"`. |
+| `ModIdentity` | `string \| nil` | Local mod folder name in lower case. |
+| `ResolvedPath` | `string \| nil` | Full path of the `.rms` file, when known. |
+| `SourceIdentity` | `string` | Id that stays the same for the same map across refreshes. |
+| `AuthoredSourceSha256` | `string \| nil` | SHA-256 of a local mod's `.rms` file (up to 16 MiB). |
+| `CatalogGeneration` | `number` | Catalog generation of this value. |
+
+The list includes `.rms` files in the local mods of the game profiles (`%USERPROFILE%\Games\Age of Empires 2 DE\<profile id>\mods\local\<mod name>\resources\_common\random-map-scripts\`). Save a script there, call `RefreshRandomMapSources()`, then select it.
+
+---
+
+## 12. Strategic Components
+
+`ResourceTracker`, `VillagerOccupation` and `ConstructionPlacement` run a simple economy for the assigned player. Create them with `.new(...)` or `:new(...)` in `Init()`, not at file scope; `ResourceTracker()` without `.new` does not work. Call their `Update()` methods from `Update()`. They need the live game: their `Update()` raises an error with Multithreading on.
 
 ### ResourceTracker
 
-Constructor: `ResourceTracker()`
+Constructor: `ResourceTracker.new()`
 
-Methods:
-
-- `Update()`
-- `GetConvertibleLivestock(position, radius)`
-- `GetOwnedLivestock()`
-- `GetDeadLivestock(position, radius)`
-- `GetForage()`
-- `GetFarms()`
-- `GetTrees()`
-- `GetGold()`
-- `GetStone()`
-
-Behavior:
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `Update()` | `nil` | Rebuilds the lists below. |
+| `GetConvertibleLivestock(position, radius)` | `Object[]` | Visible living Gaia livestock within `radius` tiles of a `Vector3`. |
+| `GetOwnedLivestock()` | `Object[]` | The player's livestock, dead or alive. |
+| `GetDeadLivestock(position, radius)` | `Object[]` | The player's dead livestock within `radius` tiles. |
+| `GetForage()` | `Object[]` | Forage bushes. |
+| `GetFarms()` | `Object[]` | The player's farms. |
+| `GetTrees()` | `Object[]` | Trees. |
+| `GetGold()` | `Object[]` | Gold mines. |
+| `GetStone()` | `Object[]` | Stone mines. |
 
 ### VillagerOccupation
 
-Constructor: `VillagerOccupation(resourceTracker)`
+Constructor: `VillagerOccupation.new(resourceTracker)`
 
-Methods:
+Each profession (`VillagerProfession`) has a weight; its target share is its weight divided by the sum. All four weights start at `1`.
 
-- `Update()`
-- `GetVillagerCount()`
-- `GetVillagerCount(profession)`
-- `GetIdleVillagerCount()`
-- `GetAllVillagers()`
-- `GetIdleVillagers()`
-- `RequestVillagers(amount, position, urgency)`
-- `RebalanceVillagers()`
-- `SetPriorities(wood, food, gold, stone)`
-- `GetPriorityPercentage(profession)`
-- `ResetPriorities()`
-- `SetPriorityPercentage(profession, percentage)`
-- `SetLivestockVillagerLimit(limit)`
-- `SetForageVillagerLimit(limit)`
-- `SetFarmMaxTownCenterDistance(distance)`
-- `SetFarmMaxMillDistance(distance)`
-- `SetProfessionBuildingRange(profession, range)`
-- `AssignVillagers(objectIds)`
-- `AssignVillagers(objects)`
-- `AssignVillager(villager)`
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `Update()` | `nil` | Sends idle villagers to the profession furthest below its share. With **Sequential Actions** on, one villager per call. Call `ResourceTracker:Update()` first. |
+| `GetVillagerCount()` | `number` | Villager count. |
+| `GetVillagerCount(profession)` | `number` | Villagers in a `VillagerProfession`. |
+| `GetIdleVillagerCount()` | `number` | Count of `GetIdleVillagers()`. |
+| `GetAllVillagers()` | `Object[]` | The player's villagers. |
+| `GetIdleVillagers()` | `Object[]` | Idle villagers, without those kept for construction. |
+| `RequestVillagers(amount, position, urgency)` | `Object[]` | Picks up to `amount` villagers for a job at a `Vector3`; gives no order. `UrgencyLevel.HIGH`: closest villagers. `MEDIUM`: prefers professions above their share. `LOW`: only professions above their share. |
+| `SetPriorities(wood, food, gold, stone)` | `nil` | Sets the four weights, whole numbers `0` to `1000000`. |
+| `GetPriorityPercentage(profession)` | `number` | Target share, whole number `0` to `100`. |
+| `SetPriorityPercentage(profession, share)` | `nil` | Sets one share as a fraction `0` to `0.99`; the others keep their ratio. |
+| `ResetPriorities()` | `nil` | All weights back to `1`. |
+| `RebalanceVillagers()` | `nil` | Moves working villagers between professions to match the shares. |
+| `SetLivestockVillagerLimit(limit)` | `nil` | Villagers on livestock before forage and farms. Default `6`. |
+| `SetForageVillagerLimit(limit)` | `nil` | Villagers on forage before farms. Default `8`. |
+| `SetFarmMaxTownCenterDistance(distance)` | `nil` | Max tiles from a town center's edge for a new farm. Default `1.0`. |
+| `SetFarmMaxMillDistance(distance)` | `nil` | Max tiles from a mill's edge for a new farm. Default `1.0`. |
+| `SetProfessionBuildingRange(profession, range)` | `nil` | Drop-off range in tiles. Default `8.0`. |
+| `AssignVillagers(villagers)` | `nil` | Assigns each villager in the array (`Object` values or ids) to the profession furthest below its share. |
+| `AssignVillager(villager)` | `nil` | Assigns one `Object` now. |
 
-Notes:
-
-- Food assignment prefers livestock, then forage, then farms, with fallback when needed
-- `SetLivestockVillagerLimit()` defaults to `6`, and `SetForageVillagerLimit()` defaults to `8`
-- `SetFarmMaxTownCenterDistance()` and `SetFarmMaxMillDistance()` default to `1.0`
-- `GetIdleVillagers()` returns idle villagers currently available for reassignment
-- `SetProfessionBuildingRange()` defaults to `8.0` tiles per profession in the current implementation
+Food assignment uses livestock up to its limit, then forage up to its limit, then farms. Wood, gold and stone villagers go to the closest resource with a drop-off building of the player in range; when there is none and a `ConstructionPlacement` was created with this `VillagerOccupation`, it queues a drop-off building.
 
 ### ConstructionPlacement
 
-Constructor: `ConstructionPlacement(villagerOccupation)`
+Constructor: `ConstructionPlacement.new(villagerOccupation)`
 
-Methods:
+`structureType` is a `UnitObjectType`. `padding` is the free tiles kept around the building (default `1`). A band around town centers stays free (`SetTownCenterPadding()`) unless `bypassTownCenterPadding` is `true` (default `false`).
 
-- `Update()`
-- `SetTownCenterPadding(padding)`
-- `BuildStructure(structureType, builderUnitId, targetPos, direction, padding)`
-- `BuildStructure(structureType, builderUnitId, targetPos, direction, padding, bypassTownCenterPadding)`
-- `BuildStructure(structureType, builderUnitId, targetPos, directionPos, padding)`
-- `BuildStructure(structureType, builderUnitId, targetPos, directionPos, padding, bypassTownCenterPadding)`
-- `BuildStructure(structureType, targetPos, direction, padding)`
-- `BuildStructure(structureType, targetPos, direction, padding, bypassTownCenterPadding)`
-- `BuildStructure(structureType, targetPos, directionPos, padding)`
-- `BuildStructure(structureType, targetPos, directionPos, padding, bypassTownCenterPadding)`
-- `BuildStructureAtTown(structureType, targetPos, padding)`
-- `BuildStructureAtTown(structureType, targetPos, padding, bypassTownCenterPadding)`
-- `BuildStructureAtTown(structureType, padding)`
-- `BuildStructureAtTown(structureType, padding, bypassTownCenterPadding)`
-- `FindBestPosition(structureType, targetPos, direction, padding, bypassTownCenterPadding)`
-- `GetValidFarmPlacementTile()`
-- `QueueBuildingRequest(structureType, targetPosition, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)`
-- `QueueBuildingRequestAtTown(structureType, priority, padding, bypassTownCenterPadding, builderUnitId, requireScouting)`
-- `ProcessBuildingRequests()`
-- `IsStructureTypeQueued(structureType)`
-- `IsUnitAssignedToBuilding(unitId)`
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `Update()` | `nil` | Reads the map and calls `ProcessBuildingRequests()`. Call it every update before placing buildings. |
+| `SetTownCenterPadding(padding)` | `nil` | Tiles around town centers kept free, `0` to `1024`. Default `3`. |
+| `BuildStructure(structureType, builderUnitId, targetPos, direction?, padding?, bypassTownCenterPadding?)` | `boolean` | Finds a free spot near the `Vector3` `targetPos` and orders unit `builderUnitId` to build. `direction` is a `PlacementDirection` (default `Center`) or a `Vector3` to search toward. `true` when the order was sent. |
+| `BuildStructure(structureType, targetPos, direction?, padding?, bypassTownCenterPadding?)` | `boolean` | Same, with the villager closest to `targetPos`. |
+| `BuildStructureAtTown(structureType, targetPos?, padding?, bypassTownCenterPadding?)` | `boolean` | Sends the closest villager to an unfinished building of the type that nobody works on. Otherwise builds near `targetPos` on the side facing the first town center, or around that town center when `targetPos` is left out. |
+| `FindBestPosition(structureType, targetPos, direction, padding, bypassTownCenterPadding?)` | `Vector3` | The spot `BuildStructure` would use; `(-1, -1, -1)` when none. |
+| `GetValidFarmPlacementTile()` | `MapTile \| nil` | A free farm tile near a town center, or else a mill. |
+| `QueueBuildingRequest(structureType, targetPosition, priority?, padding?, bypassTownCenterPadding?, builderUnitId?, requireScouting?)` | `nil` | Queues a building near `targetPosition`. `priority` is a `BuildingRequestPriority` (default `MEDIUM`); `builderUnitId` `-1` (default) takes the closest villager; `requireScouting` (default `true`) walks the builder within 5 tiles first. |
+| `QueueBuildingRequestAtTown(structureType, priority?, padding?, bypassTownCenterPadding?, builderUnitId?, requireScouting?)` | `nil` | Queues a building near the first town center. `requireScouting` defaults to `false`. |
+| `ProcessBuildingRequests()` | `nil` | Works on up to 3 queued requests, highest priority first. |
+| `IsStructureTypeQueued(structureType)` | `boolean` | A request for the type is queued or the player has an unfinished building of it. |
+| `IsUnitAssignedToBuilding(unitId)` | `boolean` | The unit is the builder of a queued request. |
+
+A request is dropped after 45 seconds of scouting or 60 seconds in total. A new request is ignored when its type is already queued or has an unfinished building (farms excepted), or its builder already serves another request.
+
+---
+
+## 13. Enums
+
+Enums are global tables of names to numbers: `UnitClass.VILLAGER`. Functions return the number; compare with `==`. Never guess a name or value; look it up at https://aoe2control.github.io/enums/ or https://aoe2control.github.io/game-options/#option-enums, or list a table at run time with `for name, value in pairs(UnitObjectType) do ... end`.
+
+Enum tables: `Age`, `BuildingPosition`, `BuildingRequestPriority`, `Fact`, `Formation`, `Key`, `ObjectAttribute`, `ObjectData`, `ObjectType`, `OptionsAIDifficulty`, `OptionsAge`, `OptionsCivilization`, `OptionsCivilizationSet`, `OptionsGameMode`, `OptionsLocation`, `OptionsMapSize`, `OptionsResources`, `OptionsRevealMap`, `OptionsVictory`, `PlacementDirection`, `PlacementResult`, `PlayerAttribute`, `PlayerType`, `ProjectileType`, `ReplaySpeed`, `ResearchState`, `ResourceType`, `Technology`, `Terrain`, `TileVisibility`, `UnitClass`, `UnitCombatStance`, `UnitObjectType`, `UrgencyLevel`, `VictoryCondition`, `VillagerProfession`.
+
+| Enum | Values |
+|------|--------|
+| `PlayerType` | `NON_PLAYER` 0, `HUMAN` 1, `GAIA` 2, `BOT` 3 |
+| `VictoryCondition` | `STANDARD` 0, `CONQUEST` 1, `TIME_LIMIT` 2, `SCORE` 3, `CUSTOM` 4 |
+| `ResearchState` | `NOT_AVAILABLE` -1, `LOCKED` 0, `RESEARCHABLE` 1, `RESEARCHING` 2, `RESEARCHED` 3 |
+| `ReplaySpeed` | `SLOW` 0, `NORMAL` 1, `FAST` 2, `FASTEST` 3 |
+| `PlayerAttribute` | `FOOD` 0, `WOOD` 1, `STONE` 2, `GOLD` 3, `POP_SPACE_LEFT` 4, `POP_CURRENT` 11, `AGE` 6 |
+| `Age` | `DARK_AGE` 0, `FEUDAL_AGE` 1, `CASTLE_AGE` 2, `IMPERIAL_AGE` 3 |
+| `ObjectType` | `RESOURCE_OR_EYE_CANDY` 10, `ANIMATED_MAP_OBJECT` 20, `DEAD_OR_FISH` 30, `PROJECTILE` 60, `NPC` 70, `BUILDING` 80 |
+| `TileVisibility` | `UNEXPLORED` 0, `VISIBLE` 15, `EXPLORED` 128 |
+| `PlacementResult` | `CAN_PLACE` 0, `TERRAIN_EDGE` 1, `TERRAIN` 2, `SLOPE` 3, `UNEXPLORED` 5, `BLOCKED` 6, `OUTSIDE_MAP` 7, `MAP_BOUNDARY` 11 |
+| `UnitCombatStance` | `AGGRESSIVE` 0, `DEFENSIVE` 1, `NO_ATTACK` 2, `STAND_GROUND` 3 |
+| `Formation` | `LINE` 2, `BOX` 4, `STAGGERED` 7, `FLANK` 8 |
+| `UrgencyLevel` | `LOW` 0, `MEDIUM` 1, `HIGH` 2 |
+| `VillagerProfession` | `WOOD` 0, `FOOD` 1, `STONE` 2, `GOLD` 3 |
+| `PlacementDirection` | `Center` 0, `North` 1, `NorthEast` 2, `East` 3, `SouthEast` 4, `South` 5, `SouthWest` 6, `West` 7, `NorthWest` 8 |
+| `BuildingRequestPriority` | `LOW` 0, `MEDIUM` 1, `HIGH` 2, `CRITICAL` 3 |
+| `BuildingPosition` | `TOWN_CENTER` 0, `AGGRESSIVE` 1 (no function takes it) |
 
 Notes:
 
-- `BuildStructure(...)`, `FindBestPosition(...)`, and queue helpers take `UnitObjectType` and derive placement size internally
-- Convenience `BuildStructure(...)` overloads can auto-select a builder villager and issue the build command directly
-- `BuildStructureAtTown(...)` adds town-center-oriented placement helpers, resumes a matching owned unfinished foundation when possible, and uses a short materialization window before replacing a stale fact-only foundation
-- `SetTownCenterPadding()` defaults to `3` and clamps to `0` or higher
-- `GetValidFarmPlacementTile()` uses the current villager-occupation farm distance rules when available
-- Build helpers also expose overloads without the final `bypassTownCenterPadding` argument; those use the default `false` behavior
-- Map tile state is cached internally to improve repeated placement work
-
-Not exposed to Lua:
-
-- `ConstructionPlacement.RenderDebug`
+- `Age` is the in-match enum; `OptionsAge` (match setup) has different values. `VictoryCondition` (`GetVictoryCondition()`) and `OptionsVictory` (`GameOptions`) differ too.
+- `ResourceType` ids run `0` to `483`. `FOOD`, `WOOD`, `STONE`, `GOLD`, `POPULATION` (also `AMOUNT_FOOD` ... `AMOUNT_POPULATION_CAP`) are `0` to `4`; the rest start with `AMOUNT_`.
+- `Terrain.UNKNOWN` is `-1`.
+- `ObjectAttribute` is the attribute enum; there is no `UnitAttribute`. Common values: `HITPOINTS` 0, `LINE_OF_SIGHT` 1, `RADIUS_X` 3, `RADIUS_Y` 4, `SPEED` 5, `ARMOR` 8, `WEAPON` 9, `WEAPON_RANGE` 12, `RESOURCE_COST` 100, `CREATION_TIME` 101.
+- `ObjectData` names drop the AI script's `object-data-` prefix: `ObjectData.POINT_X`.
+- `Key` names use mixed case: `None`, `LButton`, `RButton`, `MButton`, `Backspace`, `Tab`, `Enter`, `Shift`, `Ctrl`, `Alt`, `Pause`, `CapsLock`, `Escape`, `Space`, `PageUp`, `PageDown`, `End`, `Home`, `Left`, `Up`, `Right`, `Down`, `Insert`, `Delete`, `Num0`-`Num9`, `A`-`Z`, `Numpad0`-`Numpad9`, `Multiply`, `Add`, `Separator`, `Subtract`, `Decimal`, `Divide`, `F1`-`F12`.
+- `UnitObjectType`, `Technology`, `Fact`, `UnitClass`, `ProjectileType`, `Terrain`, `OptionsLocation` and `OptionsCivilization` are long; look them up.
 
 ---
 
-## 10. Important UI Behavior
+## 14. Menu Settings That Change Module Behavior
 
-- Global module toggle defaults to enabled
-- Module configuration is grouped by `Player 1` to `Player 8`
-- Each player group exposes one module slot for that player
-- The built-in submenus are **MODULES**, **UI**, **MISC**, **KEYBINDS**, and **DEBUG**
-- `Suppress Native AI` defaults to `true`; when enabled, assigned bot players have their native decision AI disabled while a Lua module is attached
-- `Multithreading` detaches module execution from the game's render thread, disables `Render()`, and blocks selected menu, replay, render, and IPC wait APIs
-- `Modules See Everything` defaults to `false` and affects map-tile reads, object visibility, and restricted cross-player data access
-- Player perspective options live under the **MISC** submenu: `Default`, `Player 1` to `Player 8`, `Gaia`
-- `Game Speed Multiplier` lives under the **MISC** submenu and applies a preset game-speed override
-- CONTROL resets `Player Perspective` to `Default` on startup
-- Menu scale and transparency live under the **UI** submenu
-- `Tournament Mode` blocks game commands outside `Update()` and also restricts selected engine, menu, replay, render, and `GameOptions` APIs
-- By default, assigning a module to a bot player's slot suppresses that player's native decision AI while the module remains assigned
-- The Debug menu's **Module Telemetry** view shows sampled `Update()` and `Render()` timing for active modules, plus a sampled baseline frame cost
-- In multithreading mode, the baseline frame view is hidden
-- `Spectator Mode` keeps controls enabled while spectating
-- Runtime Lua errors are displayed and logged through the UI
+| Setting (submenu) | Default | Effect |
+|-------------------|---------|--------|
+| **Enabled** (MODULES) | On | Turns all module slots on or off. |
+| **Update Interval** (MODULES) | `1.0` | Seconds of game time between `Update()` calls (slider 0.1 to 2.0). |
+| **Sequential Actions** (MODULES) | On | One game command per `Update()`. |
+| **Auto Move Camera** (MODULES) | On | Camera follows each command's target. |
+| **Suppress Native AI** (MODULES) | On | Turns off the built-in AI of a computer player whose slot has a module. |
+| **Tournament Mode** (MODULES) | Off | See [Modes](#4-modes). |
+| **Multithreading** (MODULES) | Off | See [Modes](#4-modes). Changing it reloads every module. |
+| **Modules See Everything** (MODULES) | Off | Modules ignore fog of war when reading tiles, objects and players. |
+| **Agent Bridge** (MODULES) | Off | Allows `AgentBridge.Start()`. |
+| **Sync** (player slot) | Off | Stores the module's settings in a shared profile (`S1`, `S2`, ...) instead of per player. |
+| **Game Speed Multiplier** (MISC) | `Default` | Speed override; `SetGameSpeedMultiplier()` changes it. Resets to `Default` when CONTROL starts. |
+| **API Profiling** (DEBUG) | Off | Fills `GetModuleTelemetry().api` for modules loaded after it is turned on. |
 
 ---
 
-## 11. Minimal Example
+## 15. Example
 
 ```lua
 local announced = false
@@ -749,13 +741,17 @@ end
 
 function Init()
     announced = false
-    Log("Match ready for player " .. tostring(GetAssignedPlayerId()))
 end
 
 function Update()
     if not announced then
         SendChatMessage("Hello from player " .. tostring(GetAssignedPlayerId()))
         announced = true
+    end
+
+    -- GetFact can return nil (game-state copy), so fall back to 0.
+    if (GetFact(Fact.HOUSING_HEADROOM) or 0) > 0 then
+        TrainUnit(UnitObjectType.VILLAGER_MALE)
     end
 end
 
@@ -764,12 +760,12 @@ function Render()
         return
     end
 
-    local color = Settings.GetColor("Villager Color", Color(0, 255, 0, 90))
     local player = GetAssignedPlayer()
     if not player then
         return
     end
 
+    local color = Settings.GetColor("Villager Color", Color(0, 255, 0, 90))
     for _, villager in ipairs(player:GetObjectsByClass(UnitClass.VILLAGER)) do
         RenderObjectBoundsFilled(villager, color)
     end

@@ -1,65 +1,64 @@
 # Game API — Facts
 
-This page mirrors the `Facts` block in `BindGameAPI()`. Most facts read game state and should be called from `Init`, `Update`, `Render`, or `End` while the match or end-state is available. **Tournament Mode** applies to game commands, not these read-only APIs.
+These functions read the match: the assigned player's resources and facts, objects, the map, chat and the match result. They do not change the game. Call them from `Init`, `Update`, `Render` or `End`.
 
 !!! warning "Game must be running"
-    Calling these APIs before the game starts logs an error.
+    Outside a match or its end screen, these functions log an error and return `nil`, `0`, `false` or an empty list.
 
 !!! note "Arguments"
-    Optional arguments are shown with `?` in the VS Code definitions; every other argument is required. Whole-number parameters (ids, counts, enums) also accept a float with a whole value such as `10.0`, but not `10.5`.
+    Arguments marked `?` are optional; every other argument is required. Whole-number parameters (ids, counts, enums) also accept a float with a whole value such as `10.0`, but not `10.5`.
 
 ## Reference
 
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
-| `GetFact` | `(fact)` | `number` | Overload: returns a fact value for the assigned player with parameter `0`. |
-| `GetFact` | `(fact, parameter)` | `number` | Returns a fact value for the assigned player. |
+| `GetFact` | `(fact, parameter?)` | `number \| nil` | Returns a `Fact` value for the assigned player. `parameter` (default `0`) is the fact's argument, for example a unit type id for `Fact.UNIT_TYPE_COUNT`. |
 | `IsObjectTypeAvailable` | `(unitObjectType)` | `boolean` | Returns whether the assigned player currently has access to a unit or building type. |
-| `GetUnitTypeCount` | `(unitId)` | `number` | Returns the assigned player's count for a unit type. |
-| `GetAttribute` | `(attribute)` | `number` | Returns a `PlayerAttribute` value for the assigned player. |
-| `CanAfford` | `(unitId, isBuilding)` | `boolean` | Returns whether the assigned player meets the item's resource and population cost. Availability is queried separately. |
-| `GetTechCost` | `(technology)` | `{ resourceId = ResourceType, amount = number }[]` | Returns the assigned player's current technology cost entries. |
-| `GetObjectCost` | `(unitObjectType)` | `{ resourceId = ResourceType, amount = number }[]` | Returns the assigned player's current object cost entries with multiplier `1.0`. |
-| `GetObjectCost` | `(unitObjectType, costMultiplier)` | `{ resourceId = ResourceType, amount = number }[]` | Returns the assigned player's current object cost entries with the given multiplier applied. |
-| `CanResearch` | `(technology)` | `boolean` | Returns whether the assigned player can currently research a technology. |
+| `GetUnitTypeCount` | `(unitId)` | `number` | Returns how many objects of a unit type the assigned player has. |
+| `GetAttribute` | `(attribute)` | `number` | Returns a `PlayerAttribute` value, such as `PlayerAttribute.WOOD`, for the assigned player. |
+| `CanAfford` | `(unitId, isBuilding?)` | `boolean` | Returns whether the assigned player has the resources and free population for one unit of this type. With `isBuilding = true` the population check is skipped. It does not check `IsObjectTypeAvailable`. |
+| `GetTechCost` | `(technology)` | `{ resourceId = ResourceType, amount = number }[]` | Returns the assigned player's current cost of a technology. |
+| `GetObjectCost` | `(unitObjectType, costMultiplier?)` | `{ resourceId = ResourceType, amount = number }[]` | Returns the assigned player's current cost of a unit or building type, multiplied by `costMultiplier` (default `1.0`). |
+| `CanResearch` | `(technology)` | `boolean` | Returns whether the assigned player can research a technology now: it is available and affordable. |
 | `IsTechnologyResearched` | `(technology)` | `boolean` | Returns whether the assigned player has researched a technology. |
-| `GetObjectsByType` | `(unitType)` | `Object[]` | Returns matching world objects, not just owned objects. Loot-bearing dead huntables and livestock are included. |
-| `GetObjectsByTypes` | `(unitTypes)` | `Object[]` | Returns matching world objects for any listed type. Loot-bearing dead huntables and livestock are included. |
-| `GetObjectsByClass` | `(unitClass)` | `Object[]` | Returns matching world objects of a class, not just owned objects. Loot-bearing dead huntables and livestock are included. |
-| `GetObjectsByClasses` | `(unitClasses)` | `Object[]` | Returns matching world objects of any listed class, not just owned objects. Loot-bearing dead huntables and livestock are included. |
-| `GetGameTime` | `()` | `number` | Returns the current match time in seconds. |
+| `GetObjectsByType` | `(unitType)` | `Object[]` | Returns the objects of a `UnitObjectType`, of any owner. See [Object lists](#object-lists). |
+| `GetObjectsByTypes` | `(unitTypes)` | `Object[]` | Returns the objects of any type in an array of `UnitObjectType` values. |
+| `GetObjectsByClass` | `(unitClass)` | `Object[]` | Returns the objects of a `UnitClass`, of any owner. |
+| `GetObjectsByClasses` | `(unitClasses)` | `Object[]` | Returns the objects of any class in an array of `UnitClass` values. |
+| `GetGameTime` | `()` | `number` | Returns the match time in seconds. |
 | `GetClockMs` | `()` | `number` | Returns milliseconds on a monotonic high-resolution clock with an arbitrary start. Subtract two values to measure a duration. |
-| `GetModuleTelemetry` | `()` | `table` | Returns the calling module instance's timing: `update` and `render` tables with `count`, `totalMs`, `sampleCount`, `averageMs`, `p50Ms`, `p95Ms` and `maxMs` (over the last 256 calls), plus `lateUpdates` (updates that ran a full interval or more late), `skippedIntervals` (update intervals dropped because of that) and `deferredUpdates` (Multithreading: an update came due while the previous one was still running). With the Debug setting **API Profiling** on, `api` lists the module's calls into native functions as `{ name, count, totalMs }`, longest total first; otherwise it is empty. Returns `nil` outside a module callback. |
-| `GetAllChatMessages` | `()` | `string[]` | Returns the current chat buffer as plain message strings. |
-| `GetNewChatMessages` | `()` | `string[]` | Returns chat messages that became visible since this module instance last called the function. |
+| `GetModuleTelemetry` | `()` | `table \| nil` | Returns the calling module instance's timing. See [Module telemetry](#module-telemetry). |
+| `GetAllChatMessages` | `()` | `string[]` | Returns the messages in the chat buffer. |
+| `GetNewChatMessages` | `()` | `string[]` | Returns the chat messages that appeared since this module instance last called it. The first call after a load returns the whole buffer. |
 | `GetLastChatMessage` | `()` | `string \| nil` | Returns the newest chat message, or `nil` if the chat buffer is empty. |
-| `GetAssignedPlayer` | `()` | `Player` | Returns the player currently assigned to this module instance. |
-| `GetPlayerById` | `(id)` | `Player` | Returns a player by index. Gaia is typically `0`, regular players are typically `1` to `8`. |
-| `GetPlayerCount` | `()` | `number` | Returns the size of the world player list. |
-| `GetMapTilesPtr` | `()` | `number, number` | Returns `(ptr, count)` for a packed tile snapshot owned by the current module instance and load generation. Intended for IPC / RPM readers. |
-| `GetMapWidth` | `()` | `number` | Returns the current map width in tiles. |
-| `GetMapHeight` | `()` | `number` | Returns the current map height in tiles. |
-| `GetMapTile` | `(x, y)` | `MapTile` | Overload: returns the tile at integer map coordinates, or `nil` if out of bounds. |
-| `GetMapTile` | `(position)` | `MapTile` | Overload: floors a `Vector2` world/tile position to a map tile lookup. |
-| `GetAllMapTiles` | `()` | `MapTile[]` | Returns all map tiles. Individual tile methods still respect fog-aware visibility. |
-| `CheckPlacement` | `(objectTypeId, position)` | `PlacementResult, number?` | Runs the game's own placement check of an object type for the assigned player, centred on a `Vector2` or `Vector3` position. Returns the `PlacementResult`, plus the blocking object's id for `BLOCKED`. Unexplored ground is refused unless Modules See Everything is on. Returns `nil` with Multithreading on. |
-| `CanPlaceObject` | `(objectTypeId, position)` | `boolean` | `true` when `CheckPlacement` returns `CAN_PLACE`; `nil` with Multithreading on. |
-| `CalculatePath` | `(startPos, targetPos)` | `Vector3[]` | Calculates a native path between two `Vector3` positions. |
-| `CalculatePath` | `(startPos, targetPos, collisionRadius)` | `Vector3[]` | Overload: calculates a native path between two `Vector3` positions with an explicit collision radius. |
-| `GetObjectsInArea` | `(pos1, pos2)` | `Object[]` | Returns objects whose current tile lies inside the rectangular area between two `Vector2` positions. Loot-bearing dead huntables and livestock are included. |
-| `GetObjectsInArea` | `(pos1, pos2, unitClass, owner)` | `Object[]` | Overload: returns the objects of `GetObjectsInArea(pos1, pos2)` that are in `unitClass` and owned by player id `owner`. Pass `nil` for either filter to skip it. |
-| `GetObjectStates` | `(objects)` | `table` | Reads several objects in one call. Returns a table of arrays `id`, `unitType`, `playerId`, `x`, `y`, `hitpoints`, `targetId` and `alive`; index `i` of every array describes the same object. `targetId` is `-1` without a visible target and `playerId` is `-1` without an owner. Skips `nil` entries, objects that no longer exist and objects that are not visible, so use the `id` array to match results to objects. |
-| `GetObjectChanges` | `()` | `{ created = integer[], destroyed = integer[], damaged = integer[] }` | Compares the assigned player's objects (the set `GetAssignedPlayer():GetPlayerObjects()` returns) with the previous call from this module instance. `damaged` lists objects with fewer hitpoints than at that call. Ids are in ascending order. The first call after a module load reports every object as created. Returns empty lists, and keeps the previous state, when the assigned player is unavailable. |
-| `GetObjectsPtr` | `()` | `number, number` | Returns `(ptr, count)` for a packed object snapshot owned by the current module instance and load generation. Intended for IPC / RPM readers. |
-| `GetObjectTypeData` | `(objectTypeId, objectData)` | `number` | Returns game-resolved object-type data for a `UnitObjectType` and `ObjectData` field. |
-| `GetObjectTypeAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number` | Returns a game-resolved object-type attribute value for a `UnitObjectType`. |
-| `IsEnemyPlayer` | `(player)` | `boolean` | Returns whether the given player is an enemy of the assigned player. |
-| `GetObjectById` | `(id)` | `Object` | Returns a world object by id. |
-| `GetProjectileById` | `(id)` | `Object` | Returns a projectile object by id. |
-| `GetAllProjectiles` | `()` | `Object[]` | Returns visible projectile objects. |
-| `GetProjectilesByType` | `(projectileType)` | `Object[]` | Returns projectile objects matching a `ProjectileType`. |
-| `GetVictoryCondition` | `()` | `VictoryCondition` | Returns the current victory condition. |
-| `GetVictoryPlayer` | `()` | `Player` | Returns the winner when the game has ended, otherwise `nil`. |
+| `GetAssignedPlayer` | `()` | `Player` | Returns the player this module instance is assigned to. |
+| `GetPlayerById` | `(id)` | `Player \| nil` | Returns a player by id: `0` is Gaia, `1` to `8` are the players. Returns `nil` if there is no player with that id. |
+| `GetPlayerCount` | `()` | `number` | Returns the number of player slots including Gaia. Player ids run from `0` to `GetPlayerCount() - 1`. |
+| `GetMapTilesPtr` | `()` | `number, number` | Returns `(pointer, count)` of a packed tile buffer for external readers. See the [IPC API](ipc-api.md#snapshot-buffers-for-ipc-ml). |
+| `GetMapWidth` | `()` | `number` | Returns the map width in tiles. |
+| `GetMapHeight` | `()` | `number` | Returns the map height in tiles. |
+| `GetMapTile` | `(x, y)` | `MapTile \| nil` | Returns the tile at integer map coordinates, or `nil` outside the map. |
+| `GetMapTile` | `(position)` | `MapTile \| nil` | Rounds the `Vector2` position down to whole tile coordinates and returns that tile. |
+| `GetAllMapTiles` | `()` | `MapTile[]` | Returns every tile of the map. |
+| `CheckPlacement` | `(objectTypeId, position)` | `PlacementResult, number?` | Runs the game's placement check for the assigned player and an object type centred on a `Vector2` or `Vector3` position. Returns the `PlacementResult`, plus the blocking object's id for `PlacementResult.BLOCKED`. Unexplored ground gives `PlacementResult.UNEXPLORED` unless **Modules See Everything** is on. Returns `nil` for an unknown object type. |
+| `CanPlaceObject` | `(objectTypeId, position)` | `boolean \| nil` | Returns `true` when `CheckPlacement` returns `PlacementResult.CAN_PLACE`, and `nil` when `CheckPlacement` returns `nil`. |
+| `CalculatePath` | `(startPos, targetPos, collisionRadius?)` | `Vector3[]` | Returns the game's path between two `Vector3` positions for a unit of `collisionRadius` (default `0`). Returns an empty list when there is no path. |
+| `GetObjectsInArea` | `(pos1, pos2)` | `Object[]` | Returns the objects whose tile lies inside the rectangle with corners `pos1` and `pos2` (`Vector2`, edges included). |
+| `GetObjectsInArea` | `(pos1, pos2, unitClass, owner)` | `Object[]` | Same, but only objects of `unitClass` owned by player id `owner`. Pass `nil` for either filter to skip it. |
+| `GetObjectStates` | `(objects)` | `table` | Reads several objects in one call. See [Object states](#object-states). |
+| `GetObjectChanges` | `()` | `{ created = integer[], destroyed = integer[], damaged = integer[] }` | Returns the ids of the assigned player's objects that appeared, disappeared or lost hitpoints since the last call. See [Object changes](#object-changes). |
+| `GetObjectsPtr` | `()` | `number, number` | Returns `(pointer, count)` of a packed object buffer for external readers. See the [IPC API](ipc-api.md#snapshot-buffers-for-ipc-ml). |
+| `GetObjectTypeData` | `(objectTypeId, objectData)` | `number \| nil` | Returns an `ObjectData` value of a unit type as the assigned player has it, with that player's technologies and civilization bonuses. |
+| `GetObjectTypeAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number \| nil` | Returns an `ObjectAttribute` value of a unit type as the assigned player has it. `damageType` is the armor or attack class for `ObjectAttribute.ARMOR` and `ObjectAttribute.WEAPON`; pass `0` for other attributes. |
+| `IsEnemyPlayer` | `(player)` | `boolean` | Returns whether a player is an enemy of the assigned player. |
+| `GetObjectById` | `(id)` | `Object \| nil` | Returns an object by id, or `nil` if it does not exist or the module cannot see it. |
+| `GetProjectileById` | `(id)` | `Object \| nil` | Returns a projectile by id, or `nil` if the id is not a projectile the module can see. |
+| `GetAllProjectiles` | `()` | `Object[]` | Returns the projectiles the module can see. |
+| `GetProjectilesByType` | `(projectileType)` | `Object[]` | Returns the projectiles of a `ProjectileType` that the module can see. |
+| `GetVictoryCondition` | `()` | `VictoryCondition` | Returns the match's victory condition. |
+| `GetVictoryPlayer` | `()` | `Player \| nil` | Returns the winner after the match has ended, otherwise `nil`. |
+
+`GetAssignedPlayerId()` works in `Load` too; it is listed on the [Control & Commands](commands.md) page.
 
 ## Examples
 
@@ -145,23 +144,82 @@ function Init()
 end
 ```
 
+```lua
+function Update()
+    local started = GetClockMs()
+    local states = GetObjectStates(GetObjectsByClass(UnitClass.VILLAGER))
+    local playerId = GetAssignedPlayerId()
+
+    local withoutTarget = 0
+    for i = 1, #states.id do
+        if states.playerId[i] == playerId and states.targetId[i] == -1 then
+            withoutTarget = withoutTarget + 1
+        end
+    end
+
+    Log(tostring(withoutTarget) .. " villagers without a target, read in "
+        .. string.format("%.2f", GetClockMs() - started) .. " ms")
+end
+```
+
+```lua
+function Update()
+    local changes = GetObjectChanges()
+    for _, id in ipairs(changes.damaged) do
+        Log("Object " .. tostring(id) .. " lost hitpoints")
+    end
+    if #changes.destroyed > 0 then
+        Log(tostring(#changes.destroyed) .. " objects are gone")
+    end
+end
+```
+
 ## Notes
 
-- Use `GetAssignedPlayer()`, not `GetLocalPlayer()`.
-- `GetAssignedPlayerId()` is documented on the control page because it is bound under the engine section and is also available in `Load(playerId)`.
-- `GetObjectsByType`, `GetObjectsByTypes`, and `GetObjectsByClass` scan world objects, not only the assigned player's objects. Loot-bearing dead huntables and livestock are included, and explored animals or resources can still be returned outside active vision.
-- `GetMapTile(position)` floors `position.x` and `position.y` to integer tile coordinates before resolving the tile.
-- `CalculatePath()` uses the game's native pathfinding, accepts `Vector3` start and target positions, and returns an empty list when no path is available.
-- `GetObjectsInArea(pos1, pos2)` uses the same object filter as the other scan APIs. Loot-bearing dead huntables and livestock are included, and fog-aware visibility still applies.
-- `GetTechCost()` and `GetObjectCost()` return arrays of resource-cost entries. Use `entry.resourceId` and `entry.amount`; numeric indexes `entry[1]` and `entry[2]` mirror the same values.
-- `GetAllChatMessages()` and `GetLastChatMessage()` read from the game's current chat buffer.
-- `GetNewChatMessages()` tracks unread chat state per module instance. On the first call after load or reload, it returns the currently visible buffer.
-- Projectile lookup functions return normal `Object` references whose `ObjectType` is `ObjectType.PROJECTILE` and follow the same visibility restrictions as other object queries.
-- Treat `Object`, `Player`, and `MapTile` userdata as callback-scoped views. Retaining these userdata values across `Load`, `Init`, `Update`, `Render`, or `End` callbacks is deprecated: synchronous mode may expose a mutable game-owned pointer, while snapshot-backed mode exposes immutable point-in-time data that can become stale. Retain stable value data such as an object/player ID or position, then query the current callback again before reading state or issuing a command. Commands re-resolve IDs against the current world generation and reject stale or unavailable targets.
-- When **Modules See Everything** is disabled, object retrieval functions follow the assigned player's fog-of-war with one exception: explored animals and resources can still be returned. On those non-visible references, only `IsVisible()`, `IsExplored()`, `GetId()`, `GetPosition()`, `GetClass()`, and `GetUnitObjectType()` are safe.
-- When **Modules See Everything** is disabled, player-state access through `GetPlayerById()` is limited. Resource, fact, tech, and object-availability methods only expose the assigned player's data.
-- `GetAllMapTiles()` returns the full map grid, but `MapTile` methods only expose what the assigned player is currently allowed to know.
-- `GetMapTilesPtr()` and `GetObjectsPtr()` return engine-owned buffers rebuilt on demand. Every buffer requested by one module instance during a callback remains stable through that callback; another module instance cannot invalidate it. The engine currently retains the last requested set until that same instance requests another snapshot or unloads, but external readers should copy it before that boundary. The second return value is an element count, not a byte count; an empty snapshot is `(0, 0)`.
-- `GetObjectsPtr()` is dead-inclusive. Read the alive state from the snapshot flags instead of assuming every entry is alive.
-- The snapshot helpers are primarily intended for IPC / external ML readers that want to transfer compact RPM-friendly buffers. See the IPC page for the exact packed C++ layouts.
-- `CanAfford(unitId, isBuilding)` forwards the `isBuilding` flag to the engine affordability helper. It intentionally does not imply `IsObjectTypeAvailable(unitId)`; check both before issuing a train/build command.
+### Object lists
+
+`GetObjectsByType`, `GetObjectsByTypes`, `GetObjectsByClass`, `GetObjectsByClasses` and `GetObjectsInArea` return objects of every owner, not only the assigned player's.
+
+- They contain living units, buildings and resources, and dead animals that still carry food. Unfinished buildings (foundations) are left out; `Player:GetFoundations()` returns them.
+- With **Modules See Everything** off, they contain the objects the assigned player can see, plus explored animals and resources outside its vision. On those out-of-sight objects only a few methods work; see [Types](types.md#fog-of-war-and-stale-objects).
+- Projectiles are `Object` values with `ObjectType.PROJECTILE`. The projectile functions follow the same visibility rule.
+
+With **Modules See Everything** off, `MapTile` methods and the player data of other players (resources, facts, technologies) are also limited to what the assigned player may know. See [Types](types.md).
+
+### Keeping references
+
+An `Object`, `Player` or `MapTile` is valid during the callback that returned it. To track something across callbacks, keep its id or position and look it up again, for example with `GetObjectById(id)`.
+
+### Object states
+
+`GetObjectStates(objects)` takes an array of `Object` values, for example the result of `GetObjectsByClass`. It returns a table of arrays: `id`, `unitType`, `playerId`, `x`, `y`, `hitpoints`, `targetId` and `alive`. Index `i` of every array describes the same object.
+
+- `playerId` is `-1` for an object without an owner. `targetId` is `-1` when the object has no target, or its target is not visible.
+- `nil` entries, objects that no longer exist and objects the module cannot see are left out, so the arrays can be shorter than the input. Use the `id` array to match results to objects.
+- A value that is not an `Object` raises an error.
+
+### Object changes
+
+`GetObjectChanges()` compares the assigned player's objects (the list `GetAssignedPlayer():GetPlayerObjects()` returns) with the previous call from the same module instance.
+
+- `created`: ids that are new since the previous call.
+- `destroyed`: ids that are no longer in the list.
+- `damaged`: ids whose hitpoints are lower than at the previous call.
+
+Each list is sorted by id. The first call after a module load reports every object as created. When the assigned player cannot be read, the function returns empty lists and keeps the previous state.
+
+### Module telemetry
+
+`GetModuleTelemetry()` returns `nil` outside a module callback. Otherwise it returns a table with:
+
+| Field | Content |
+|-------|---------|
+| `update`, `render` | Tables with `count` and `totalMs` over all calls, and `sampleCount`, `averageMs`, `p50Ms`, `p95Ms` and `maxMs` over the last 256 calls. |
+| `lateUpdates` | Updates that started a full update interval or more after they were due. |
+| `skippedIntervals` | Update intervals dropped because of those late updates. |
+| `deferredUpdates` | With Multithreading on: updates that came due while the previous update was still running. |
+| `api` | With the Debug setting **API Profiling** on, one `{ name, count, totalMs }` entry per function the module called, highest `totalMs` first. The setting applies to modules loaded or reloaded after it is turned on. Otherwise empty. |
+
+### Multithreading
+
+With **Multithreading** on, and while the [Agent Bridge](agent-bridge.md) runs, some functions return `nil` for data the game-state copy does not hold. See [Limits](limits.md#game-state-copy).

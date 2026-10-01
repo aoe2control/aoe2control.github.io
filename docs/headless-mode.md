@@ -4,148 +4,148 @@ description: "Run the AoE2Control launcher in headless mode, override settings o
 
 # Headless Mode
 
-The launcher supports a headless mode for script-driven startup. In this mode it writes status lines to standard output instead of showing the normal launcher window.
+With `--headless`, the launcher opens no window. It starts CONTROL in the running game, writes status lines to standard output and ends with an exit code.
 
 ## When To Use It
 
-Use headless mode when you want to:
+Use headless mode to:
 
-- start CONTROL from another program or test harness
-- apply a temporary `settings.ini` before startup
-- copy a module file or module folder into the config directory automatically
-- watch launcher progress from Python or another scripting language
+- start CONTROL from another program or a test harness
+- install a `settings.ini` before CONTROL starts
+- copy a module file or module folder into the modules folder before CONTROL starts
+- read the launcher's progress and result from Python or another language
 
-!!! note "Game first"
-    Start Age of Empires II: Definitive Edition before launching CONTROL in headless mode. The launcher still attaches to an already running game process.
+!!! note "Start the game first"
+    The launcher does not start the game. Start Age of Empires II: Definitive Edition and wait until its window is open and not minimized. Otherwise the launcher ends with exit code `6` or `7`.
 
 ## Command Line
 
 ```text
-AoE2Control.exe --headless [--override-settings <file>] [--override-module <file-or-folder>]
+AoE2Control.exe --headless [--timeout-ms <ms>] [--override-settings <file>] [--override-module <file-or-folder>]
 ```
 
-The launcher accepts both styles for option values:
+An option's value can follow a space or `=`:
 
 - `--override-settings "C:\path\to\settings.ini"`
 - `--override-settings="C:\path\to\settings.ini"`
-- `--override-module "C:\path\to\my_module"`
-- `--override-module="C:\path\to\my_module"`
+
+The launcher is a Windows (GUI) program. PowerShell does not wait for it or set `$LASTEXITCODE` unless you capture its output, as the [examples](#examples) do.
 
 ## Arguments
 
 | Argument | Description |
 |----------|-------------|
-| `--headless` | Runs the launcher without the normal window and writes status lines to stdout. |
-| `--override-settings <file>` | Replaces `%appdata%\CONTROL\AoE2Control\settings.ini` with the given file before startup. |
-| `--override-module <file-or-folder>` | Copies a module file or a module folder into `%appdata%\CONTROL\AoE2Control\modules\` before startup. |
+| `--headless` | Runs without a window and writes status lines to standard output. |
+| `--timeout-ms <ms>` | How long to wait, in milliseconds, for CONTROL to report that it is ready or has failed. Default `120000`. The same limit applies when CONTROL is still starting in the game from an earlier launch. Accepts a whole number from `1` to `4294967295`. |
+| `--override-settings <file>` | Replaces `%appdata%\CONTROL\AoE2Control\settings.ini` with the given file before CONTROL starts. |
+| `--override-module <file-or-folder>` | Copies a module file or module folder into `%appdata%\CONTROL\AoE2Control\modules\` before CONTROL starts. |
+| `--rmside-status-json`, `--rmside-ui=hidden` | Used by the AoE2RMSIDE map editor. Both are required together, need `--headless` and cannot be combined with the override options. Status lines become JSON, and the CONTROL menu and module drawings stay hidden. |
+
+Any other argument ends the launcher with exit code `2`.
+
+## RMS IDE Endpoint
+
+While CONTROL runs, it serves the RMS IDE endpoint, the named pipe `\\.\pipe\AoE2ControlRmsIdeV1` that AoE2RMSIDE uses. It runs however CONTROL was started, not only after a launch with the RMS IDE options. Every process running under your Windows user can connect to it and call all of its requests, including requests that start a match, end the match and unload CONTROL. Processes of other Windows users cannot connect.
 
 ## Override Behavior
 
-The launcher applies overrides after it finds the game and before it starts CONTROL.
+The launcher applies overrides after it finds the game window and before it starts CONTROL.
 
-- If the game is not running, nothing is copied.
-- If CONTROL is already running in the game, the launcher refuses the overrides and exits with code `3`. Restart the game first.
-- If any override fails, the launcher restores the previous files.
+- If the game is not running or its window is not ready, nothing is copied.
+- If CONTROL already runs in the game, nothing is copied and the launcher exits with code `3`. A running CONTROL keeps its settings in memory and would overwrite the new files. Restart the game first.
+- If an override fails, the launcher restores the previous files and exits with code `3`.
 
 ### `--override-settings`
 
 - The source must be a file.
-- The target is always `%appdata%\CONTROL\AoE2Control\settings.ini`.
-- An existing `settings.ini` is replaced.
+- It replaces `%appdata%\CONTROL\AoE2Control\settings.ini`.
 
 ### `--override-module`
 
-- The source can be a single file or a folder.
-- If the source is a file, it is copied to `%appdata%\CONTROL\AoE2Control\modules\<filename>`.
-- If the source is a folder, it is copied to `%appdata%\CONTROL\AoE2Control\modules\<folder-name>\...`. A trailing `\` or `\.` is ignored, so `C:\temp\my_module\` installs as `my_module`.
-- An existing file or folder with the same name is replaced. Other modules are not touched.
-- The launcher refuses a source folder that contains the modules folder, and a target that is a link or junction.
+- The source can be a file or a folder.
+- A file is copied to `%appdata%\CONTROL\AoE2Control\modules\<file-name>`.
+- A folder is copied to `%appdata%\CONTROL\AoE2Control\modules\<folder-name>\`. A trailing `\` or `\.` is ignored, so `C:\temp\my_module\` installs as `my_module`.
+- An existing file or folder of the same name is replaced as a whole: files in the old folder that the source does not have are deleted. Other modules are not touched.
+- The launcher refuses a source folder that contains the CONTROL config folder, and a destination that is a link or junction.
 
-See [Config Location](config-location.md) for the destination layout.
+See [Config Location](config-location.md) for the folder layout.
 
 ## Output
 
-With `--headless`, the launcher writes one line per status change. The first line is the launcher version, followed by progress and terminal status lines.
-
-Typical output looks like this:
+The launcher writes one line each time its status changes. Output to a pipe or file is UTF-8. The first line is the launcher version. A typical successful start:
 
 ```text
-v1.0.0
+v1.1.0
 Scanning...
 Checking game startup...
 Waiting for connection...
 Initializing...
 Fetching Offsets...
+Offsets Ready
+Testing D3D11
 Ready
 ```
 
-Possible terminal success lines include:
+The progress lines can change between versions. Scripts should use the last line and the exit code.
 
-- `Ready`
-- `Ready - Diagnostics pending`
-- `Ready - Partially outdated`
-- `Ready - Requires update`
-- `Already Running!`: CONTROL of the same version is already running in the game.
+These last lines mean success (exit code `0`):
 
-The graphical launcher may first show `Ready - Diagnostics pending` while match-only checks are waiting to run. After passive diagnostics finish, the displayed status refreshes to `Ready` or the applicable update warning. Headless mode treats the first typed ready status as startup success and exits with code `0`.
+| Line | Meaning |
+|------|---------|
+| `Ready` | CONTROL runs. |
+| `Ready - Partially outdated` | CONTROL runs, but some of its functions do not work on this game version. |
+| `Ready - Requires update` | CONTROL runs, but important functions do not work on this game version. Wait for a CONTROL update. |
+| `Already Running!` | The same CONTROL version already runs in the game. The launcher leaves it running. |
 
-Possible terminal failure lines include:
-
-- `Process not found`
-- `Startup validation failed`
-- `Offset Error: game version <version> is not supported (rows <numbers>). Wait for a CONTROL update. Details: ...`. CONTROL does not support this game version yet. The row numbers identify what failed when you report it.
-- `Render Hook Failed`
-- `CONTROL <version> is already running in this game. Restart the game to use version <version>`
-- `CONTROL failed to start in this game (<reason>). Restart the game`: an earlier start failed and could not fully stop.
-- `Timed out waiting for startup status`
-- override errors such as missing files, invalid paths, or `CONTROL is already running in the game. Restart the game to apply overrides`
+Headless mode exits at the first of these lines. During a match CONTROL checks more game functions; the launcher window can then change `Ready` to one of the warnings, but a headless launcher has already exited.
 
 ## Exit Codes
 
-| Exit Code | Meaning |
-|----------:|---------|
-| `0` | Success. This also includes `Already Running!`. |
-| `1` | Another launcher instance is already running. |
-| `2` | Invalid command-line arguments. |
-| `3` | An override could not be applied, or CONTROL was already running in the game. |
-| `4` | Startup failed for another reason, for example `Offset Error` or `Render Hook Failed`. |
-| `5` | CONTROL in the game has another version or failed earlier. Restart the game. |
-| `6` | The game is not running. |
-| `7` | The game window is not ready yet. |
-| `8` | Injection failed. |
-| `9` | Timed out waiting for startup. |
+| Exit Code | Meaning | Last line |
+|----------:|---------|-----------|
+| `0` | Success. | See [Output](#output). |
+| `1` | Another launcher is already running. | `Launcher already running` |
+| `2` | Invalid command-line arguments. | For example `Unknown argument: --foo`, `Missing value for --override-module`, `Invalid value for --timeout-ms` |
+| `3` | An override could not be applied, or CONTROL already runs in the game and overrides were given. | For example `Override settings file not found`, `CONTROL is already running in the game. Restart the game to apply overrides` |
+| `4` | CONTROL failed to start for a reason not listed below. | For example `Offset Error: ...`, `Startup validation failed`, `Render Hook Failed`, `Target process exited before startup completed` |
+| `5` | CONTROL in the game has another version or failed to start earlier. Restart the game. | `CONTROL <version> is already running in this game. Restart the game to use version <version>`, `CONTROL failed to start in this game (<reason>). Restart the game` |
+| `6` | The game is not running. | `Process not found` |
+| `7` | The game window is not ready: not open, minimized or smaller than 640x360. | `Game window not ready` |
+| `8` | Injection failed. | The injection error, for example `Process open failed` |
+| `9` | No result within `--timeout-ms`. | `Timed out waiting for startup status`, `CONTROL is still starting in this game` |
 
-Codes 5 to 9 were added in 1.1.0. Earlier versions report those cases as `4`, and report `Already Running!` with `0` even when CONTROL in the game had another version or had failed.
+`Offset Error` means CONTROL does not support this game version yet. The full line is `Offset Error: game version <version> is not supported (rows <numbers>). Wait for a CONTROL update. Details: %APPDATA%\CONTROL\AoE2Control\diagnostics\latest.json`. Include the row numbers and `latest.json` when you report it.
 
 ## Examples
 
-Start normally in headless mode:
+Start CONTROL and print the exit code (PowerShell):
 
 ```powershell
-.\AoE2Control.exe --headless
+.\AoE2Control.exe --headless | Out-Host
+$LASTEXITCODE
 ```
 
 Apply a custom settings file:
 
 ```powershell
-.\AoE2Control.exe --headless --override-settings "C:\temp\settings.ini"
+.\AoE2Control.exe --headless --override-settings "C:\temp\settings.ini" | Out-Host
 ```
 
 Copy a module folder before startup:
 
 ```powershell
-.\AoE2Control.exe --headless --override-module "C:\temp\my_module"
+.\AoE2Control.exe --headless --override-module "C:\temp\my_module" | Out-Host
 ```
 
 Copy a single module entry file before startup:
 
 ```powershell
-.\AoE2Control.exe --headless --override-module "C:\temp\my_module.main.lua"
+.\AoE2Control.exe --headless --override-module "C:\temp\my_module.main.lua" | Out-Host
 ```
 
 ## Python Example
 
-This is a working base for starting the launcher, streaming status lines, and checking the exit code:
+This script starts the launcher, prints its status lines and checks the exit code:
 
 ```python
 from pathlib import Path
@@ -189,4 +189,4 @@ if exit_code != 0:
     raise SystemExit(exit_code)
 ```
 
-Replace `launcher_path` with the packaged launcher executable on your system.
+Set `launcher_path` to the location of `AoE2Control.exe` on your system.

@@ -35,7 +35,7 @@ markdown_extensions:
 
 extra:
   discord: "https://discord.gg/DENDVuWq5t"
-  version: "1.0"
+  version: "1.1"
   generator: false
   social:
     - icon: fontawesome/brands/discord
@@ -64,14 +64,15 @@ nav:
     - commands.md
     - session-control.md
     - facts.md
-  - Render API: render-api.md
+  - Render API:
+    - render-api.md
+    - render-api-examples.md
   - Types & Enums:
     - types.md
     - game-options.md
     - enums.md
   - Advanced APIs:
     - settings-api.md
-    - render-api-impl.md
     - ipc-api.md
     - agent-bridge.md
   - Reference:

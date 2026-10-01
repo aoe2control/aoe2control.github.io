@@ -1,27 +1,37 @@
 # CONTROL Lua — Agent Instructions
 
-This document is the thin companion guide for the full CONTROL Lua reference. It is intended for coding agents and human developers who need a short operating checklist without duplicating the full API contract.
+Rules for coding agents that write CONTROL (AoE2Control) Lua modules. Look up every function, signature and enum in `CONTROL_LUA_ENGINE_REFERENCE.md`. If that file lacks a detail, check the [AoE2Control Documentation](https://aoe2control.github.io/).
 
-**Target:** Coding agents assisting users with CONTROL Lua modules, plus developers who want a short set of guardrails before opening the full reference.
+## API
 
-## Usage Rules
+1. Use only functions, methods, tables and enums from the reference. CONTROL is not the AoE2 `.per` AI language. There is no `GetLocalPlayer()`; use `GetAssignedPlayer()` and `GetAssignedPlayerId()`.
+2. Never guess enum names or numbers, and never hard-code ids for units, technologies, facts or ages. `Age` (in-match) and `OptionsAge` (match setup) have different values.
+3. Call methods on objects with `:` (`player:GetTownCenters()`) and table functions with `.` (`Settings.AddBool(...)`, `IPC.Send(...)`).
+4. Create strategic components with `ResourceTracker.new()`, `VillagerOccupation.new(tracker)`, `ConstructionPlacement.new(occupation)` in `Init()`. `ResourceTracker()` does not work.
+5. `Color(r, g, b, a)` with integers takes `0` to `255`; with any float argument it takes `0` to `1`. `Color(1, 1, 1)` is almost black.
 
-1. Treat `CONTROL_LUA_ENGINE_REFERENCE.md` as the contract for function names, signatures, lifecycle behavior, and sandbox restrictions.
-2. If the bundled reference appears incomplete or stale, confirm the missing detail on the official docs before shipping code: [AoE2Control Documentation](https://aoe2control.github.io/).
-3. Do not assume standard AoE2 `.per` AI syntax or generic engine APIs unless CONTROL documents them explicitly.
-4. Never guess enum member names or numeric values. Verify the correct table first, especially when working with `Age` versus `OptionsAge`.
-5. Keep the module entry file thin and move real logic into submodules loaded with `require("folder.filename")`.
+## Callbacks
 
-## Fast Navigation
+6. Define callbacks as globals: `function Update()`, not `local function Update()`. CONTROL calls `Load(playerId)`, `Init()`, `Update()`, `Render()`, `End(hasWon)` and `Unload()`; all are optional.
+7. Call `Settings.Add*` and `AgentBridge.Start()` in `Load()`. Do not read game state in `Load()`; it can run in the main menu.
+8. Give game commands (`TrainUnit`, `UnitsMove`, `ResearchTechnology` and the rest) only in `Update()`. With **Sequential Actions** on (the default), only the first command per `Update()` runs.
+9. Call `Render*` draw functions only inside `Render()`. Anywhere else they raise an error. Keep expensive work out of `Render()`; it runs every frame.
+10. A callback, including the file's top-level code, is stopped with an error after 1 second. Never write loops that wait for game state; `IPC.WaitForMessage` waits at most 500 ms.
+11. After an error in `Update()` or `Render()`, CONTROL stops calling it until the module is reloaded. Guard code paths that can fail.
 
-- Lifecycle and callback intent: [Lifecycle](https://aoe2control.github.io/lifecycle/)
-- Module loading rules and sandbox behavior: [Module System](https://aoe2control.github.io/module-system/)
-- Enum and constant lookup: [Enums](https://aoe2control.github.io/enums/)
-- Setup-only enums and lobby configuration: [Game Options](https://aoe2control.github.io/game-options/)
-- Fact readers and player attributes: [Facts](https://aoe2control.github.io/facts/)
+## Nil checks and stale objects
 
-## Common Mistakes
+12. Check for `nil` before use: `GetAssignedPlayer()`, `GetPlayerById()`, `GetObjectById()`, `GetMapTile()`, `GetCurrentGameOptions()`, `Object:GetTargetObject()`, `Object:GetCurrentMapTile()`, `Player:GetSelectedObject()`, `GetFact()` and `ParseJSON()` can return `nil`.
+13. Keep object ids or positions across callbacks, not `Object` values. A kept object that went into the fog or no longer exists raises an error on most methods. Check `IsVisible()` or fetch it again.
+14. Object lists do not include unfinished buildings; use `Player:GetFoundations()`. `Object:GetName()` is the current graphic's name and changes with the activity; use `GetTypeName()` or `GetUnitObjectType()` to identify a type.
 
-- Hard-coding numeric ids for facts, units, technologies, or ages.
-- Mixing setup enums such as `OptionsAge` with in-match enums such as `Age` without verifying the API expects that table.
-- Repeating large API tables in prompts or project docs instead of linking or attaching the full reference.
+## Modes
+
+15. **Multithreading** or a running **Agent Bridge**: modules read a copy of the game state. `Render()` is not called with Multithreading. `GetFact`, `Object:GetAttribute`, `Object:GetObjectData`, `GetObjectTypeData`, `GetObjectTypeAttribute`, `CheckPlacement`, `CanPlaceObject` and `MapTile:IsBuildable` can return `nil`. Commands are queued, so `true` means queued, not done. Strategic components raise an error.
+16. **Tournament Mode**: commands outside `Update()` are refused, draw calls draw nothing, and `Log`, `SendChatMessage`, `SetCameraPosition`, the `Dispatch*` and random-map functions, replay and speed functions, render queries and most `GameOptions` methods do nothing. Do not rely on `Log()` output there.
+17. Modules run in multiplayer only when the match has cheats enabled.
+
+## Sandbox and files
+
+18. `io`, `os`, `debug`, `coroutine`, `utf8` and `package` do not exist. `load`, `loadfile`, `dofile`, `module` and `collectgarbage` are removed. Use `Log()`, not `print()`. Talk to other programs through `IPC`.
+19. Name the entry file `{moduleName}.main.lua` (letters, digits, underscores) inside its own folder under `modules\`. Keep it short and load other files with `require("folder.file")`: up to four dot-separated parts, relative to the entry file's folder, no `..`.

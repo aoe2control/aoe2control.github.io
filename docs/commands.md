@@ -1,96 +1,137 @@
 ---
-description: Reference for AoE2Control engine control APIs, session automation helpers, replay controls, and in-match command functions in Lua.
+description: Reference for AoE2Control engine functions, menu and replay controls, and in-match command functions in Lua.
 ---
 
 # Game API — Control & Commands
 
-This page follows the same grouping used by `BindGameAPI()` in `module_bindings.cpp`: `Engine`, `Menu / UI`, `Replays`, and `Commands`.
+This page lists the functions that control CONTROL itself, read the menu and replay state, and give orders to the module's player. Starting matches, loading saves and choosing random maps are covered in [Automation & Session Control](session-control.md).
 
-!!! warning "Game must be running"
-    Calling most game API functions before the game starts logs an error. The main exceptions are `GetAssignedPlayerId()` and `AssignAndLoadModule()`.
+Pass every parameter shown in a signature. When a function accepts a shorter form, it has its own row.
 
-!!! note "Lua signatures are strict"
-    Lua only gets overloads that are explicitly bound. If a parameter is shown here, pass it explicitly even if the C++ function has a default value.
+## Command Rules
 
-## API Rules
+These rules apply to the functions in the [Commands](#commands) table.
 
-- The **Commands** section below is the only part affected by replay blocking, the `Update()`-only warning, and `Sequential Actions`.
-- **Tournament Mode** also blocks selected functions in the `Engine`, `Menu / UI`, and `Replays` sections, plus many render and `GameOptions` APIs documented on other pages.
-- **Multithreading** blocks selected menu, replay, render, and IPC wait APIs, and `Render()` is not executed while it is enabled.
-- Most unit and building commands silently filter the input list down to objects owned by the assigned player.
-- `SetCameraPosition` and `SendChatMessage` are command-style functions, but they are not ownership-filtered.
-- `Log()`, `SetEngineUIVisibility()`, `UnloadEngine()`, and `AssignAndLoadModule()` are not in-match game commands and can be used from any callback, unless **Tournament Mode** blocks them.
+- Commands need a running match. Before the match starts or after it ends, they log `Lua error: Game API function called before the game started...` and return `false` (or nothing).
+- Commands do nothing in a replay and log `Lua error: Game Commands are blocked during replay`.
+- Call commands from `Update()`. From another callback they still run, but log a warning once per module load. **Tournament Mode** refuses them outside `Update()`.
+- Commands act for the module's assigned player. Units and buildings in the list that this player does not own are dropped. If none are left, the command does nothing and returns `false`.
+- **Sequential Actions** (on by default) allows one command per `Update()`. Further commands in the same update do nothing and return `false`.
+- **Auto Move Camera** (on by default) moves the camera to each command's target. Only one module moves the camera: the one assigned to your own player, or else the one with the lowest player id.
+- Object lists must be Lua arrays of `Object` values with no gaps, such as `{ villager1, villager2 }`. Anything else raises a Lua error.
+- A function whose return type is `nil` gives no result. Read the game state on a later update to see whether it worked.
+- `SetCameraPosition` and `SendChatMessage` are exceptions: they also work in replays and on end screens, from any callback, and do not count toward **Sequential Actions**.
 
-For a deeper guide to match startup, save loading, and pre-game setup, see [Automation & Session Control](session-control.md) and [GameOptions](game-options.md).
+### With Multithreading or the Agent Bridge
+
+With **Multithreading** on, or while the [Agent Bridge](agent-bridge.md) runs, a module reads a copy of the game state and its commands go into a queue. The game runs the queued commands on its next frame, or after the pause ends.
+
+- `true` means the command was queued, not that it succeeded.
+- A command that is refused at the call returns `false` and logs `<Call> was not sent: <reason>`, for example `UnitsMove was not sent: none of the units is the module player's, alive and visible`. Other reasons include `Sequential Actions allows no more commands in this update`, `the target is not visible to the module player`, `the target belongs to another player` and `an object is from an earlier match`.
+- A queued command can still fail when it runs, for example when the player can no longer afford it. CONTROL then logs a `[MODULE_COMMAND_REJECTION]` line with `reason=<code>` and `command=<Call>`, once per command and reason per module load.
+
+### Blocked Functions
+
+Some functions on this page are refused with **Multithreading** or **Tournament Mode** on. A refused call logs `Lua error: Multithreading blocked Lua function '<name>'.` (or `Tournament Mode blocked ...`) once per module load and returns `false`, `nil`, an empty string or an empty table.
+
+| Functions | Multithreading | Tournament Mode |
+|-----------|----------------|-----------------|
+| `GetAssignedPlayerId`, `GetCurrentGameOptions` | allowed | allowed |
+| `Log`, `SetEngineUIVisibility`, `UnloadEngine`, `AssignAndLoadModule` | allowed | blocked |
+| `IsGamePaused`, `IsMenuOpen`, `GetAvailableSaveFiles`, `GetCurrentReplayFileName` | allowed | blocked |
+| `SetCameraPosition`, `SendChatMessage` | allowed (queued) | blocked |
+| `Dispatch*`, `SetGamePaused`, `SetReplaySpeed`, `SetGameSpeedMultiplier` | blocked | blocked |
+| Game commands | queued | `Update()` only |
 
 ## Engine
 
+These functions work at any time, in menus as well as in a match.
+
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
-| `Log` | `(message)` | `nil` | Writes a message to the CONTROL log window. |
-| `SetEngineUIVisibility` | `(visible)` | `nil` | Shows or hides the CONTROL overlay. |
-| `UnloadEngine` | `()` | `nil` | Detaches CONTROL from the game process. |
-| `GetAssignedPlayerId` | `()` | `number` | Returns the player id currently assigned to this module instance. Available in `Load`. |
-| `AssignAndLoadModule` | `(playerId, moduleName)` | `boolean` | Assigns a discovered module entry to a player slot and loads or reloads it. |
+| `Log` | `(message)` | `nil` | Writes `[MODULE] <message>` to the CONTROL log. |
+| `SetEngineUIVisibility` | `(visible)` | `nil` | Opens (`true`) or closes (`false`) the CONTROL menu, the window that Shift toggles. |
+| `UnloadEngine` | `()` | `nil` | Unloads CONTROL from the game, as the Delete key does. |
+| `GetAssignedPlayerId` | `()` | `number` | Returns the player id (`1` to `8`) this module instance is assigned to. Works in `Load()`, before the match starts. |
+| `AssignAndLoadModule` | `(playerId, moduleName)` | `boolean` | Assigns a module to player `1` to `8` and loads it, or reloads it if it is already assigned. |
 
-`AssignAndLoadModule()` accepts player ids `1` to `8`. `moduleName` must match a discovered module entry name. When called from inside a running module callback, CONTROL queues the reassignment and applies it safely through the module manager.
+`AssignAndLoadModule()` takes the module name without the `.main.lua` or `.main.module` ending. The assignment is applied after the current callback returns. It returns `true` when the assignment was accepted and `false` for a player id outside `1` to `8` or a malformed name. A name that matches no module file is ignored when the assignment is applied.
 
 ## Menu / UI
 
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
-| `DispatchStartGame` | `()` | `boolean` | Starts the configured session; after an ended ordinary single-player match, queues a native clean teardown and fresh match while preserving exposed setup state. |
-| `DispatchRestartGame` | `()` | `boolean` | Restarts the current single-player session when supported. |
-| `DispatchResignGame` | `()` | `boolean` | Resigns the current game. |
-| `DispatchQuitGame` | `()` | `boolean` | Queues the game's native full-match teardown and return-to-menu transaction when supported. |
-| `DispatchLoadGame` | `(saveGameFileName)` | `boolean` | Loads a file from the current load-game list by file name. |
-| `GetAvailableSaveFiles` | `()` | `string[]` | Returns the file names currently exposed by the game's load-game list. |
-| `GetCurrentGameOptions` | `()` | `GameOptions \| nil` | Returns the current session setup object when available. |
-| `IsGamePaused` | `()` | `boolean` | Returns whether the current game or replay is paused. |
-| `IsMenuOpen` | `()` | `boolean` | Returns whether the game UI is currently in a menu state. Also works during replays. |
+| `IsGamePaused` | `()` | `boolean` | Returns whether the match or replay is paused. |
+| `IsMenuOpen` | `()` | `boolean` | Returns whether the game's in-match menu is open. |
+| `DispatchStartGame` | `()` | `boolean` | Starts a single-player match with the current setup. |
+| `DispatchRestartGame` | `()` | `boolean` | Restarts the current single-player match or replay. |
+| `DispatchResignGame` | `()` | `boolean` | Resigns the current match. |
+| `DispatchQuitGame` | `()` | `boolean` | Leaves the current single-player match and returns to the menu. |
+| `DispatchLoadGame` | `(saveGameFileName)` | `boolean` | Loads a save or replay by file name. |
+| `GetAvailableSaveFiles` | `()` | `string[]` | Returns the file names in the game's load list. |
+| `GetCurrentGameOptions` | `()` | `GameOptions \| nil` | Returns the match setup. See [GameOptions](game-options.md). |
 
-## Replays
+`IsGamePaused()` and `IsMenuOpen()` need a match, a replay or an end screen. Elsewhere they log `Lua error: Game API function called before the game started...` and return `false`.
+
+[Automation & Session Control](session-control.md) explains when each `Dispatch*` function succeeds and lists the random-map functions.
+
+## Pause, Speed and Replays
 
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
-| `SetGameSpeedMultiplier` | `(multiplier)` | `nil` | Sets the current game or replay speed multiplier. |
-| `SetGamePaused` | `(paused)` | `nil` | Pauses or resumes the current game or replay session. |
-| `SetReplaySpeed` | `(speed)` | `nil` | Sets replay playback speed using `ReplaySpeed`. |
-| `GetCurrentReplayFileName` | `()` | `string` | Returns the current replay file name while a replay is active. |
+| `SetGamePaused` | `(paused)` | `nil` | Pauses (`true`) or resumes (`false`) the match or replay. |
+| `SetGameSpeedMultiplier` | `(multiplier)` | `boolean` | Sets the game speed multiplier, like the **Game Speed Multiplier** setting in the CONTROL menu. Returns `true`. |
+| `SetReplaySpeed` | `(speed)` | `nil` | Sets the playback speed of the running replay to a `ReplaySpeed` value: `SLOW`, `NORMAL`, `FAST` or `FASTEST`. Does nothing outside a replay. |
+| `GetCurrentReplayFileName` | `()` | `string` | Returns the file name of the running replay, or `""` when no replay is playing. |
+
+`SetGamePaused()`, `SetReplaySpeed()` and `GetCurrentReplayFileName()` need a match, a replay or an end screen, like `IsGamePaused()`.
+
+`SetGameSpeedMultiplier()` works at any time. The speed applies to matches and replays and stays in effect for later matches. Pass `0` or less to go back to the game's default speed.
 
 ## Commands
 
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
 | `SetCameraPosition` | `(position)` | `nil` | Moves the camera to a `Vector2` world position. |
-| `SendChatMessage` | `(message)` | `nil` | Sends chat text as the assigned player. |
-| `TrainUnit` | `(unitId)` | `boolean` | Trains one unit by automatically selecting a matching production source for the assigned player. |
-| `TrainUnit` | `(unitId, amount)` | `boolean` | Trains `amount` units by automatically selecting a matching production source for the assigned player. |
-| `TrainUnit` | `(trainSources, unitId)` | `boolean` | Trains one unit using the assigned player's most common matching source from the provided source types. |
-| `TrainUnit` | `(trainSources, unitId, amount)` | `boolean` | Trains `amount` units using the assigned player's most common matching source from the provided source types. |
-| `UnitsTargetObject` | `(units, target)` | `boolean` | Orders owned units to attack, interact with, or target an object. |
-| `UnitsBuildStructure` | `(builders, structureId, position)` | `boolean` | Orders owned builders to place a structure at a `Vector3` world position. |
-| `UnitsMove` | `(units, position)` | `boolean` | Orders owned units to move to a `Vector3` world position. |
-| `EnableScouting` | `()` | `boolean` | Enables auto-scouting on an idle assigned scout-line unit if one is available. |
-| `ResearchTechnology` | `(technology)` | `boolean` | Researches a technology using the assigned player's most common matching research source automatically. |
-| `DeleteUnit` | `(unit)` | `nil` | Deletes an owned unit. |
-| `DestroyBuilding` | `(building)` | `nil` | Destroys an owned building. |
-| `SetGatherPoint` | `(buildings, targetPosition)` | `nil` | Sets the gather point of owned buildings. |
-| `RingTownBell` | `(building, isCallingIn)` | `nil` | Calls villagers into shelter or sends them back out. |
-| `SendBackToWork` | `(building)` | `nil` | Sends workers from the selected building back to their previous jobs. |
-| `SendAllBackToWork` | `(building)` | `nil` | Sends all workers from the selected building back to work. |
-| `SetUnitStanceAutoScout` | `(units)` | `nil` | Sets owned units to auto-scout. |
-| `SetUnitStancePatrol` | `(units, targetPosition)` | `nil` | Sets owned units to patrol toward a `Vector3` target. |
-| `SetUnitStanceGuard` | `(units, targetObject)` | `nil` | Sets owned units to guard an object. |
-| `SetUnitStanceFollow` | `(units, targetObject)` | `nil` | Sets owned units to follow an object. |
-| `SetUnitStanceAttackMove` | `(units, targetPosition)` | `nil` | Sets owned units to attack-move toward a `Vector3` target. |
-| `SetUnitStanceGarrison` | `(units, targetObject)` | `nil` | Garrisons owned units into a target object. |
-| `SetUnitStanceUngarrison` | `(sourceObjects, unit)` | `nil` | Ungarrisons an owned unit from owned source buildings. |
-| `SetUnitStanceSeekShelter` | `(units)` | `nil` | Orders owned units to seek shelter. |
-| `SetUnitCombatStance` | `(units, stance)` | `nil` | Sets the combat stance of owned units using `UnitCombatStance`. |
-| `SetFormation` | `(units, formation)` | `nil` | Sets the formation of owned units using `Formation`, as the game's formation buttons do. It takes effect when the units next move together. `ObjectData.FORMATION_ID` does not report it. |
+| `SendChatMessage` | `(message)` | `nil` | Sends a chat message, shown in the assigned player's color. |
+| `TrainUnit` | `(unitId)` | `boolean` | Trains one unit of type `unitId` at the player's buildings that can train it. |
+| `TrainUnit` | `(unitId, amount)` | `boolean` | Makes sure `amount` units of type `unitId` are in production. |
+| `TrainUnit` | `(trainSources, unitId)` | `boolean` | Like `TrainUnit(unitId)`, but only uses buildings of the `UnitObjectType` values in `trainSources`. |
+| `TrainUnit` | `(trainSources, unitId, amount)` | `boolean` | Like `TrainUnit(unitId, amount)`, but only uses buildings of the types in `trainSources`. |
+| `UnitsTargetObject` | `(units, target)` | `boolean` | Orders the player's units to act on an object, for example to attack it, gather from it or repair it. |
+| `UnitsBuildStructure` | `(builders, structureId, position)` | `boolean` | Orders the player's builders to build a structure at a `Vector3` world position. |
+| `UnitsMove` | `(units, position)` | `boolean` | Orders the player's units to move to a `Vector3` world position. |
+| `EnableScouting` | `()` | `boolean` | Sets the player's idle scouts to auto-scout. |
+| `ResearchTechnology` | `(technology)` | `boolean` | Researches a `Technology` at one of the player's buildings that can research it. |
+| `DeleteUnit` | `(unit)` | `nil` | Deletes one of the player's units. |
+| `DestroyBuilding` | `(building)` | `nil` | Deletes one of the player's buildings. Same game command as `DeleteUnit`. |
+| `SetGatherPoint` | `(buildings, targetPosition)` | `nil` | Sets the gather point of the player's buildings to a `Vector3` position. |
+| `RingTownBell` | `(building, isCallingIn)` | `nil` | `true` rings the town bell at the building so villagers take shelter; `false` sends them back out. |
+| `SendBackToWork` | `(building)` | `nil` | Not supported on the current game build. Logs this once per module load and does nothing. |
+| `SendAllBackToWork` | `(building)` | `nil` | Not supported on the current game build. Logs this once per module load and does nothing. |
+| `SetUnitStanceAutoScout` | `(units)` | `nil` | Sets the player's units to auto-scout. |
+| `SetUnitStancePatrol` | `(units, targetPosition)` | `nil` | Orders the player's units to patrol to a `Vector3` position. |
+| `SetUnitStanceGuard` | `(units, targetObject)` | `nil` | Not supported on the current game build. Logs this once per module load and does nothing. |
+| `SetUnitStanceFollow` | `(units, targetObject)` | `nil` | Not supported on the current game build. Logs this once per module load and does nothing. |
+| `SetUnitStanceAttackMove` | `(units, targetPosition)` | `nil` | Orders the player's units to attack-move to a `Vector3` position. |
+| `SetUnitStanceGarrison` | `(units, targetObject)` | `nil` | Orders the player's units to garrison in an object. |
+| `SetUnitStanceUngarrison` | `(sourceObjects, unit)` | `nil` | Ungarrisons one of the player's units from the player's buildings in `sourceObjects`. |
+| `SetUnitStanceSeekShelter` | `(units)` | `nil` | Orders the player's units to seek shelter. |
+| `SetUnitCombatStance` | `(units, stance)` | `nil` | Sets the `UnitCombatStance` of the player's units: `AGGRESSIVE`, `DEFENSIVE`, `NO_ATTACK` or `STAND_GROUND`. |
+| `SetFormation` | `(units, formation)` | `nil` | Sets the `Formation` of the player's units (`LINE`, `BOX`, `STAGGERED` or `FLANK`), as the game's formation buttons do. It takes effect when the units next move together. `ObjectData.FORMATION_ID` does not report it. |
+
+Without Multithreading or the Agent Bridge, the `boolean` commands return `true` when the order was given to the game, and `false` when it was not:
+
+- `TrainUnit` counts the units of that type already in production. If that count is `amount` or more, it returns `false` and trains nothing; otherwise it trains the difference. `TrainUnit(unitId)` therefore trains nothing while one unit of that type is in production. It uses the building type of which the player owns the most, and returns `false` when the player cannot afford the unit or owns no such building.
+- `UnitsBuildStructure` returns `false` when the player cannot afford the structure. It does not check the position; use `CheckPlacement` from [Facts](facts.md) first.
+- `EnableScouting` uses Scout Cavalry, Camel Scouts and Eagle Scouts that are idle and not already scouting. It returns `false` when there are none.
+- `ResearchTechnology` returns `false` when the technology cannot be researched now or the player cannot afford it.
+
+With Multithreading on, or while the Agent Bridge runs, these checks run when the queued command executes; see [With Multithreading or the Agent Bridge](#with-multithreading-or-the-agent-bridge).
 
 ## Examples
+
+Skip drawing while the in-match menu is open or the game is paused:
 
 ```lua
 function Render()
@@ -102,39 +143,18 @@ function Render()
 end
 ```
 
-```lua
-function Update()
-    SetReplaySpeed(ReplaySpeed.FAST)
-end
-```
+Play replays at the fastest speed:
 
 ```lua
 function Update()
-    local player = GetAssignedPlayer()
-    if not player then
-        return
-    end
-
-    local townCenters = player:GetTownCenters()
-    if #townCenters == 0 then
-        return
-    end
-
-    if CanAfford(UnitObjectType.VILLAGER_MALE, false) then
-        TrainUnit(UnitObjectType.VILLAGER_MALE)
-    end
+    SetReplaySpeed(ReplaySpeed.FASTEST)
 end
 ```
 
-## Notes
+Keep one villager in production. `TrainUnit` returns `false` while a villager is training or the player cannot afford one:
 
-- `GetAssignedPlayerId()` is intentionally available in `Load(playerId)` before the match is running.
-- `GetCurrentGameOptions()` returns the session setup object documented on [GameOptions](game-options.md).
-- `DispatchLoadGame()` expects an exact file name from `GetAvailableSaveFiles()`.
-- `SetReplaySpeed()` uses `ReplaySpeed.SLOW`, `ReplaySpeed.NORMAL`, `ReplaySpeed.FAST`, and `ReplaySpeed.FASTEST`.
-- `TrainUnit` has overloads with and without explicit `trainSources`.
-- `TrainUnit(unitId)` and `TrainUnit(unitId, amount)` look up eligible source object types automatically.
-- `ResearchTechnology(technology)` resolves eligible research sources automatically.
-- `DeleteUnit`, `DestroyBuilding`, and stance commands do not return success flags.
-- Only the **Commands** section is affected by replay blocking, `Sequential Actions`, and outside-`Update()` warnings.
-- **Tournament Mode** also blocks selected engine, menu, replay, render, and `GameOptions` APIs outside the **Commands** section.
+```lua
+function Update()
+    TrainUnit(UnitObjectType.VILLAGER_MALE)
+end
+```

@@ -1,112 +1,97 @@
 ---
-description: "Reference for the GameOptions Lua type in AoE2Control, including writable setup fields, player-slot methods, and the option enums used by session setup automation."
+description: "Reference for the GameOptions Lua type in AoE2Control: reading and changing the match setup before a game starts, player slots, and the Options* enums."
 ---
 
 # GameOptions
 
-`GetCurrentGameOptions()` returns a `GameOptions` object for the current session setup. Use it to inspect or edit the pending match configuration before starting the game.
-
-!!! note "Write timing"
-    `GameOptions` setter methods return `false` while a match is already running. Use them before `DispatchStartGame()` or from menu-oriented workflows.
-
-## Access
+`GetCurrentGameOptions()` returns a `GameOptions` object, or `nil` when the game has no setup available. Before a match, it is the setup that the next `DispatchStartGame()` uses. During a match, it is the running match's setup, which you can read but not change.
 
 ```lua
-local options = GetCurrentGameOptions()
-if options then
+function Load()
+    local options = GetCurrentGameOptions()
+    if not options then
+        return
+    end
+
     options:SetLocation(OptionsLocation.ARENA)
     options:SetGameMode(OptionsGameMode.RANDOM_MAP)
 end
 ```
 
-Notes:
+## When methods work
 
-- `GetCurrentGameOptions()` can return `nil`.
-- Player-slot methods accept slot indexes `0` to `7`.
-- `DispatchStartGame()` uses the same current setup state.
+- Every `Set...` method returns `true` when it wrote the value and `false` when it did not.
+- Setters return `false` while a match is running. Change the setup before you call `DispatchStartGame()`.
+- With **Tournament Mode** on, every method except `SetAssignedPlayerCivilization()` is blocked: setters return `false`, getters return `0`, `false` or `nil`, and CONTROL writes a log line for the first blocked call of each method.
+- The random map seed and source methods have more rules; see [Random map seed and source](#random-map-seed-and-source).
 
-## Global Setup Methods
+## Match settings
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `GetAIDifficulty()` | `OptionsAIDifficulty` | Returns the current AI difficulty preset. |
-| `SetAIDifficulty(difficulty)` | `boolean` | Sets the AI difficulty preset. |
-| `GetCivilizationSet()` | `OptionsCivilizationSet` | Returns the active civilization set. |
+| `GetAIDifficulty()` | `OptionsAIDifficulty` | AI difficulty. |
+| `SetAIDifficulty(difficulty)` | `boolean` | Sets the AI difficulty. |
+| `GetCivilizationSet()` | `OptionsCivilizationSet` | Civilization set. |
 | `SetCivilizationSet(civilizationSet)` | `boolean` | Sets the civilization set. |
-| `GetGameMode()` | `OptionsGameMode` | Returns the selected game mode. |
-| `SetGameMode(gameMode)` | `boolean` | Sets the game mode. |
-| `GetMapSize()` | `OptionsMapSize` | Returns the selected map size. |
+| `GetGameMode()` | `OptionsGameMode` | Game mode. Returns `OptionsGameMode.UNAVAILABLE` when the setup uses a mode that has no `OptionsGameMode` value. |
+| `SetGameMode(gameMode)` | `boolean` | Sets the game mode. Returns `false` for `UNAVAILABLE` and for numbers that are not an `OptionsGameMode` value. |
+| `GetMapSize()` | `OptionsMapSize` | Map size. |
 | `SetMapSize(mapSize)` | `boolean` | Sets the map size. |
-| `GetStartingAge()` | `OptionsAge` | Returns the starting age preset. |
-| `SetStartingAge(age)` | `boolean` | Sets the starting age preset. |
-| `GetEndingAge()` | `OptionsAge` | Returns the ending age preset. |
-| `SetEndingAge(age)` | `boolean` | Sets the ending age preset. |
-| `GetGameSpeed()` | `number` | Returns the configured game speed multiplier. |
-| `SetGameSpeed(gameSpeed)` | `boolean` | Sets the configured game speed multiplier. |
-| `GetRevealMap()` | `OptionsRevealMap` | Returns the reveal-map mode. |
-| `SetRevealMap(revealMap)` | `boolean` | Sets the reveal-map mode. |
-| `GetVictory()` | `OptionsVictory` | Returns the victory rule. |
-| `SetVictory(victory)` | `boolean` | Sets the victory rule. |
-| `GetVictoryLimit()` | `number` | Returns the current victory limit value. |
+| `GetStartingAge()` | `OptionsAge` | Starting age. |
+| `SetStartingAge(age)` | `boolean` | Sets the starting age. |
+| `GetEndingAge()` | `OptionsAge` | Ending age. |
+| `SetEndingAge(age)` | `boolean` | Sets the ending age. |
+| `GetGameSpeed()` | `number` | Game speed. |
+| `SetGameSpeed(gameSpeed)` | `boolean` | Sets the game speed. |
+| `GetRevealMap()` | `OptionsRevealMap` | Reveal map setting. |
+| `SetRevealMap(revealMap)` | `boolean` | Sets the reveal map setting. |
+| `GetVictory()` | `OptionsVictory` | Victory condition. |
+| `SetVictory(victory)` | `boolean` | Sets the victory condition. |
+| `GetVictoryLimit()` | `number` | Victory limit value. |
 | `SetVictoryLimit(victoryLimit)` | `boolean` | Sets the victory limit value. |
-| `GetResources()` | `OptionsResources` | Returns the resource preset. |
-| `SetResources(resources)` | `boolean` | Sets the resource preset. |
-| `GetPopulation()` | `number` | Returns the configured population cap. |
-| `SetPopulation(population)` | `boolean` | Sets the population cap. |
-| `GetTeamsNotTogether()` | `boolean` | Returns whether team spawn grouping is disabled. |
-| `SetTeamsNotTogether(teamsNotTogether)` | `boolean` | Sets whether team spawn grouping is disabled. |
-| `GetRecordGame()` | `boolean` | Returns whether game recording is enabled. |
-| `SetRecordGame(recordGame)` | `boolean` | Sets whether game recording is enabled. |
-| `GetTeamPositions()` | `boolean` | Returns whether team positions are enforced. |
-| `SetTeamPositions(teamPositions)` | `boolean` | Sets whether team positions are enforced. |
-| `GetFullTechTree()` | `boolean` | Returns whether full tech tree is enabled. |
-| `SetFullTechTree(fullTechTree)` | `boolean` | Sets whether full tech tree is enabled. |
-| `GetLockTeams()` | `boolean` | Returns whether team changes are locked. |
-| `SetLockTeams(lockTeams)` | `boolean` | Sets whether team changes are locked. |
-| `GetLockSpeed()` | `boolean` | Returns whether game speed changes are locked. |
-| `SetLockSpeed(lockSpeed)` | `boolean` | Sets whether game speed changes are locked. |
-| `GetTurboMode()` | `boolean` | Returns whether turbo mode is enabled. |
-| `SetTurboMode(turboMode)` | `boolean` | Sets whether turbo mode is enabled. |
-| `GetAntiquityMode()` | `boolean` | Returns whether antiquity mode is enabled. |
-| `SetAntiquityMode(antiquityMode)` | `boolean` | Sets whether antiquity mode is enabled. |
-| `GetLocation()` | `OptionsLocation` | Returns the selected map or location id. |
-| `SetLocation(location)` | `boolean` | Sets the selected map or location id. |
-| `SetRandomMapPoolLocations(locations)` | `boolean` | Sets a custom random map pool from a Lua array of `OptionsLocation` values. |
-| `GetRandomMapSeed()` | `number \| nil` | Returns the requested unsigned 32-bit fixed seed. `nil` means game-selected randomness. |
-| `SetRandomMapSeed(seed)` | `boolean` | Stages an exact unsigned 32-bit fixed seed from `0` through `4294967295`. |
-| `ClearRandomMapSeed()` | `boolean` | Returns the request to game-selected randomness. |
-| `GetRandomMapSource()` | `RandomMapSource \| nil` | Returns the currently selected source as an immutable copied catalog value. |
-| `SetRandomMapSource(source)` | `boolean` | Selects a current-generation game-visible source. Rejects stale or forged values. |
-| `GetPlayersCount()` | `number` | Returns the configured player-slot count. |
-| `SetPlayersCount(playersCount)` | `boolean` | Sets the configured player-slot count. |
-| `GetTreatyLength()` | `number` | Returns the treaty length. |
+| `GetResources()` | `OptionsResources` | Starting resources. |
+| `SetResources(resources)` | `boolean` | Sets the starting resources. |
+| `GetPopulation()` | `number` | Population limit. |
+| `SetPopulation(population)` | `boolean` | Sets the population limit. |
+| `GetTreatyLength()` | `number` | Treaty length. |
 | `SetTreatyLength(treatyLength)` | `boolean` | Sets the treaty length. |
-| `GetHandicap()` | `boolean` | Returns whether handicap mode is enabled. |
-| `SetHandicap(handicap)` | `boolean` | Sets whether handicap mode is enabled. |
+| `GetPlayersCount()` | `number` | Number of player slots in use. |
+| `SetPlayersCount(playersCount)` | `boolean` | Sets the number of player slots in use. |
+| `GetLocation()` | `OptionsLocation` | Selected map. |
+| `SetLocation(location)` | `boolean` | Selects a map. Also clears a custom map pool set by `SetRandomMapPoolLocations()`. |
+| `SetRandomMapPoolLocations(locations)` | `boolean` | Sets a custom random map pool. See [Custom random map pools](#custom-random-map-pools). |
 
-## Player Slot Methods
+The on/off options have a getter that returns a `boolean` and a setter that takes one.
 
-These methods operate on one of the eight setup slots.
+| Getter | Setter | Option |
+|--------|--------|--------|
+| `GetTeamsNotTogether()` | `SetTeamsNotTogether(value)` | `true` when **Team Together** is off. |
+| `GetRecordGame()` | `SetRecordGame(value)` | **Record Game** |
+| `GetTeamPositions()` | `SetTeamPositions(value)` | **Team Positions** |
+| `GetFullTechTree()` | `SetFullTechTree(value)` | **Full Tech Tree** |
+| `GetLockTeams()` | `SetLockTeams(value)` | **Lock Teams** |
+| `GetLockSpeed()` | `SetLockSpeed(value)` | **Lock Speed** |
+| `GetTurboMode()` | `SetTurboMode(value)` | **Turbo Mode** |
+| `GetAntiquityMode()` | `SetAntiquityMode(value)` | **Antiquity Mode** |
+| `GetHandicap()` | `SetHandicap(value)` | **Handicap** |
+
+## Player slots
+
+The setup has eight player slots. `playerIndex` is `0` to `7`: slot `0` is player 1 and slot `7` is player 8. For an index outside `0` to `7`, setters return `false` and getters return `0`.
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `GetPlayerTeam(playerIndex)` | `number` | Returns the team number for a player slot. |
-| `SetPlayerTeam(playerIndex, team)` | `boolean` | Sets the team number for a player slot. |
-| `GetPlayerHandicapPercentage(playerIndex)` | `number` | Returns the handicap percentage for a player slot. |
-| `SetPlayerHandicapPercentage(playerIndex, handicapPercentage)` | `boolean` | Sets the handicap percentage for a player slot. |
-| `GetPlayerColor(playerIndex)` | `number` | Returns the raw player color index for a player slot. |
-| `SetPlayerColor(playerIndex, color)` | `boolean` | Sets the raw player color index for a player slot. |
-| `GetPlayerCivilization(playerIndex)` | `OptionsCivilization` | Returns the civilization assigned to a player slot. |
-| `SetPlayerCivilization(playerIndex, civilization)` | `boolean` | Sets the civilization assigned to a player slot. |
-| `SetAssignedPlayerCivilization(civilization)` | `boolean` | Sets the civilization for the module's assigned player slot. |
+| `GetPlayerTeam(playerIndex)` | `number` | Team number of the slot. |
+| `SetPlayerTeam(playerIndex, team)` | `boolean` | Sets the team number of the slot. |
+| `GetPlayerHandicapPercentage(playerIndex)` | `number` | Handicap percentage of the slot. |
+| `SetPlayerHandicapPercentage(playerIndex, handicapPercentage)` | `boolean` | Sets the handicap percentage of the slot. |
+| `GetPlayerColor(playerIndex)` | `number` | Color index of the slot. |
+| `SetPlayerColor(playerIndex, color)` | `boolean` | Sets the color index of the slot. |
+| `GetPlayerCivilization(playerIndex)` | `OptionsCivilization` | Civilization of the slot. |
+| `SetPlayerCivilization(playerIndex, civilization)` | `boolean` | Sets the civilization of the slot and turns off its random civilization. |
+| `SetAssignedPlayerCivilization(civilization)` | `boolean` | Sets the civilization of the module's assigned player. |
 
-Notes:
-
-- `SetAssignedPlayerCivilization()` uses the current module instance's assigned player id and requires that id to be a regular player slot from `1` to `8`.
-- Most `GameOptions` methods are blocked while **Tournament Mode** is enabled. `SetAssignedPlayerCivilization()` remains available in the current Lua API.
-- Random-map seed/source mutators are also rejected in multiplayer and while a match is active. Check [Random Map Control](session-control.md#random-map-control) capabilities before using them.
-- A source is tied to its catalog generation. Refreshing the catalog makes every earlier source stale for selection, although its copied properties remain safe to read.
-- An ended ordinary single-player match can be followed by `DispatchStartGame()` to create a fresh world with all exposed options, source, and seed preserved through native teardown/setup reconstruction. `DispatchRestartGame()` retains its explicit same-session restart meaning.
+`SetAssignedPlayerCivilization()` writes the slot of the player the module is assigned to (`GetAssignedPlayerId()`). It returns `false` when that id is not `1` to `8`. Tournament Mode does not block it.
 
 ## Example
 
@@ -126,9 +111,11 @@ function Load()
 end
 ```
 
-## Custom Random Map Pools
+[Automation & Session Control](session-control.md#session-control) describes `DispatchStartGame()`, including starting a new match after one has ended.
 
-Use `SetRandomMapPoolLocations()` when you want the setup screen to use a custom random map pool instead of a single fixed location.
+## Custom random map pools
+
+`SetRandomMapPoolLocations(locations)` takes a Lua array of `OptionsLocation` values. The game picks one of them when the match starts.
 
 ```lua
 function Load()
@@ -145,18 +132,32 @@ function Load()
 end
 ```
 
-Notes:
+- The array must hold 1 to 256 locations. An empty or longer array returns `false`.
+- One location does the same as `SetLocation()`.
+- Two or more locations set the location to `OptionsLocation.CUSTOM_MAP_POOL`.
 
-- Pass a Lua array of `OptionsLocation` values.
-- Passing one location behaves like `SetLocation(...)`.
-- Passing multiple locations sets `GetLocation()` to `OptionsLocation.CUSTOM_MAP_POOL`.
+## Random map seed and source
 
-## Option Enums
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `GetRandomMapSeed()` | `number \| nil` | The fixed seed set with `SetRandomMapSeed()`, or `nil` when the game picks the seed. |
+| `SetRandomMapSeed(seed)` | `boolean` | Sets a fixed map seed, `0` to `4294967295`, for the next match. |
+| `ClearRandomMapSeed()` | `boolean` | Removes the fixed seed. The game picks the seed again. |
+| `GetRandomMapSource()` | `RandomMapSource \| nil` | The selected random map script, or `nil`. |
+| `SetRandomMapSource(source)` | `boolean` | Selects a random map script returned by `GetAvailableRandomMapSources()`. |
+
+- `SetRandomMapSeed()`, `ClearRandomMapSeed()` and `SetRandomMapSource()` work only in single-player setup. They return `false` during a match, in multiplayer, in a replay, and while a match is starting or quitting. CONTROL logs the reason.
+- They also return `false` when the matching flag of `GetRandomMapControlCapabilities()` is `false`: `requestedSeed` for the seed methods, `selection` for `SetRandomMapSource()`.
+- `SetRandomMapSource()` returns `false` for a source from an older catalog. After `RefreshRandomMapSources()`, get the sources again with `GetAvailableRandomMapSources()`.
+
+[Random Map Control](session-control.md#random-map-control) describes the catalog functions and the `RandomMapSource` type.
+
+## Option enums
 
 ### OptionsAIDifficulty
 
-| Value | Numeric Value |
-|-------|---------------|
+| Name | Value |
+|------|-------|
 | `EXTREME` | `-1` |
 | `HARDEST` | `0` |
 | `HARD` | `1` |
@@ -166,15 +167,20 @@ Notes:
 
 ### OptionsCivilizationSet
 
-| Value | Numeric Value |
-|-------|---------------|
+`ALL` and `AGE_OF_EMPIRES_II` are two names for the same value.
+
+| Name | Value |
+|------|-------|
 | `ALL` | `0` |
 | `AGE_OF_EMPIRES_II` | `0` |
 
 ### OptionsGameMode
 
-| Value | Numeric Value |
-|-------|---------------|
+These are CONTROL's own numbers, not the game's internal game mode ids. CONTROL converts between the two, so a name keeps its value when a game update renumbers the modes. `UNAVAILABLE` is only returned by `GetGameMode()`; `SetGameMode()` rejects it.
+
+| Name | Value |
+|------|-------|
+| `UNAVAILABLE` | `-1` |
 | `RANDOM_MAP` | `0` |
 | `REGICIDE` | `1` |
 | `DEATH_MATCH` | `2` |
@@ -190,8 +196,8 @@ Notes:
 
 ### OptionsMapSize
 
-| Value | Numeric Value |
-|-------|---------------|
+| Name | Value |
+|------|-------|
 | `TINY` | `120` |
 | `SMALL` | `144` |
 | `MEDIUM` | `168` |
@@ -202,8 +208,8 @@ Notes:
 
 ### OptionsAge
 
-| Value | Numeric Value |
-|-------|---------------|
+| Name | Value |
+|------|-------|
 | `STANDARD` | `0` |
 | `DARK_AGE` | `2` |
 | `FEUDAL_AGE` | `3` |
@@ -213,16 +219,18 @@ Notes:
 
 ### OptionsRevealMap
 
-| Value | Numeric Value |
-|-------|---------------|
+| Name | Value |
+|------|-------|
 | `NORMAL` | `0` |
 | `EXPLORED` | `1` |
 | `ALL_VISIBLE` | `2` |
 
 ### OptionsVictory
 
-| Value | Numeric Value |
-|-------|---------------|
+These numbers differ from the [`VictoryCondition`](enums.md#victorycondition) values that `GetVictoryCondition()` returns during a match.
+
+| Name | Value |
+|------|-------|
 | `STANDARD` | `9` |
 | `CONQUEST` | `1` |
 | `TIME_LIMIT` | `7` |
@@ -231,8 +239,8 @@ Notes:
 
 ### OptionsResources
 
-| Value | Numeric Value |
-|-------|---------------|
+| Name | Value |
+|------|-------|
 | `STANDARD` | `0` |
 | `LOW` | `1` |
 | `MEDIUM` | `2` |
@@ -243,14 +251,12 @@ Notes:
 
 ### OptionsLocation
 
-The binding exposes the current engine map table as `OptionsLocation`.
+Map ids for `SetLocation()` and `SetRandomMapPoolLocations()`. `CUSTOM_MAP_POOL` (`137`) stands for a custom map pool and `SCENARIO_MAP` (`-1`) for a scenario.
 
 Common values:
 
-| Value | Numeric Value |
-|-------|---------------|
-| `CUSTOM_MAP_POOL` | `137` |
-| `SCENARIO_MAP` | `-1` |
+| Name | Value |
+|------|-------|
 | `ARABIA` | `9` |
 | `BLACK_FOREST` | `12` |
 | `ARENA` | `29` |
@@ -258,14 +264,14 @@ Common values:
 | `ACROPOLIS` | `67` |
 | `MEGARANDOM` | `77` |
 | `SOCOTRA` | `87` |
+| `CUSTOM_MAP_POOL` | `137` |
 | `FOUR_LAKES` | `140` |
 | `LAND_NOMAD` | `141` |
 
-??? info "Full OptionsLocation value table"
+??? info "All OptionsLocation values"
 
-    | Value | Numeric Value |
-    |-------|---------------|
-    | `CUSTOM_MAP_POOL` | `137` |
+    | Name | Value |
+    |------|-------|
     | `SCENARIO_MAP` | `-1` |
     | `ARABIA` | `9` |
     | `ARCHIPELAGO` | `10` |
@@ -385,6 +391,7 @@ Common values:
     | `REAL_WORLD_BLACK_SEA` | `134` |
     | `REAL_WORLD_CAUCASUS` | `135` |
     | `REAL_WORLD_SIBERIA` | `136` |
+    | `CUSTOM_MAP_POOL` | `137` |
     | `GOLDEN_SWAMP` | `139` |
     | `FOUR_LAKES` | `140` |
     | `LAND_NOMAD` | `141` |
@@ -463,10 +470,10 @@ Common values:
 
 ### OptionsCivilization
 
-??? info "Full OptionsCivilization value table"
+??? info "All OptionsCivilization values"
 
-    | Value | Numeric Value |
-    |-------|---------------|
+    | Name | Value |
+    |------|-------|
     | `GAIA` | `0` |
     | `BRITONS` | `1` |
     | `FRANKS` | `2` |

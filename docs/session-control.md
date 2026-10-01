@@ -1,82 +1,129 @@
 ---
-description: "Automate launcher and menu workflows in AoE2Control, including match startup, restarts, resigning, save loading, UI visibility, and engine unload."
+description: "Start, restart, resign and quit matches, load saves and replays, edit the match setup, and choose random maps and seeds from Lua in AoE2Control."
 ---
 
 # Automation & Session Control
 
-CONTROL exposes a small set of functions for engine and menu automation. These functions cover overlay visibility, engine unload, save discovery, pre-game setup access, match startup, restarts, resigning, and loading saves.
+These functions start, restart, resign and quit matches, load saves and replays, and choose the random map and seed of the next match. They work from the game's menus, so a module can drive the game without clicks.
 
-!!! note "Separate from in-match commands"
-    These functions are not the same as the in-match command API such as `TrainUnit`, `UnitsMove`, or `ResearchTechnology`. The in-match command API is blocked during replays.
+They are not game commands: the [command rules](commands.md#command-rules) do not apply to them. The `Dispatch*` functions and `RefreshRandomMapSources()` are blocked with **Multithreading** or **Tournament Mode** on. **Tournament Mode** also blocks `GetAvailableSaveFiles()` and the other random-map functions on this page. A blocked call logs an error once per module load and returns `false`, `nil` or an empty table.
 
 ## Engine Control
 
-| Function | Signature | Returns | Description |
-|----------|-----------|---------|-------------|
-| `SetEngineUIVisibility` | `(visible)` | `nil` | Shows or hides the CONTROL overlay. |
-| `UnloadEngine` | `()` | `nil` | Detaches CONTROL from the game process. |
+`SetEngineUIVisibility()` and `UnloadEngine()` are listed under [Engine](commands.md#engine).
 
 ## Session Control
 
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
-| `DispatchStartGame` | `()` | `boolean` | Starts the currently configured session. After an ended ordinary single-player match, queues a clean teardown and a genuinely fresh match with the current exposed setup state. Replay end screens retain restart behavior. |
-| `DispatchRestartGame` | `()` | `boolean` | Restarts the current single-player session when the game state supports it. |
-| `DispatchResignGame` | `()` | `boolean` | Resigns the current game. |
-| `DispatchQuitGame` | `()` | `boolean` | Queues the game's native full-match teardown and return-to-menu transaction when supported. `true` means the asynchronous transaction was accepted. |
-| `DispatchLoadGame` | `(saveGameFileName)` | `boolean` | Loads a file from the current load-game list by file name. The file name must match one of the entries returned by `GetAvailableSaveFiles()`. |
-| `GetAvailableSaveFiles` | `()` | `string[]` | Returns the file names currently exposed by the game's load-game list. |
-| `GetCurrentGameOptions` | `()` | `GameOptions \| nil` | Returns the current session setup object when available. |
+| `DispatchStartGame` | `()` | `boolean` | Starts a single-player match with the current setup. |
+| `DispatchRestartGame` | `()` | `boolean` | Restarts the current single-player match or replay with the same setup. |
+| `DispatchResignGame` | `()` | `boolean` | Resigns the current match. |
+| `DispatchQuitGame` | `()` | `boolean` | Leaves the current single-player match and returns to the menu. |
+| `DispatchLoadGame` | `(saveGameFileName)` | `boolean` | Loads a save or replay from the game's load list. |
+| `GetAvailableSaveFiles` | `()` | `string[]` | Returns the file names in the game's load list, such as `"MyGame.aoe2spg"` or `"MyMatch.aoe2record"`. |
+| `GetCurrentGameOptions` | `()` | `GameOptions \| nil` | Returns the setup of the next or current match, or `nil` when the game has none. |
 
-When `DispatchStartGame()`, `DispatchRestartGame()`, or `DispatchLoadGame()` succeeds from the menu flow, CONTROL closes the related setup or load screen so the game view is not left underneath an open menu.
+`true` means the game accepted the request. The match or menu change happens over the next frames, so check the result in a later callback.
 
-`DispatchStartGame()`, `DispatchRestartGame()`, `DispatchResignGame()`, `DispatchQuitGame()`, and `DispatchLoadGame()` are blocked while **Multithreading** is enabled.
+`DispatchStartGame()` does different things depending on where the game is:
+
+- In the menu, it starts a match with the current `GameOptions`.
+- On the end screen of a single-player match, it leaves that match and starts a new one with the same `GameOptions`, map source and seed request.
+- On the end screen of a replay, it plays the replay again, like `DispatchRestartGame()`.
+
+It returns `false` while a match is running, in multiplayer, when `GetCurrentGameOptions()` returns `nil`, and while an earlier start or quit is still in progress. CONTROL logs the reason as `[SESSION_START] rejected=<reason>`.
+
+The other functions return `false` in these cases:
+
+| Function | Returns `false` when |
+|----------|----------------------|
+| `DispatchRestartGame` | The game is multiplayer, or there is no running match, ended match or replay end screen. |
+| `DispatchResignGame` | No match is running, or a replay is playing. |
+| `DispatchQuitGame` | The game is in the menu, multiplayer or a replay, or an earlier start or quit is still in progress. Logged as `[SESSION_QUIT] rejected=<reason>`. |
+| `DispatchLoadGame` | A match is running, the game is multiplayer, or the name is not in `GetAvailableSaveFiles()`. |
+
+`DispatchLoadGame()` takes a file name exactly as `GetAvailableSaveFiles()` returns it, not a path. A file ending in `.aoe2record` loads as a replay.
 
 ## Working With `GameOptions`
 
-`GetCurrentGameOptions()` gives Lua access to the current game setup object. Use it to inspect or modify the pending session configuration before calling `DispatchStartGame()`.
+`GetCurrentGameOptions()` returns the match setup. Change it, then call `DispatchStartGame()`. Check the result for `nil` before you use it.
 
-See [GameOptions](game-options.md) for the full type reference and associated enums.
-
-Important rules:
-
-- `GetCurrentGameOptions()` can return `nil`, so guard it before use.
-- `GameOptions` setter methods return `false` while already in game.
-- Player-slot methods accept slot indexes `0` to `7`.
+[GameOptions](game-options.md) lists every method and enum, and [when the setters work](game-options.md#when-methods-work).
 
 ## Random Map Control
 
-Random-map control is capability-gated. Query `GetRandomMapControlCapabilities()` at runtime instead of assuming that an update-sensitive native feature is available.
+These functions list the random maps the game knows, select one for the next match, and read the map and seed of the running match. Select a map and seed with the `GameOptions` methods `SetRandomMapSource()` and `SetRandomMapSeed()`.
 
 | Function | Returns | Description |
 |----------|---------|-------------|
-| `GetRandomMapControlCapabilities()` | `table` | Returns API version `1` and the capability flags described below. |
-| `GetRandomMapStartStatus()` | `table` | Returns structured lifecycle state, capability revision, requested/effective seed and source, and the current catalog generation. Use it to distinguish unavailable, staged, starting, running, and ended states. |
-| `RefreshRandomMapSources()` | `number \| nil` | Asks the game to refresh its visible random-map catalog and returns the new catalog generation. Returns `nil` when refresh is unavailable, the lifecycle rejects it, or the native catalog is invalid. |
-| `GetAvailableRandomMapSources()` | `RandomMapSource[]` | Returns immutable copied values from the current game-visible catalog. |
-| `GetEffectiveRandomMapSeed()` | `number \| nil` | Returns the authoritative unsigned 32-bit seed for a running random-map world, or `nil` until that state exists. |
-| `GetEffectiveRandomMapSource()` | `RandomMapSource \| nil` | Returns the authoritative catalog source for a running random-map world, or `nil` until that state exists. |
+| `GetRandomMapControlCapabilities()` | `table` | Returns which random-map features work on this game build. |
+| `GetRandomMapStartStatus()` | `table` | Returns whether a new match can start now, and why not. |
+| `RefreshRandomMapSources()` | `number \| nil` | Makes the game reload its list of random maps. Returns the new catalog generation. |
+| `GetAvailableRandomMapSources()` | `RandomMapSource[]` | Returns the random maps in the current list. |
+| `GetEffectiveRandomMapSeed()` | `number \| nil` | Returns the map seed of the running match. |
+| `GetEffectiveRandomMapSource()` | `RandomMapSource \| nil` | Returns the random map of the running match. |
 
-The capability table contains `apiVersion`, `capabilityRevision`, `freshStart`, `requestedSeed`, `effectiveSeed`, `sourceCatalog`, `refresh`, `selection`, `effectiveSource`, `managedLocalMod`, `directPath`, and `inlineSource`.
+`RefreshRandomMapSources()` works only while no single-player match is running: in the menus or on a match's end screen. It returns `nil` while a match runs, while a replay is loaded, in multiplayer, while a start or quit is in progress, or when the list cannot be read. CONTROL logs the reason as `[RMS_CONTROL] operation=refresh rejected=<reason>`. Each refresh increases the catalog generation. `SetRandomMapSource()` rejects a source from an earlier generation, so call `GetAvailableRandomMapSources()` again after a refresh.
 
-On the current supported AoE2DE build, `freshStart` and the seed/game-catalog capabilities are available when all of their focused signatures resolve. `directPath` and `inlineSource` are deliberately `false`:
+`GetEffectiveRandomMapSeed()` and `GetEffectiveRandomMapSource()` return `nil` when no match is running, including on the end screen.
 
-- Direct-path and inline RMS loading are not exposed because native parser ownership, include resolution, cache invalidation, and authoritative readback are not sufficiently durable.
+### Capabilities
 
-`RandomMapSource` has read-only `DisplayName`, `NativeMapId`, `SourceKind`, `ModIdentity`, `ResolvedPath`, `SourceIdentity`, `AuthoredSourceSha256`, and `CatalogGeneration` properties, with matching `Get...()` methods. Optional metadata can be `nil` when the native catalog does not provide it. `SourceIdentity` is stable catalog identity; `AuthoredSourceSha256` is populated only when CONTROL can safely hash the bounded authored source. Values are copies rather than native-pointer wrappers. Old-generation values remain safe to inspect, but `GameOptions:SetRandomMapSource()` rejects them.
+`GetRandomMapControlCapabilities()` returns a table of flags. A flag is `false` when CONTROL could not find the game function it needs on this game build. Other CONTROL features keep working.
 
-Lua deliberately keeps `GameOptions` as the single casual-user setup surface. Request IDs, typed `SetupContext` JSON, transaction rollback evidence, match epochs, and canonical bulk final-world snapshots belong to the separate versioned RMS IDE named-pipe endpoint and are not duplicated as Lua tables. The final-world response contains bounded terrain/elevation and directly validated object ID, kind, owner, tile, and XY position data; unit type IDs and Z positions are explicitly unavailable because resolving them would require broader mutable native queries. Direct-path, inline-source, parser/RNG trace, and intermediate generation-stage APIs are not exposed in Lua.
+| Field | Meaning |
+|-------|---------|
+| `apiVersion` | `1`. |
+| `capabilityRevision` | `2`. |
+| `freshStart` | `DispatchStartGame()` can start a new match from an end screen. |
+| `requestedSeed` | `GameOptions` seed methods work. |
+| `effectiveSeed` | `GetEffectiveRandomMapSeed()` works. |
+| `sourceCatalog` | `GetAvailableRandomMapSources()` works. |
+| `refresh` | `RefreshRandomMapSources()` works. |
+| `selection` | `SetRandomMapSource()` works. |
+| `effectiveSource` | `GetEffectiveRandomMapSource()` works. |
+| `sourceIdentity`, `authoredSourceHash` | Same as `sourceCatalog`. |
+| `explicitQuitThenStart` | Same as `freshStart`. |
+| `structuredStartStatus` | Always `true`. |
+| `directPath`, `inlineSource`, `atomicFreshStart` | Always `false`. Lua cannot load a map script from an arbitrary path or from a string. |
 
-Lifecycle and failure rules:
+### Start Status
 
-- Refresh, requested-seed mutation, and source selection are rejected during an active match and for multiplayer setup.
-- CONTROL never copies or deploys RMS files. A caller or IDE owns deployment; CONTROL only refreshes and selects sources that the game's native catalog actually exposes. Refresh does not promise that an arbitrary mod file or same-name built-in override will become a catalog source.
-- Missing or deleted content can make refresh return `nil` or remove a source from the next generation. A previously returned source then becomes stale.
-- Mutation methods return `false` and write a precise rejection to the CONTROL log. Effective getters return `nil` until authoritative running-world state exists.
-- `DispatchStartGame()` rejects an active match. On an ended ordinary non-replay single-player match it preserves the complete exposed `GameOptions` state plus the requested source/seed, runs the native clean teardown, reconstructs the single-player setup, and starts a fresh world without replacing the game process or CONTROL engine. The Boolean result reports whether that asynchronous route was accepted; later native failure or timeout is logged precisely.
-- `DispatchRestartGame()` remains an explicit same-session restart. Replay end-screen behavior is unchanged and continues to use restart rather than the RMS fresh-match route.
-- `DispatchQuitGame()` uses the same native teardown task and rejects a second lifecycle request while one is pending.
-- Public signatures target only the current supported game build. A failed RMS signature degrades the related flags without disabling unrelated CONTROL functionality.
+`GetRandomMapStartStatus()` returns:
+
+| Field | Type | Meaning |
+|-------|------|---------|
+| `canStart` | `boolean` | `true` when `DispatchStartGame()` can start a new match now. |
+| `code` | `string` | `"ready"`, or the reason a match cannot start. |
+| `optionsAvailable` | `boolean` | `GetCurrentGameOptions()` has a setup. |
+| `sessionActive` | `boolean` | A single-player match is running. |
+| `multiplayer` | `boolean` | The game is in multiplayer. |
+| `replay` | `boolean` | A replay is loaded. |
+| `lifecycleTransitionPending` | `boolean` | A start or quit is still in progress. |
+| `cleanStartContract` | `string` | Always `"explicit-quit-then-start"`. |
+| `capabilityRevision` | `number` | `2`. |
+
+`code` is one of `"ready"`, `"fresh_start_capability_unavailable"`, `"game_options_unavailable"`, `"multiplayer_not_supported"`, `"replay_not_supported"`, `"explicit_clean_end_required"` (a match is running: call `DispatchQuitGame()` first), `"lifecycle_transition_pending"`, `"rms_session_safety_unknown"` or `"rms_session_safety_changing"` (the game is between states; try again later).
+
+### `RandomMapSource`
+
+A `RandomMapSource` is one entry of the random-map list. Its properties are read-only. Each also has a `Get...()` method, such as `source:GetDisplayName()`.
+
+| Property | Type | Meaning |
+|----------|------|---------|
+| `DisplayName` | `string` | The map's name. For a local mod file, the file name without `.rms`. |
+| `NativeMapId` | `number` | The game's map id. |
+| `SourceKind` | `string` | `"game-catalog"` for maps in the game's list, `"local-mod"` for `.rms` files in a local mod. |
+| `ModIdentity` | `string \| nil` | The local mod's folder name in lower case, for local mod maps. |
+| `ResolvedPath` | `string \| nil` | The full path of the `.rms` file, when known. |
+| `SourceIdentity` | `string` | An id that stays the same for the same map across refreshes. |
+| `AuthoredSourceSha256` | `string \| nil` | The SHA-256 hash of a local mod's `.rms` file, up to 16 MiB. |
+| `CatalogGeneration` | `number` | The catalog generation this value belongs to. |
+
+Besides the game's own list, CONTROL lists every `.rms` file in the local mods of your game profiles: `%USERPROFILE%\Games\Age of Empires 2 DE\<profile id>\mods\local\<mod name>\resources\_common\random-map-scripts\`. To use a new or changed script, save it there, call `RefreshRandomMapSources()` and select it from the new list. CONTROL does not copy map files.
+
+The separate RMS IDE tool (AoE2RMSIDE) talks to CONTROL through its own interface, not through these Lua functions.
 
 ## Example: Configure And Start A Match
 
@@ -96,9 +143,36 @@ function End()
 end
 ```
 
-## Example: Load The First Matching File
+## Example: Start A Local Mod Map With A Fixed Seed
 
-`DispatchLoadGame()` expects the exact file name from `GetAvailableSaveFiles()`, not a full path.
+```lua
+function Load()
+    local options = GetCurrentGameOptions()
+    if not options or not GetRandomMapControlCapabilities().selection then
+        return
+    end
+
+    RefreshRandomMapSources()
+    for _, source in ipairs(GetAvailableRandomMapSources()) do
+        if source.SourceKind == "local-mod" and source.DisplayName == "MyMap" then
+            options:SetRandomMapSource(source)
+            options:SetRandomMapSeed(12345)
+            DispatchStartGame()
+            return
+        end
+    end
+    Log("MyMap was not found")
+end
+
+function Init()
+    local seed = GetEffectiveRandomMapSeed()
+    if seed then
+        Log("Map seed: " .. seed)
+    end
+end
+```
+
+## Example: Load The First Replay
 
 ```lua
 function string:endswith(ending)
@@ -119,10 +193,3 @@ function End()
     DispatchRestartGame()
 end
 ```
-
-## Typical Patterns
-
-- Hide the overlay before handing control to a streamer setup with `SetEngineUIVisibility(false)`.
-- Read `GameOptions`, adjust map or civilization settings, then call `DispatchStartGame()`.
-- Enumerate saves with `GetAvailableSaveFiles()` and pass one exact entry to `DispatchLoadGame()`.
-- Call `UnloadEngine()` from a cleanup workflow when a module needs to detach CONTROL programmatically.

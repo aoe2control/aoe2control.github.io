@@ -1,52 +1,55 @@
 # Settings API
 
-The Settings API adds module-specific controls to CONTROL's UI.
+The `Settings` table adds a module's own controls to the CONTROL menu: checkboxes, sliders, dropdowns, keybinds and color pickers. The module reads their values with the `Get` functions.
 
-!!! note "Lua signatures are strict"
-    Getter functions require the fallback/default argument in Lua. They are not optional overloads.
+Each module instance has its own settings group. The menu shows it as a submenu named after the module and the player id, for example `MYBOT [P2]`. CONTROL saves the values in `settings.ini`, so they persist between sessions.
 
 ## Add Functions
 
-Call these only from `Load(playerId)`.
+Call these in `Load(playerId)`. The menu shows the settings in the order they are added. Adding a key that already exists keeps its current or saved value; the default applies only to a new key.
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
 | `Settings.AddBool` | `(key, defaultValue)` | Adds a checkbox. |
-| `Settings.AddInt` | `(key, defaultValue, minValue, maxValue)` | Adds an integer slider. |
-| `Settings.AddFloat` | `(key, defaultValue, minValue, maxValue)` | Adds a float slider. |
-| `Settings.AddDropdown` | `(key, defaultValue, options)` | Adds a dropdown from a string array. |
-| `Settings.AddKeybind` | `(key, defaultVkCode)` | Adds a keybind picker. |
-| `Settings.AddTooltip` | `(key, tooltip)` | Adds a tooltip to an existing setting. |
-| `Settings.AddColor` | `(key, defaultColor)` | Adds a color picker. |
+| `Settings.AddInt` | `(key, defaultValue, minValue, maxValue)` | Adds an integer slider from `minValue` to `maxValue`. |
+| `Settings.AddFloat` | `(key, defaultValue, minValue, maxValue)` | Adds a float slider from `minValue` to `maxValue`. |
+| `Settings.AddDropdown` | `(key, defaultValue, options)` | Adds a dropdown. `options` is an array of strings with no gaps; `defaultValue` is one of them. |
+| `Settings.AddKeybind` | `(key, defaultVkCode)` | Adds a keybind picker. The value is a Windows virtual-key code, such as `Key.Tab`. |
+| `Settings.AddTooltip` | `(key, tooltip)` | Shows `tooltip` when the mouse is over the setting `key`. |
+| `Settings.AddColor` | `(key, defaultColor)` | Adds a color picker. `defaultColor` must be a `Color`. |
 
 ## Get Functions
 
-Call these from `Load`, `Init`, `Update`, or `Render`.
+Call these from any callback. Each returns `defaultValue` when the key does not exist. If you leave `defaultValue` out, the fallback is `false`, `0`, `0.0`, `""`, `0` or `Color(0, 0, 0, 0)`.
 
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
-| `Settings.GetBool` | `(key, defaultValue)` | `boolean` | Reads a checkbox value. |
-| `Settings.GetInt` | `(key, defaultValue)` | `number` | Reads an integer value. |
-| `Settings.GetFloat` | `(key, defaultValue)` | `number` | Reads a float value. |
-| `Settings.GetString` | `(key, defaultValue)` | `string` | Reads a string or dropdown value. |
-| `Settings.GetKeybind` | `(key, defaultVkCode)` | `number` | Reads a keybind virtual key code. |
-| `Settings.GetColor` | `(key, defaultColor)` | `Color` | Reads a color value. |
+| `Settings.GetBool` | `(key, defaultValue?)` | `boolean` | Reads a checkbox. |
+| `Settings.GetInt` | `(key, defaultValue?)` | `number` | Reads an integer slider. |
+| `Settings.GetFloat` | `(key, defaultValue?)` | `number` | Reads a float slider. |
+| `Settings.GetString` | `(key, defaultValue?)` | `string` | Reads the selected dropdown option. |
+| `Settings.GetKeybind` | `(key, defaultVkCode?)` | `number` | Reads a keybind's virtual-key code. |
+| `Settings.GetColor` | `(key, defaultColor?)` | `Color` | Reads a color. |
 
 ## Input Helper
 
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
-| `IsKeyPressed` | `(vkCode)` | `boolean` | Returns whether a key is currently pressed. |
+| `IsKeyPressed` | `(vkCode)` | `boolean` | Returns whether a key is held down now. It reads the Windows key state, so it also returns `true` while another window has focus. |
+
+`Update()` runs once per update interval (1 second by default) and can miss a short key press. Check keys in `Render()`.
 
 ## Example
+
+The module draws a label while **Show Overlay** is on, and hides it while the player holds the **Hide Key** keybind.
 
 ```lua
 function Load(playerId)
     Settings.AddBool("Show Overlay", true)
     Settings.AddDropdown("Mode", "Eco", { "Eco", "Rush", "Boom" })
-    Settings.AddColor("Overlay Color", Color(0, 255, 0, 90))
-    Settings.AddKeybind("Toggle Speed", Key.Add)
-    Log("Registered settings for player " .. tostring(playerId))
+    Settings.AddColor("Overlay Color", Color(0, 255, 0, 255))
+    Settings.AddKeybind("Hide Key", Key.Tab)
+    Settings.AddTooltip("Hide Key", "Hold this key to hide the overlay.")
 end
 
 function Render()
@@ -54,18 +57,17 @@ function Render()
         return
     end
 
-    local mode = Settings.GetString("Mode", "Eco")
-    local key = Settings.GetKeybind("Toggle Speed", Key.Add)
-    local color = Settings.GetColor("Overlay Color", Color(0, 255, 0, 90))
-
-    if IsKeyPressed(key) then
-        SetGameSpeedMultiplier(2.0)
+    local hideKey = Settings.GetKeybind("Hide Key", Key.Tab)
+    if IsKeyPressed(hideKey) then
+        return
     end
 
+    local mode = Settings.GetString("Mode", "Eco")
+    local color = Settings.GetColor("Overlay Color", Color(0, 255, 0, 255))
     RenderText("Mode: " .. mode, Vector2(120, 40), 16.0, color, true, true)
 end
 ```
 
 ## Multi-Module Note
 
-When **Sync Settings** is enabled for a player's module slot, the UI stores custom setting values under a shared profile-specific settings group instead of a per-player group.
+With **Sync** on in a player's module slot, the module's settings belong to a sync profile instead of the player. Every slot that uses the same module and profile shares the same values, and the submenu is named after the profile, for example `MYBOT [S1]`. See [Player Module Slots](interface-options.md#player-module-slots).

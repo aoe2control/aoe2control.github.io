@@ -1,11 +1,14 @@
 # AI Agent Reference
 
-This page is the thin companion guide for the downloadable CONTROL Lua reference. It is meant for coding agents and human developers who need a short operating checklist without duplicating the full API contract.
+Two Markdown files describe CONTROL's Lua API for coding agents. Give them to the agent that writes your modules.
 
-**Target:** Coding agents assisting users with CONTROL Lua modules, plus developers who want a short set of guardrails before opening the full reference.
+| File | Contents |
+|------|----------|
+| `CONTROL_LUA_ENGINE_REFERENCE.md` | Every Lua function, method, type and enum on one page, with the lifecycle, limits and modes. |
+| `CONTROL_LUA_AGENT_INSTRUCTIONS.md` | Short rules the agent must follow when it writes a module. |
 
-!!! tip "Quick access for coding agents"
-    Get the full reference text to paste into your coding agent:
+!!! tip "Engine reference"
+    Download the file or copy its text to paste into your coding agent:
 
     <a href="../assets/CONTROL_LUA_ENGINE_REFERENCE.md.raw" class="md-button md-button--primary" download="CONTROL_LUA_ENGINE_REFERENCE.md">Download CONTROL_LUA_ENGINE_REFERENCE.md</a>
 
@@ -32,8 +35,8 @@ This page is the thin companion guide for the downloadable CONTROL Lua reference
     })();
     </script>
 
-!!! tip "Quick access for coding agents"
-    Get the slim instruction text to paste into your coding agent:
+!!! tip "Agent instructions"
+    Download the file or copy its text to paste into your coding agent:
 
     <a href="../assets/CONTROL_LUA_AGENT_INSTRUCTIONS.md.raw" class="md-button md-button--primary" download="CONTROL_LUA_AGENT_INSTRUCTIONS.md">Download CONTROL_LUA_AGENT_INSTRUCTIONS.md</a>
 
@@ -60,19 +63,10 @@ This page is the thin companion guide for the downloadable CONTROL Lua reference
     })();
     </script>
 
-## Recommended Workflow
+## How To Use Them
 
-To start coding immediately, place both downloaded files in the root of your Lua project:
+1. Put both files in the root folder of your Lua project.
+2. Point the agent's instruction setting (for example a project instructions file or a custom-instructions field) at `CONTROL_LUA_AGENT_INSTRUCTIONS.md`.
+3. Keep `CONTROL_LUA_ENGINE_REFERENCE.md` next to it. The instructions tell the agent to look up every function and enum there.
 
-- `CONTROL_LUA_ENGINE_REFERENCE.md`
-- `CONTROL_LUA_AGENT_INSTRUCTIONS.md`
-
-Use `CONTROL_LUA_ENGINE_REFERENCE.md` as the API contract and behavior reference. Point your editor, coding agent, or workspace instructions at `CONTROL_LUA_AGENT_INSTRUCTIONS.md` so the tool knows how to use the reference correctly in your project context.
-
-Which file you reference directly depends on the editor or AI workflow you use. In setups with a dedicated instruction field, use the agent instructions there and keep the full reference alongside it in the project root for lookup.
-
-## RMS setup boundary
-
-For Lua modules, use the existing `GameOptions` methods, `GetRandomMapControlCapabilities()`, `GetRandomMapStartStatus()`, and immutable `RandomMapSource` values. Do not invent a second table-shaped setup API. `SourceIdentity` and `AuthoredSourceSha256` are read-only correlation metadata; source selection still requires a current catalog generation.
-
-The typed `SetupContext` transaction, request identities, rollback evidence, match epochs, and bulk final-world snapshot are headless/IDE features rather than Lua functions. Direct-path and inline RMS execution remain unavailable, and no public surface exposes parser decisions, RNG checkpoints, or intermediate generation stages.
+Download the files again after a CONTROL update. The pages of this site describe each function in more detail: [Game API](commands.md), [Facts](facts.md), [Types](types.md), [Enums](enums.md) and [Limits](limits.md).

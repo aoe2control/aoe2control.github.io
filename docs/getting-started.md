@@ -4,37 +4,42 @@ description: "Install AoE2Control for Age of Empires II: Definitive Edition, cre
 
 # Getting Started
 
-This guide walks through installing CONTROL, creating a Lua module, and attaching it to a player slot.
+This guide installs CONTROL, creates a Lua module and assigns it to a player.
 
 ## Installation
 
-Download the latest packaged build from the [GitHub Releases page](https://github.com/aoe2control/AoE2Control/releases).
+Download the latest release from the [GitHub Releases page](https://github.com/aoe2control/AoE2Control/releases) and extract `AoE2Control.exe`.
 
 <small>(extraction password: <code>control</code>)</small>
 
-1. Start Age of Empires II: Definitive Edition.
-2. Run the AoE2Control Launcher.
-3. Press **START** to attach CONTROL to the game.
+1. Start Age of Empires II: Definitive Edition. Keep the game window open and not minimized.
+2. Run `AoE2Control.exe`. The launcher shows **Ready to Start**.
+3. Click **START**. When CONTROL runs in the game, the launcher shows **Ready**.
 
-Once attached, the overlay appears and the config folder is created.
+The launcher shows **Ready - Partially outdated** or **Ready - Requires update** when CONTROL runs but some of its functions do not work on this game version. Check for a newer CONTROL release. [Headless Mode](headless-mode.md#output) lists every status.
+
+When CONTROL starts, the CONTROL menu opens in the game.
+
+| Key | Action |
+|-----|--------|
+| **Shift** | Show or hide the CONTROL menu. |
+| **Delete** | Unload CONTROL from the game. |
+
+Change these keys in the KEYBINDS submenu.
 
 ## First Run
 
-CONTROL creates its config folder at:
+CONTROL creates its config folder when it starts:
 
 ```text
 %appdata%\CONTROL\AoE2Control\
 ```
 
-Important contents:
-
-- `settings.ini`
-- `imgui.ini`
-- `modules/`
+It holds `settings.ini`, `menu.ini`, the `modules\` folder for your modules and the `diagnostics\` folder. See [Config Location](config-location.md).
 
 ## First Module
 
-Create:
+Create this file in the config folder:
 
 ```text
 modules\my_first_module\my_first_module.main.lua
@@ -44,12 +49,14 @@ Starter file:
 
 ```lua
 function Load(playerId)
-    Settings.AddBool("Enabled", true)
-    Log("Loading for player " .. tostring(playerId))
+    Settings.AddBool("Say Hello", true)
+    Log("Loaded for player " .. tostring(playerId))
 end
 
 function Init()
-    Log("Match ready for player " .. tostring(GetAssignedPlayerId()))
+    if Settings.GetBool("Say Hello", true) then
+        Log("Match ready for player " .. tostring(GetAssignedPlayerId()))
+    end
 end
 
 function Update()
@@ -65,17 +72,18 @@ function Unload()
 end
 ```
 
-All callbacks are **optional**.
+Every callback is optional. [Lifecycle](lifecycle.md) explains when each one runs.
 
-`End(hasWon)` also runs when a running match is manually exited. In that case, `hasWon` is `false`.
+`Log()` writes to the CONTROL log window. Open it with **Show Log** in the DEBUG submenu.
 
 ## Attach The Module
 
-1. Open the CONTROL overlay.
-2. Expand the player section you want to configure, for example **Player 1**.
-3. Choose your module in the **Module** dropdown.
-4. Leave **Enabled** on.
-5. Start or load a single-player match, or a multiplayer match with cheats enabled.
+1. Press **Shift** if the CONTROL menu is hidden.
+2. Open the **MODULES** submenu.
+3. Expand the player the module should control, for example **Player 1**.
+4. Choose `my_first_module` in the **Module** dropdown.
+5. Leave **Enabled** on.
+6. Start or load a single-player match, or a multiplayer match with cheats enabled.
 
 ## Next Steps
 

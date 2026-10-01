@@ -6,24 +6,29 @@ Download CONTROL from the [GitHub Releases page](https://github.com/aoe2control/
 
 ## What Is Distributed
 
-- **CONTROL Launcher** (EXE) — Loads the engine into the game
+Each release is one password-protected zip file:
+
+| File | Description |
+|------|-------------|
+| `AoE2Control.exe` | The launcher. It contains CONTROL and starts it in the running game. |
+| `release-manifest.json` | The release version and the SHA-256 hash of `AoE2Control.exe`. |
+| `LICENSE.md` | License. |
+| `THIRD_PARTY.md`, `THIRD_PARTY.lock.json` | Third-party components and their licenses. |
+
+The [Discord server](https://discord.gg/DENDVuWq5t) announces each release with the SHA-256 hashes of the zip file and the launcher. Compare them with your download.
 
 ## Installation
 
-Use the latest release package from [GitHub Releases](https://github.com/aoe2control/AoE2Control/releases).
+1. Extract `AoE2Control.exe` from the zip file.
+2. Start Age of Empires II: Definitive Edition.
+3. Run `AoE2Control.exe` and click **START**.
 
-<small>(extraction password: <code>control</code>)</small>
-
-1. Start Age of Empires II: Definitive Edition
-2. Run the CONTROL launcher
-3. Press **START** to attach the engine to the game
-
-Once attached, the engine overlay appears and the config folder is created.
+When CONTROL runs, the launcher shows **Ready** and the CONTROL menu opens in the game. See [Getting Started](getting-started.md) for the next steps.
 
 ## Antivirus
 
-The engine may be **flagged by antivirus** due to techniques (process injection, memory access) that resemble some malware. Users may need to adjust Windows Defender or add an exclusion.
+Antivirus software may flag the launcher, because it loads CONTROL into another process and reads that process's memory, as some malware does. If Windows Defender blocks or deletes it, add an exclusion for the launcher.
 
 ## Updates
 
-The engine may need updates after major AoE2DE patches. Check for new releases when the game updates. Join the [Discord server](https://discord.gg/DENDVuWq5t) for announcements and support.
+A game update can break CONTROL. The launcher then reports `Offset Error`, `Ready - Partially outdated` or `Ready - Requires update` (see [Headless Mode](headless-mode.md#exit-codes)). Check for a new release when the game updates. The [Discord server](https://discord.gg/DENDVuWq5t) announces new releases.
