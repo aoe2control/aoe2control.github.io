@@ -94,6 +94,7 @@ Open a player section to configure that player's module slot. If no module is as
 | Setting | Default | Description |
 |---------|---------|-------------|
 | **Module Telemetry** | Off | Shows `Update()` and `Render()` cost for active modules and CONTROL's share of each frame. |
+| **API Profiling** | Off | Counts each module's calls into CONTROL and Lua library functions and the time they take. Applies to modules loaded or reloaded after it is turned on, and slows them down. |
 
 The Debug submenu also provides a button to show or hide the log window.
 
@@ -104,6 +105,8 @@ When **Module Telemetry** is enabled, the Debug menu shows:
 - per active module, the `Update()` and `Render()` mean, 95th percentile and maximum over the last 256 calls, and the mean relative to the baseline
 
 Modules can read their own numbers with `GetModuleTelemetry()` whether or not the setting is on. `diagnostics/latest.json` includes the same report under `moduleTelemetry`.
+
+With **API Profiling** on, `GetModuleTelemetry().api` and each module's `api` list in `diagnostics/latest.json` show how often each native function was called and its total time, by the name used at the call site (`GetPosition`, `format`). A function called from native code, such as one passed directly to `pcall`, appears as `(unnamed)`. Time spent in Lua code is not included.
 
 In multithreading mode, `Render()` is disabled and the baseline frame view is hidden.
 
