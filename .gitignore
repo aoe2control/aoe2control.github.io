@@ -14,3 +14,6 @@ venv/
 *.swp
 .DS_Store
 Thumbs.db
+
+# MkDocs build output; CI builds the site from docs/
+site/
