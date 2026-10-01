@@ -13,7 +13,7 @@ Each release is one password-protected zip file:
 | `AoE2Control.exe` | The launcher. It contains CONTROL and starts it in the running game. |
 | `release-manifest.json` | The release version and the SHA-256 hash of `AoE2Control.exe`. |
 | `LICENSE.md` | License. |
-| `THIRD_PARTY.md`, `THIRD_PARTY.lock.json` | Third-party components and their licenses. |
+| `THIRD_PARTY_NOTICES.md` | Open-source components in AoE2Control and their licenses. |
 
 The [Discord server](https://discord.gg/DENDVuWq5t) announces each release with the SHA-256 hashes of the zip file and the launcher. Compare them with your download.
 
