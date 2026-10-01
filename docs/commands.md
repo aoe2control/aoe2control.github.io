@@ -112,7 +112,7 @@ These functions work at any time, in menus as well as in a match.
 | `SetUnitStanceAutoScout` | `(units)` | `nil` | Sets the player's units to auto-scout. |
 | `SetUnitStancePatrol` | `(units, targetPosition)` | `nil` | Orders the player's units to patrol to a `Vector3` position. |
 | `SetUnitStanceGuard` | `(units, targetObject)` | `nil` | Orders the player's units to guard an object. They stay close to it when it moves. |
-| `SetUnitStanceFollow` | `(units, targetObject)` | `nil` | Orders the player's units to follow an object. |
+| `SetUnitStanceFollow` | `(units, targetObject)` | `nil` | Orders the player's units to follow an object. Villagers may stop following once the target moves. |
 | `SetUnitStanceAttackMove` | `(units, targetPosition)` | `nil` | Orders the player's units to attack-move to a `Vector3` position. |
 | `SetUnitStanceGarrison` | `(units, targetObject)` | `nil` | Orders the player's units to garrison in an object. |
 | `SetUnitStanceUngarrison` | `(sourceObjects, unit)` | `nil` | Ungarrisons one of the player's units from the player's buildings in `sourceObjects`. |

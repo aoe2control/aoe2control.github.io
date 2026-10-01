@@ -201,7 +201,7 @@ Select a map and seed with the `GameOptions` methods `SetRandomMapSource()` and 
 | `SetUnitStanceAutoScout` | `(units)` | `nil` | Sets units to auto-scout. |
 | `SetUnitStancePatrol` | `(units, targetPosition)` | `nil` | Orders units to patrol to a `Vector3` position. |
 | `SetUnitStanceGuard` | `(units, targetObject)` | `nil` | Orders units to guard an object. |
-| `SetUnitStanceFollow` | `(units, targetObject)` | `nil` | Orders units to follow an object. |
+| `SetUnitStanceFollow` | `(units, targetObject)` | `nil` | Orders units to follow an object. Villagers may stop following once the target moves. |
 | `SetUnitStanceAttackMove` | `(units, targetPosition)` | `nil` | Orders units to attack-move to a `Vector3` position. |
 | `SetUnitStanceGarrison` | `(units, targetObject)` | `nil` | Orders units to garrison in an object. |
 | `SetUnitStanceUngarrison` | `(sourceObjects, unit)` | `nil` | Ungarrisons a unit from the player's buildings in `sourceObjects`. |
