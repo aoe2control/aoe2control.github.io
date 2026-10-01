@@ -145,7 +145,7 @@ With **Multithreading** on, and while the Agent Bridge runs, every module reads 
 | `DispatchQuitGame` | `()` | `boolean` | Leaves the current single-player match and returns to the menu. `false` in the menu, in multiplayer, in a replay, or while a start or quit is in progress. |
 | `DispatchLoadGame` | `(saveGameFileName)` | `boolean` | Loads a save or replay by a file name exactly as `GetAvailableSaveFiles()` returns it (not a path). `.aoe2record` files load as replays. `false` while a match runs, in multiplayer, or for an unknown name. |
 | `GetAvailableSaveFiles` | `()` | `string[]` | File names in the game's load list, such as `"MyGame.aoe2spg"` or `"MyMatch.aoe2record"`. |
-| `GetCurrentGameOptions` | `()` | `GameOptions \| nil` | Setup of the next or current match. See [GameOptions](#gameoptions). |
+| `GetCurrentGameOptions` | `()` | `GameOptions` or `nil` | Setup of the next or current match. See [GameOptions](#gameoptions). |
 
 `true` from a `Dispatch*` function means the game accepted the request. The change happens over the next frames; check the result in a later callback.
 
@@ -166,10 +166,10 @@ Select a map and seed with the `GameOptions` methods `SetRandomMapSource()` and 
 |----------|-----------|---------|-------------|
 | `GetRandomMapControlCapabilities` | `()` | `table` | Flags for the random-map features that work on this game build (fields below). |
 | `GetRandomMapStartStatus` | `()` | `table` | Whether a new match can start now, and why not (fields below). |
-| `RefreshRandomMapSources` | `()` | `number \| nil` | Makes the game reload its random-map list; returns the new catalog generation. Works only in the menus or on an end screen; `nil` while a match runs, with a replay loaded, in multiplayer, during a start or quit, or when the list cannot be read. |
+| `RefreshRandomMapSources` | `()` | `number` or `nil` | Makes the game reload its random-map list; returns the new catalog generation. Works only in the menus or on an end screen; `nil` while a match runs, with a replay loaded, in multiplayer, during a start or quit, or when the list cannot be read. |
 | `GetAvailableRandomMapSources` | `()` | `RandomMapSource[]` | Random maps in the current list. |
-| `GetEffectiveRandomMapSeed` | `()` | `number \| nil` | Map seed of the running match. `nil` without a running match, including on the end screen. |
-| `GetEffectiveRandomMapSource` | `()` | `RandomMapSource \| nil` | Random map of the running match. `nil` without a running match. |
+| `GetEffectiveRandomMapSeed` | `()` | `number` or `nil` | Map seed of the running match. `nil` without a running match, including on the end screen. |
+| `GetEffectiveRandomMapSource` | `()` | `RandomMapSource` or `nil` | Random map of the running match. `nil` without a running match. |
 
 `GetRandomMapControlCapabilities()` fields: `apiVersion` (`1`), `capabilityRevision` (`2`), `freshStart`, `requestedSeed`, `effectiveSeed`, `sourceCatalog`, `refresh`, `selection`, `effectiveSource`, `sourceIdentity`, `authoredSourceHash`, `explicitQuitThenStart`, `structuredStartStatus` (always `true`), `directPath`, `inlineSource`, `atomicFreshStart` (always `false`). A flag is `false` when the feature does not work on this game build. Lua cannot load a map script from a path or a string.
 
@@ -229,7 +229,7 @@ These functions read the match and do not change it. Call them from `Init`, `Upd
 
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
-| `GetFact` | `(fact, parameter?)` | `number \| nil` | `Fact` value for the assigned player. `parameter` (default `0`) is the fact's argument, such as a unit type id for `Fact.UNIT_TYPE_COUNT`. |
+| `GetFact` | `(fact, parameter?)` | `number` or `nil` | `Fact` value for the assigned player. `parameter` (default `0`) is the fact's argument, such as a unit type id for `Fact.UNIT_TYPE_COUNT`. |
 | `IsObjectTypeAvailable` | `(unitObjectType)` | `boolean` | Whether the assigned player can currently get a unit or building type. |
 | `GetUnitTypeCount` | `(unitId)` | `number` | How many objects of a unit type the assigned player has. |
 | `GetAttribute` | `(attribute)` | `number` | `PlayerAttribute` value for the assigned player. |
@@ -244,36 +244,36 @@ These functions read the match and do not change it. Call them from `Init`, `Upd
 | `GetObjectsByClasses` | `(unitClasses)` | `Object[]` | Objects of any class in an array of `UnitClass`. |
 | `GetObjectsInArea` | `(pos1, pos2)` | `Object[]` | Objects whose tile lies in the rectangle with `Vector2` corners `pos1` and `pos2`, edges included. |
 | `GetObjectsInArea` | `(pos1, pos2, unitClass, owner)` | `Object[]` | Same, filtered by `unitClass` and owner player id. Pass `nil` to skip a filter. |
-| `GetObjectById` | `(id)` | `Object \| nil` | Object by id; `nil` if it does not exist or the module cannot see it. |
+| `GetObjectById` | `(id)` | `Object` or `nil` | Object by id; `nil` if it does not exist or the module cannot see it. |
 | `GetObjectStates` | `(objects)` | `table` | Reads several objects in one call (see below). |
 | `GetObjectChanges` | `()` | `{ created, destroyed, damaged }` | Ids of the assigned player's objects that appeared, disappeared or lost hitpoints since the last call (see below). |
-| `GetProjectileById` | `(id)` | `Object \| nil` | Projectile by id, if the module can see it. |
+| `GetProjectileById` | `(id)` | `Object` or `nil` | Projectile by id, if the module can see it. |
 | `GetAllProjectiles` | `()` | `Object[]` | Projectiles the module can see. |
 | `GetProjectilesByType` | `(projectileType)` | `Object[]` | Visible projectiles of a `ProjectileType`. |
-| `GetObjectTypeData` | `(objectTypeId, objectData)` | `number \| nil` | `ObjectData` value of a unit type with the assigned player's technologies and bonuses. |
-| `GetObjectTypeAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number \| nil` | `ObjectAttribute` value of a unit type for the assigned player. `damageType` is the armor or attack class for `ARMOR` and `WEAPON`; pass `0` otherwise. |
+| `GetObjectTypeData` | `(objectTypeId, objectData)` | `number` or `nil` | `ObjectData` value of a unit type with the assigned player's technologies and bonuses. |
+| `GetObjectTypeAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number` or `nil` | `ObjectAttribute` value of a unit type for the assigned player. `damageType` is the armor or attack class for `ARMOR` and `WEAPON`; pass `0` otherwise. |
 | `CheckPlacement` | `(objectTypeId, position)` | `PlacementResult, number?` | The game's placement check for the assigned player, centred on a `Vector2` or `Vector3`. Second value: the blocking object's id for `PlacementResult.BLOCKED`. Unexplored ground gives `UNEXPLORED` unless **Modules See Everything** is on. `nil` for an unknown type. |
-| `CanPlaceObject` | `(objectTypeId, position)` | `boolean \| nil` | `true` when `CheckPlacement` returns `CAN_PLACE`; `nil` when it returns `nil`. |
+| `CanPlaceObject` | `(objectTypeId, position)` | `boolean` or `nil` | `true` when `CheckPlacement` returns `CAN_PLACE`; `nil` when it returns `nil`. |
 | `CalculatePath` | `(startPos, targetPos, collisionRadius?)` | `Vector3[]` | The game's path between two `Vector3` positions for a unit of `collisionRadius` (default `0`). Empty when there is no path. |
 | `GetGameTime` | `()` | `number` | Match time in seconds. |
 | `GetClockMs` | `()` | `number` | Milliseconds on a monotonic clock with an arbitrary start. Subtract two values for a duration. |
-| `GetModuleTelemetry` | `()` | `table \| nil` | This module instance's timing (see below). `nil` outside a module callback. |
+| `GetModuleTelemetry` | `()` | `table` or `nil` | This module instance's timing (see below). `nil` outside a module callback. |
 | `GetAllChatMessages` | `()` | `string[]` | Messages in the chat buffer. |
 | `GetNewChatMessages` | `()` | `string[]` | Messages that appeared since this module instance last called it. The first call after a load returns the whole buffer. |
-| `GetLastChatMessage` | `()` | `string \| nil` | Newest chat message, or `nil`. |
+| `GetLastChatMessage` | `()` | `string` or `nil` | Newest chat message, or `nil`. |
 | `GetAssignedPlayer` | `()` | `Player` | This module instance's player. |
-| `GetPlayerById` | `(id)` | `Player \| nil` | `0` is Gaia, `1` to `8` are players. `nil` for no such player. |
+| `GetPlayerById` | `(id)` | `Player` or `nil` | `0` is Gaia, `1` to `8` are players. `nil` for no such player. |
 | `GetPlayerCount` | `()` | `number` | Player slots including Gaia. Ids run from `0` to `GetPlayerCount() - 1`. |
 | `IsEnemyPlayer` | `(player)` | `boolean` | Whether a `Player` is an enemy of the assigned player. |
 | `GetMapWidth` | `()` | `number` | Map width in tiles. |
 | `GetMapHeight` | `()` | `number` | Map height in tiles. |
-| `GetMapTile` | `(x, y)` | `MapTile \| nil` | Tile at integer coordinates; `nil` outside the map. |
-| `GetMapTile` | `(position)` | `MapTile \| nil` | Tile at a `Vector2`, rounded down. |
+| `GetMapTile` | `(x, y)` | `MapTile` or `nil` | Tile at integer coordinates; `nil` outside the map. |
+| `GetMapTile` | `(position)` | `MapTile` or `nil` | Tile at a `Vector2`, rounded down. |
 | `GetAllMapTiles` | `()` | `MapTile[]` | Every tile of the map. |
 | `GetMapTilesPtr` | `()` | `number, number` | `(pointer, count)` of a packed tile buffer for external readers (see [IPC](#9-ipc)). |
 | `GetObjectsPtr` | `()` | `number, number` | `(pointer, count)` of a packed object buffer for external readers. |
 | `GetVictoryCondition` | `()` | `VictoryCondition` | The match's victory condition. |
-| `GetVictoryPlayer` | `()` | `Player \| nil` | The winner after the match ends, otherwise `nil`. |
+| `GetVictoryPlayer` | `()` | `Player` or `nil` | The winner after the match ends, otherwise `nil`. |
 
 A cost list is an array of `{ resourceId = ResourceType, amount = number }`.
 
@@ -383,8 +383,8 @@ A module runs a Windows named-pipe server; external programs on the same PC, run
 | `IPC.Send` | `(message)` | `boolean` | Sends to every connected client, wrapped in an envelope. A string is sent as is; other values are converted with `ToJSON`. `false` for `nil`, without a connected client, or when a limit is reached. |
 | `IPC.HasMessages` | `()` | `boolean` | Whether messages are waiting. |
 | `IPC.GetMessages` | `()` | `string[]` | All waiting messages, oldest first; removes them. |
-| `IPC.WaitForMessage` | `(timeoutMs?)` | `string \| nil` | Oldest waiting message, or waits up to `timeoutMs` (default and maximum `500`) for one. `nil` on timeout, without a server, and with **Multithreading** on. The wait counts toward the 1-second callback limit. |
-| `IPC.GetStats` | `()` | `table \| nil` | Counters: `connectedClients`, `sentMessages`, `sentBytes`, `sendFailedNoClient`, `sendFailedTooLarge`, `sendFailedQueueFull`, `receivedMessages`, `receiveDroppedQueueFull`, `receiveDroppedTooLarge`, `receiveDroppedInvalidRouting`, `slowClientDisconnects`. `nil` without a server. |
+| `IPC.WaitForMessage` | `(timeoutMs?)` | `string` or `nil` | Oldest waiting message, or waits up to `timeoutMs` (default and maximum `500`) for one. `nil` on timeout, without a server, and with **Multithreading** on. The wait counts toward the 1-second callback limit. |
+| `IPC.GetStats` | `()` | `table` or `nil` | Counters: `connectedClients`, `sentMessages`, `sentBytes`, `sendFailedNoClient`, `sendFailedTooLarge`, `sendFailedQueueFull`, `receivedMessages`, `receiveDroppedQueueFull`, `receiveDroppedTooLarge`, `receiveDroppedInvalidRouting`, `slowClientDisconnects`. `nil` without a server. |
 | `ParseJSON` | `(str)` | `any` | JSON to Lua values (`null` becomes `nil`). `nil` for invalid JSON. |
 | `ToJSON` | `(value)` | `string` | Lua value to JSON. A non-empty table with keys `1` to `n` becomes an array; other tables, including empty ones, become objects. `"{}"` when the value cannot be converted. |
 
@@ -447,10 +447,10 @@ The pipe protocol (`negotiate`, `observe`, `act`) is described at https://aoe2co
 | `GetTypeName()` | `string` | In-game name of the type, such as `Villager`, in the game's language. `""` for types without one. |
 | `GetObjectType()` | `ObjectType` | Category: resource, building, projectile and so on. |
 | `GetOwningPlayer()` | `Player` | Owner. |
-| `GetGarrisonObject()` | `Object \| nil` | Object this one is garrisoned in. |
+| `GetGarrisonObject()` | `Object` or `nil` | Object this one is garrisoned in. |
 | `GetTargetPosition()` | `Vector3` | Unit AI target position, `z = 0`. `(0, 0, 0)` without a unit AI. |
-| `GetTargetObject()` | `Object \| nil` | Unit AI target object. |
-| `GetActionTargetPosition()` | `Vector3 \| nil` | Target position of the current action, such as where a projectile lands. `nil` without an action. |
+| `GetTargetObject()` | `Object` or `nil` | Unit AI target object. |
+| `GetActionTargetPosition()` | `Vector3` or `nil` | Target position of the current action, such as where a projectile lands. `nil` without an action. |
 | `GetDirection()` | `Vector3` | Facing direction, `z = 0`. |
 | `IsVisible()` | `boolean` | Whether the object's tile is visible to the assigned player. Always `true` with Modules See Everything. `false` for an object that no longer exists. Never raises an error. |
 | `IsExplored()` | `boolean` | Whether the tile is explored or visible. Never raises an error. |
@@ -466,10 +466,10 @@ The pipe protocol (`negotiate`, `observe`, `act`) is described at https://aoe2co
 | `GetHitpoints()` | `number` | Current hit points. |
 | `GetMaxHitpoints()` | `number` | Maximum hit points. |
 | `GetPosition()` | `Vector3` | World position. |
-| `GetCurrentMapTile()` | `MapTile \| nil` | Tile under the object. |
+| `GetCurrentMapTile()` | `MapTile` or `nil` | Tile under the object. |
 | `GetPath()` | `Vector3[]` | Waypoints of the current path; empty when not moving. |
 | `CalculatePath(targetPos)` | `Vector3[]` | Path from the object to a `Vector3`, sized for the object. |
-| `GetSprite()` | `table \| nil` | Current graphic: `name` (as `GetName()`), `fileName` (as `GetGraphicFileName()`), `facet`, `facetCount`, `frameCount`, `frameDuration` (seconds per frame at normal speed, `0` without animation). `nil` without a graphic. The current frame is not available. |
+| `GetSprite()` | `table` or `nil` | Current graphic: `name` (as `GetName()`), `fileName` (as `GetGraphicFileName()`), `facet`, `facetCount`, `frameCount`, `frameDuration` (seconds per frame at normal speed, `0` without animation). `nil` without a graphic. The current frame is not available. |
 
 - Resources and other objects that cannot move (`ObjectType.RESOURCE_OR_EYE_CANDY`, `ObjectType.ANIMATED_MAP_OBJECT`) return `(0, 0, 0)` from `GetDirection()`, an empty list from `GetPath()` and `nil` from `GetActionTargetPosition()`.
 - A kept `Object` that went into the fog or stopped existing raises a Lua error on most method calls. Check `IsVisible()` first, or fetch objects again.
@@ -497,8 +497,8 @@ The pipe protocol (`negotiate`, `observe`, `act`) is described at https://aoe2co
 | `GetPlayerType()` | `PlayerType` | Player type. |
 | `GetPlayerObjects()` | `Object[]` | The player's objects. |
 | `GetCameraPosition()` | `Vector2` | The player's camera position. |
-| `GetMouseHoveredObject()` | `Object \| nil` | Object under the player's mouse. |
-| `GetSelectedObject()` | `Object \| nil` | Object the player selected last. |
+| `GetMouseHoveredObject()` | `Object` or `nil` | Object under the player's mouse. |
+| `GetSelectedObject()` | `Object` or `nil` | Object the player selected last. |
 | `GetSelectedObjectCount()` | `number` | Number of selected objects. |
 | `GetPlayerName()` | `string` | Player name. |
 | `GetCivilizationId()` | `number` | Civilization id, `0` when unknown. |
@@ -509,7 +509,7 @@ The pipe protocol (`negotiate`, `observe`, `act`) is described at https://aoe2co
 | `GetColor()` | `Color` | Player color. |
 | `GetAttribute(attribute)` | `number` | `PlayerAttribute` value. |
 | `GetUnitTypeCount(id)` | `number` | Units of a type id. |
-| `GetFact(fact, parameter?)` | `number \| nil` | `Fact` value; `parameter` defaults to `0`. |
+| `GetFact(fact, parameter?)` | `number` or `nil` | `Fact` value; `parameter` defaults to `0`. |
 | `IsObjectTypeAvailable(unitObjectType)` | `boolean` | The player can currently get the type. |
 | `CanAfford(id, isBuilding?)` | `boolean` | Resources and, unless `isBuilding` is `true`, population room. Does not check availability. |
 | `GetResearchState(technology)` | `ResearchState` | Research state. |
@@ -563,8 +563,8 @@ With **Modules See Everything** off, attribute, fact, count, cost, research and 
 | `GetTurboMode()` | `SetTurboMode(value)` | `boolean` |
 | `GetAntiquityMode()` | `SetAntiquityMode(value)` | `boolean` |
 | `GetHandicap()` | `SetHandicap(value)` | `boolean` |
-| `GetRandomMapSeed()` | `SetRandomMapSeed(seed)` | `number \| nil`: fixed seed `0` to `4294967295`; `nil` when the game picks it. `ClearRandomMapSeed()` removes the fixed seed. |
-| `GetRandomMapSource()` | `SetRandomMapSource(source)` | `RandomMapSource \| nil`, from `GetAvailableRandomMapSources()`. |
+| `GetRandomMapSeed()` | `SetRandomMapSeed(seed)` | `number` or `nil`: fixed seed `0` to `4294967295`; `nil` when the game picks it. `ClearRandomMapSeed()` removes the fixed seed. |
+| `GetRandomMapSource()` | `SetRandomMapSource(source)` | `RandomMapSource` or `nil`, from `GetAvailableRandomMapSources()`. |
 
 Player slots: `playerIndex` is `0` to `7` (slot `0` is player 1). Out of range: setters return `false`, getters `0`.
 
@@ -587,10 +587,10 @@ Read-only properties. Each has a matching method: `GetDisplayName()`, `GetNative
 | `DisplayName` | `string` | Map name; for a local mod file, the file name without `.rms`. |
 | `NativeMapId` | `number` | The game's map id. |
 | `SourceKind` | `string` | `"game-catalog"` or `"local-mod"`. |
-| `ModIdentity` | `string \| nil` | Local mod folder name in lower case. |
-| `ResolvedPath` | `string \| nil` | Full path of the `.rms` file, when known. |
+| `ModIdentity` | `string` or `nil` | Local mod folder name in lower case. |
+| `ResolvedPath` | `string` or `nil` | Full path of the `.rms` file, when known. |
 | `SourceIdentity` | `string` | Id that stays the same for the same map across refreshes. |
-| `AuthoredSourceSha256` | `string \| nil` | SHA-256 of a local mod's `.rms` file (up to 16 MiB). |
+| `AuthoredSourceSha256` | `string` or `nil` | SHA-256 of a local mod's `.rms` file (up to 16 MiB). |
 | `CatalogGeneration` | `number` | Catalog generation of this value. |
 
 The list includes `.rms` files in the local mods of the game profiles (`%USERPROFILE%\Games\Age of Empires 2 DE\<profile id>\mods\local\<mod name>\resources\_common\random-map-scripts\`). Save a script there, call `RefreshRandomMapSources()`, then select it.
@@ -661,7 +661,7 @@ Constructor: `ConstructionPlacement.new(villagerOccupation)`
 | `BuildStructure(structureType, targetPos, direction?, padding?, bypassTownCenterPadding?)` | `boolean` | Same, with the villager closest to `targetPos`. |
 | `BuildStructureAtTown(structureType, targetPos?, padding?, bypassTownCenterPadding?)` | `boolean` | Sends the closest villager to an unfinished building of the type that nobody works on. Otherwise builds near `targetPos` on the side facing the first town center, or around that town center when `targetPos` is left out. |
 | `FindBestPosition(structureType, targetPos, direction, padding, bypassTownCenterPadding?)` | `Vector3` | The spot `BuildStructure` would use; `(-1, -1, -1)` when none. |
-| `GetValidFarmPlacementTile()` | `MapTile \| nil` | A free farm tile near a town center, or else a mill. |
+| `GetValidFarmPlacementTile()` | `MapTile` or `nil` | A free farm tile near a town center, or else a mill. |
 | `QueueBuildingRequest(structureType, targetPosition, priority?, padding?, bypassTownCenterPadding?, builderUnitId?, requireScouting?)` | `nil` | Queues a building near `targetPosition`. `priority` is a `BuildingRequestPriority` (default `MEDIUM`); `builderUnitId` `-1` (default) takes the closest villager; `requireScouting` (default `true`) walks the builder within 5 tiles first. |
 | `QueueBuildingRequestAtTown(structureType, priority?, padding?, bypassTownCenterPadding?, builderUnitId?, requireScouting?)` | `nil` | Queues a building near the first town center. `requireScouting` defaults to `false`. |
 | `ProcessBuildingRequests()` | `nil` | Works on up to 3 queued requests, highest priority first. |

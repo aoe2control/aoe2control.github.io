@@ -11,8 +11,8 @@ The IPC API connects a module to other programs on the same PC through a Windows
 | `IPC.Send` | `(message)` | `boolean` | Sends `message` to every connected client, wrapped in an [envelope](#outgoing-envelope). A string is sent as is; any other Lua value is first converted to JSON as `ToJSON` does. Returns `false` for `nil`. Does not wait for the clients to read it. |
 | `IPC.HasMessages` | `()` | `boolean` | Returns whether messages are waiting for this module instance. |
 | `IPC.GetMessages` | `()` | `string[]` | Returns all waiting messages, oldest first, and removes them. Returns an empty table when there are none. |
-| `IPC.WaitForMessage` | `([timeoutMs])` | `string \| nil` | Returns the oldest waiting message and removes it. If none is waiting, waits up to `timeoutMs` milliseconds (default and maximum 500) for one. Returns `nil` on timeout, without a server, and while **Multithreading** is enabled. The wait counts toward the callback's 1-second limit. |
-| `IPC.GetStats` | `()` | `table \| nil` | Returns this module instance's counters (see [Limits](#limits)), or `nil` without a server. |
+| `IPC.WaitForMessage` | `([timeoutMs])` | `string` or `nil` | Returns the oldest waiting message and removes it. If none is waiting, waits up to `timeoutMs` milliseconds (default and maximum 500) for one. Returns `nil` on timeout, without a server, and while **Multithreading** is enabled. The wait counts toward the callback's 1-second limit. |
+| `IPC.GetStats` | `()` | `table` or `nil` | Returns this module instance's counters (see [Limits](#limits)), or `nil` without a server. |
 
 `IPC.Send`, `IPC.HasMessages` and `IPC.GetMessages` return at once, so you can call them in every `Update()`.
 

@@ -22,7 +22,7 @@ They are not game commands: the [command rules](commands.md#command-rules) do no
 | `DispatchQuitGame` | `()` | `boolean` | Leaves the current single-player match and returns to the menu. |
 | `DispatchLoadGame` | `(saveGameFileName)` | `boolean` | Loads a save or replay from the game's load list. |
 | `GetAvailableSaveFiles` | `()` | `string[]` | Returns the file names in the game's load list, such as `"MyGame.aoe2spg"` or `"MyMatch.aoe2record"`. |
-| `GetCurrentGameOptions` | `()` | `GameOptions \| nil` | Returns the setup of the next or current match, or `nil` when the game has none. |
+| `GetCurrentGameOptions` | `()` | `GameOptions` or `nil` | Returns the setup of the next or current match, or `nil` when the game has none. |
 
 `true` means the game accepted the request. The match or menu change happens over the next frames, so check the result in a later callback.
 
@@ -59,10 +59,10 @@ These functions list the random maps the game knows, select one for the next mat
 |----------|---------|-------------|
 | `GetRandomMapControlCapabilities()` | `table` | Returns which random-map features work on this game build. |
 | `GetRandomMapStartStatus()` | `table` | Returns whether a new match can start now, and why not. |
-| `RefreshRandomMapSources()` | `number \| nil` | Makes the game reload its list of random maps. Returns the new catalog generation. |
+| `RefreshRandomMapSources()` | `number` or `nil` | Makes the game reload its list of random maps. Returns the new catalog generation. |
 | `GetAvailableRandomMapSources()` | `RandomMapSource[]` | Returns the random maps in the current list. |
-| `GetEffectiveRandomMapSeed()` | `number \| nil` | Returns the map seed of the running match. |
-| `GetEffectiveRandomMapSource()` | `RandomMapSource \| nil` | Returns the random map of the running match. |
+| `GetEffectiveRandomMapSeed()` | `number` or `nil` | Returns the map seed of the running match. |
+| `GetEffectiveRandomMapSource()` | `RandomMapSource` or `nil` | Returns the random map of the running match. |
 
 `RefreshRandomMapSources()` works only while no single-player match is running: in the menus or on a match's end screen. It returns `nil` while a match runs, while a replay is loaded, in multiplayer, while a start or quit is in progress, or when the list cannot be read. CONTROL logs the reason as `[RMS_CONTROL] operation=refresh rejected=<reason>`. Each refresh increases the catalog generation. `SetRandomMapSource()` rejects a source from an earlier generation, so call `GetAvailableRandomMapSources()` again after a refresh.
 
@@ -115,10 +115,10 @@ A `RandomMapSource` is one entry of the random-map list. Its properties are read
 | `DisplayName` | `string` | The map's name. For a local mod file, the file name without `.rms`. |
 | `NativeMapId` | `number` | The game's map id. |
 | `SourceKind` | `string` | `"game-catalog"` for maps in the game's list, `"local-mod"` for `.rms` files in a local mod. |
-| `ModIdentity` | `string \| nil` | The local mod's folder name in lower case, for local mod maps. |
-| `ResolvedPath` | `string \| nil` | The full path of the `.rms` file, when known. |
+| `ModIdentity` | `string` or `nil` | The local mod's folder name in lower case, for local mod maps. |
+| `ResolvedPath` | `string` or `nil` | The full path of the `.rms` file, when known. |
 | `SourceIdentity` | `string` | An id that stays the same for the same map across refreshes. |
-| `AuthoredSourceSha256` | `string \| nil` | The SHA-256 hash of a local mod's `.rms` file, up to 16 MiB. |
+| `AuthoredSourceSha256` | `string` or `nil` | The SHA-256 hash of a local mod's `.rms` file, up to 16 MiB. |
 | `CatalogGeneration` | `number` | The catalog generation this value belongs to. |
 
 Besides the game's own list, CONTROL lists every `.rms` file in the local mods of your game profiles: `%USERPROFILE%\Games\Age of Empires 2 DE\<profile id>\mods\local\<mod name>\resources\_common\random-map-scripts\`. To use a new or changed script, save it there, call `RefreshRandomMapSources()` and select it from the new list. CONTROL does not copy map files.

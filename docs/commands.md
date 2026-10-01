@@ -69,7 +69,7 @@ These functions work at any time, in menus as well as in a match.
 | `DispatchQuitGame` | `()` | `boolean` | Leaves the current single-player match and returns to the menu. |
 | `DispatchLoadGame` | `(saveGameFileName)` | `boolean` | Loads a save or replay by file name. |
 | `GetAvailableSaveFiles` | `()` | `string[]` | Returns the file names in the game's load list. |
-| `GetCurrentGameOptions` | `()` | `GameOptions \| nil` | Returns the match setup. See [GameOptions](game-options.md). |
+| `GetCurrentGameOptions` | `()` | `GameOptions` or `nil` | Returns the match setup. See [GameOptions](game-options.md). |
 
 `IsGamePaused()` and `IsMenuOpen()` need a match, a replay or an end screen. Elsewhere they log `Lua error: Game API function called before the game started...` and return `false`.
 

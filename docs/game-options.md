@@ -140,10 +140,10 @@ end
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `GetRandomMapSeed()` | `number \| nil` | The fixed seed set with `SetRandomMapSeed()`, or `nil` when the game picks the seed. |
+| `GetRandomMapSeed()` | `number` or `nil` | The fixed seed set with `SetRandomMapSeed()`, or `nil` when the game picks the seed. |
 | `SetRandomMapSeed(seed)` | `boolean` | Sets a fixed map seed, `0` to `4294967295`, for the next match. |
 | `ClearRandomMapSeed()` | `boolean` | Removes the fixed seed. The game picks the seed again. |
-| `GetRandomMapSource()` | `RandomMapSource \| nil` | The selected random map script, or `nil`. |
+| `GetRandomMapSource()` | `RandomMapSource` or `nil` | The selected random map script, or `nil`. |
 | `SetRandomMapSource(source)` | `boolean` | Selects a random map script returned by `GetAvailableRandomMapSources()`. |
 
 - `SetRandomMapSeed()`, `ClearRandomMapSeed()` and `SetRandomMapSource()` work only in single-player setup. They return `false` during a match, in multiplayer, in a replay, and while a match is starting or quitting. CONTROL logs the reason.
