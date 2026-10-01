@@ -36,7 +36,7 @@ The launcher is a Windows (GUI) program. PowerShell does not wait for it or set 
 | Argument | Description |
 |----------|-------------|
 | `--headless` | Runs without a window and writes status lines to standard output. |
-| `--timeout-ms <ms>` | How long to wait, in milliseconds, for CONTROL to report that it is ready or has failed. Default `120000`. The same limit applies when CONTROL is still starting in the game from an earlier launch. Accepts a whole number from `1` to `4294967295`. |
+| `--timeout-ms <ms>` | How long to wait, in milliseconds, for CONTROL to report that it is ready or has failed. Default `120000`. The same limit applies when CONTROL is still starting in the game from an earlier launch, or still unloading. Accepts a whole number from `1` to `4294967295`. |
 | `--override-settings <file>` | Replaces `%appdata%\CONTROL\AoE2Control\settings.ini` with the given file before CONTROL starts. |
 | `--override-module <file-or-folder>` | Copies a module file or module folder into `%appdata%\CONTROL\AoE2Control\modules\` before CONTROL starts. |
 | `--rmside-status-json`, `--rmside-ui=hidden` | Used by the AoE2RMSIDE map editor. Both are required together, need `--headless` and cannot be combined with the override options. Status lines become JSON, and the CONTROL menu and module drawings stay hidden. |
@@ -112,7 +112,7 @@ Headless mode exits at the first of these lines. During a match CONTROL checks m
 | `6` | The game is not running. | `Process not found` |
 | `7` | The game window is not ready: not open, minimized or smaller than 640x360. | `Game window not ready` |
 | `8` | Injection failed. | The injection error, for example `Process open failed` |
-| `9` | No result within `--timeout-ms`. | `Timed out waiting for startup status`, `CONTROL is still starting in this game` |
+| `9` | No result within `--timeout-ms`. | `Timed out waiting for startup status`, `CONTROL is still starting in this game`, `CONTROL is still unloading in this game` |
 
 `Offset Error` means CONTROL does not support this game version yet. The full line is `Offset Error: game version <version> is not supported (rows <numbers>). Wait for a CONTROL update. Details: %APPDATA%\CONTROL\AoE2Control\diagnostics\latest.json`. Include the row numbers and `latest.json` when you report it.
 
