@@ -35,7 +35,7 @@ Call these from any callback. Each returns `defaultValue` when the key does not 
 
 | Function | Signature | Returns | Description |
 |----------|-----------|---------|-------------|
-| `IsKeyPressed` | `(vkCode)` | `boolean` | Returns whether a key is held down now. It reads the Windows key state, so it also returns `true` while another window has focus. |
+| `IsKeyPressed` | `(vkCode)` | `boolean` | Returns whether a key is held down now. Returns `false` while the game window is not focused. |
 
 `Update()` runs once per update interval (1 second by default) and can miss a short key press. Check keys in `Render()`.
 

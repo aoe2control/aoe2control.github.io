@@ -69,8 +69,8 @@ Each running module gets its own settings submenu, named after the module and it
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| **Menu Toggle Key** | `Shift` | Opens or closes the CONTROL menu. |
-| **Unload Key** | `Delete` | Unloads CONTROL from the game. |
+| **Menu Toggle Key** | `Shift` | Opens or closes the CONTROL menu. Works only while the game window is focused. |
+| **Unload Key** | `Delete` | Unloads CONTROL from the game. Works only while the game window is focused. |
 
 ## DEBUG Submenu
 

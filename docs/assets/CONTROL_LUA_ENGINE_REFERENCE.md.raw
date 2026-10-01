@@ -366,7 +366,7 @@ Get functions work in any callback and return `defaultValue` when the key does n
 | `Settings.GetString` | `(key, defaultValue?)` | `string` (selected dropdown option) |
 | `Settings.GetKeybind` | `(key, defaultVkCode?)` | `number` |
 | `Settings.GetColor` | `(key, defaultColor?)` | `Color` |
-| `IsKeyPressed` | `(vkCode)` | `boolean`: key held down now. Reads the Windows key state, so it is also `true` while another window has focus. |
+| `IsKeyPressed` | `(vkCode)` | `boolean`: key held down now; `false` while the game window is not focused. |
 
 `Update()` runs once per update interval and can miss a short key press; check keys in `Render()`.
 
