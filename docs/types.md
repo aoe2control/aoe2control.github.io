@@ -270,6 +270,7 @@ end
 | `SetPriorities(wood, food, gold, stone)` | `nil` | Sets raw villager priority weights. |
 | `GetPriorityPercentage(profession)` | `number` | Returns the current target percentage for a `VillagerProfession`. |
 | `ResetPriorities()` | `nil` | Resets villager priorities to defaults. |
+| `RebalanceVillagers()` | `nil` | Moves working villagers between professions to match the priority percentages. `Update()` assigns idle villagers only. |
 | `SetPriorityPercentage(profession, percentage)` | `nil` | Sets a percentage target for one profession. |
 | `SetLivestockVillagerLimit(limit)` | `nil` | Sets the preferred cap for villagers assigned to livestock food handling. |
 | `SetForageVillagerLimit(limit)` | `nil` | Sets the preferred cap for villagers assigned to forage before farms are preferred. |

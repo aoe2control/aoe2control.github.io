@@ -126,6 +126,7 @@ Command functions usually filter input objects to ones owned by the assigned pla
 | `UnitsTargetObject` | `(units, target)` | `boolean` | Order owned units to target an object. |
 | `UnitsBuildStructure` | `(builders, structureId, position)` | `boolean` | Order owned builders to construct a building. |
 | `UnitsMove` | `(units, position)` | `boolean` | Order owned units to move. |
+| `SetFormation` | `(units, formation)` | `nil` | Sets the formation of owned units using `Formation`, as the game's formation buttons do. It takes effect when the units next move together. `ObjectData.FORMATION_ID` does not report it. |
 | `EnableScouting` | `()` | `boolean` | Enable auto-scouting on an idle assigned scout-line unit. |
 | `ResearchTechnology` | `(technology)` | `boolean` | Research a technology from the assigned player's most common matching source type automatically. |
 | `DeleteUnit` | `(unit)` | `nil` | Delete an owned unit. |
@@ -174,7 +175,10 @@ Rules:
 | `GetObjectsByType` | `(unitType)` | `Object[]` | Scan matching world objects by type. Not restricted to owned objects. Loot-bearing dead huntables and livestock are included. |
 | `GetObjectsByTypes` | `(unitTypes)` | `Object[]` | Scan matching world objects by any listed type. Loot-bearing dead huntables and livestock are included. |
 | `GetObjectsByClass` | `(unitClass)` | `Object[]` | Scan matching world objects by class. Not restricted to owned objects. Loot-bearing dead huntables and livestock are included. |
+| `GetObjectsByClasses` | `(unitClasses)` | `Object[]` | Returns matching world objects of any listed class, not just owned objects. Loot-bearing dead huntables and livestock are included. |
 | `GetGameTime` | `()` | `number` | Match time in seconds. |
+| `GetClockMs` | `()` | `number` | Returns milliseconds on a monotonic high-resolution clock with an arbitrary start. Subtract two values to measure a duration. |
+| `GetModuleTelemetry` | `()` | `table` | Returns the calling module instance's timing: `update` and `render` tables with `count`, `totalMs`, `sampleCount`, `averageMs`, `p50Ms`, `p95Ms` and `maxMs` (over the last 256 calls), plus `lateUpdates` (updates that ran a full interval or more late), `skippedIntervals` (update intervals dropped because of that) and `deferredUpdates` (Multithreading: an update came due while the previous one was still running). With the Debug setting **API Profiling** on, `api` lists the module's calls into native functions as `{ name, count, totalMs }`, longest total first; otherwise it is empty. Returns `nil` outside a module callback. |
 | `GetAllChatMessages` | `()` | `string[]` | Current chat buffer as plain message strings. |
 | `GetNewChatMessages` | `()` | `string[]` | Chat messages that became visible since this module instance last called the function. |
 | `GetLastChatMessage` | `()` | `string \| nil` | Newest chat message, or `nil` when the chat buffer is empty. |
@@ -190,6 +194,11 @@ Rules:
 | `CalculatePath` | `(startPos, targetPos)` | `Vector3[]` | Calculate a native path between two `Vector3` positions. |
 | `CalculatePath` | `(startPos, targetPos, collisionRadius)` | `Vector3[]` | Calculate a native path between two `Vector3` positions with an explicit collision radius. |
 | `GetObjectsInArea` | `(pos1, pos2)` | `Object[]` | Objects inside the rectangle defined by two `Vector2` positions. Loot-bearing dead huntables and livestock are included. |
+| `GetObjectsInArea` | `(pos1, pos2, unitClass, owner)` | `Object[]` | Overload: returns the objects of `GetObjectsInArea(pos1, pos2)` that are in `unitClass` and owned by player id `owner`. Pass `nil` for either filter to skip it. |
+| `GetObjectStates` | `(objects)` | `table` | Reads several objects in one call. Returns a table of arrays `id`, `unitType`, `playerId`, `x`, `y`, `hitpoints`, `targetId` and `alive`; index `i` of every array describes the same object. `targetId` is `-1` without a visible target and `playerId` is `-1` without an owner. Skips `nil` entries, objects that no longer exist and objects that are not visible, so use the `id` array to match results to objects. |
+| `GetObjectChanges` | `()` | `{ created = integer[], destroyed = integer[], damaged = integer[] }` | Compares the assigned player's objects (the set `GetAssignedPlayer():GetPlayerObjects()` returns) with the previous call from this module instance. `damaged` lists objects with fewer hitpoints than at that call. Ids are in ascending order. The first call after a module load reports every object as created. Returns empty lists, and keeps the previous state, when the assigned player is unavailable. |
+| `CheckPlacement` | `(objectTypeId, position)` | `PlacementResult, number?` | Runs the game's own placement check of an object type for the assigned player, centred on a `Vector2` or `Vector3` position. Returns the `PlacementResult`, plus the blocking object's id for `BLOCKED`. Unexplored ground is refused unless Modules See Everything is on. Returns `nil` with Multithreading on. |
+| `CanPlaceObject` | `(objectTypeId, position)` | `boolean` | `true` when `CheckPlacement` returns `CAN_PLACE`; `nil` with Multithreading on. |
 | `GetObjectsPtr` | `()` | `number, number` | Returns `(ptr, count)` for an engine-owned packed object snapshot buffer. Intended for IPC / RPM readers. |
 | `GetObjectTypeData` | `(objectTypeId, objectData)` | `number` | Game-resolved object-type data lookup for a `UnitObjectType`. |
 | `GetObjectTypeAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number` | Game-resolved object-type attribute lookup for a `UnitObjectType`. |
@@ -366,6 +375,16 @@ Flags:
 - `Tile.flags` bit `1`: navigatable
 - `Object.flags` bit `0`: alive
 
+### Agent Bridge
+
+Off by default; enable **Modules > Agent Bridge**. It lets an outside program read the module player's view and send commands over `\\.\pipe\AoE2ControlAgentV1`. Refused in multiplayer.
+
+| Function | Returns | Description |
+|----------|---------|-------------|
+| `AgentBridge.Start()` | `boolean` | Opens the pipe for this module instance. Call it in `Load()`. |
+| `AgentBridge.Tick()` | `boolean` | Publishes an observation and applies a pending action. Call it in `Update()`. |
+| `AgentBridge.Stop()` | `nil` | Closes the pipe. Call it in `Unload()`. |
+
 ---
 
 ## 9. Types
@@ -417,6 +436,7 @@ Methods:
 - `IsVisible()`
 - `IsExplored()`
 - `IsAlive()`
+- `IsFoundation()`
 - `GetUnitObjectType()`
 - `GetClass()`
 - `GetAttribute(attribute, damageType)`
@@ -430,8 +450,9 @@ Methods:
 - `GetCurrentMapTile()`
 - `GetPath()`
 - `GetName()`
-- `GetInternalName()`
-- `GetMasterName()`
+- `GetGraphicFileName()`
+- `GetTypeName()`
+- `GetSprite()`
 - `CalculatePath(targetPos)`
 
 Behavior:
@@ -440,8 +461,9 @@ Behavior:
 - Cached objects can throw a Lua error on most method calls after they become invisible
 - Explored animals and resources can still be returned even when they are not currently visible
 - On those non-visible explored object references, only `IsVisible()`, `IsExplored()`, `GetId()`, `GetPosition()`, `GetClass()`, and `GetUnitObjectType()` are safe
-- `GetName()` and `GetInternalName()` return empty strings when name data is unavailable
-- `GetMasterName()` is kept for compatibility and currently mirrors `GetName()`
+- `GetName()` and `GetGraphicFileName()` describe the object's current graphic (`Villager Male (Idle)`, `u_vil_male_villager_idleA_x1`) and change with its activity; `GetTypeName()` is the type's in-game name (`Villager`). They return empty strings when the data is unavailable
+- `GetSprite()` returns `{ name, fileName, facet, facetCount, frameCount, frameDuration }` or `nil`
+- `IsMoving()` is true while a unit follows a path; `IsFoundation()` is true for an unfinished building, which object lists leave out
 - Re-fetch object references in the current frame when fog-aware mode is active
 
 ### MapTile
@@ -585,6 +607,9 @@ Methods:
 - `GetObjectsByMostCommonType(unitTypes)`
 - `GetObjectsByClass(unitClass)`
 - `GetObjectsByClassDeadInclusive(unitClass)`
+- `GetFoundations()`
+- `CountObjectsByTypes(unitTypes)`
+- `CountObjectsByClass(unitClass)`
 - `GetTownCenters()`
 
 Behavior:
@@ -623,6 +648,7 @@ Methods:
 - `GetAllVillagers()`
 - `GetIdleVillagers()`
 - `RequestVillagers(amount, position, urgency)`
+- `RebalanceVillagers()`
 - `SetPriorities(wood, food, gold, stone)`
 - `GetPriorityPercentage(profession)`
 - `ResetPriorities()`
