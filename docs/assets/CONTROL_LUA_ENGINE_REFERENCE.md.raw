@@ -69,7 +69,7 @@ A module defines up to six callbacks. All are optional. CONTROL looks them up af
 | `Init()` | Once per match, when the match runs and game time is above 0. Again for the next match, and at once when the module is reloaded during a match. | Per-match setup: reset caches, read the map, `IPC.StartServer()`, create strategic components. |
 | `Update()` | Every **Update Interval** seconds of game time (default `1.0`) while a match runs. Not while paused. Missed intervals are dropped, not run back to back. | Decisions and game commands. |
 | `Render()` | Every frame while a match runs, after `Init()`. Not called with **Multithreading** on. | Drawing with `Render*` functions. |
-| `End(hasWon)` | Once per match: when the match or replay ends, or the player leaves a running match. `hasWon` is `false` when the player leaves and at the end of a replay. | Final reads. Game commands do nothing here. |
+| `End(hasWon)` | Once per match: when the match or replay ends, or the player leaves a running match. Not when the tech tree, options, hotkeys, save or load screen opens. `hasWon` is `false` when the player leaves and at the end of a replay. | Final reads. Game commands do nothing here. |
 | `Unload()` | When the module stops in its slot: slot or **Enabled** turned off, assigned player not in the match, another module selected, the module reloaded or removed, CONTROL unloaded. Can run without `End()`. | Cleanup: `IPC.StopServer()`, `AgentBridge.Stop()`. |
 
 Rules:
@@ -552,8 +552,8 @@ With **Modules See Everything** off, attribute, fact, count, cost, research and 
 | `GetPopulation()` | `SetPopulation(population)` | `number` |
 | `GetTreatyLength()` | `SetTreatyLength(treatyLength)` | `number` |
 | `GetPlayersCount()` | `SetPlayersCount(playersCount)` | `number` of player slots in use |
-| `GetLocation()` | `SetLocation(location)` | `OptionsLocation`. The setter also clears a custom map pool. |
-| — | `SetRandomMapPoolLocations(locations)` | Array of 1 to 256 `OptionsLocation` values. One entry acts like `SetLocation()`; two or more set the location to `OptionsLocation.CUSTOM_MAP_POOL`. |
+| `GetLocation()` | `SetLocation(location)` | `OptionsLocation`; during a match, the map the game started. The setter also clears a custom map pool. |
+| — | `SetRandomMapPoolLocations(locations)` | Array of 1 to 256 `OptionsLocation` values. One entry acts like `SetLocation()`; two or more set the location to `OptionsLocation.CUSTOM_MAP_POOL`, which `GetLocation()` then returns. Known issue in 1.1.0: `DispatchStartGame()` then starts the game's default map (Coastal), not a pool map. |
 | `GetTeamsNotTogether()` | `SetTeamsNotTogether(value)` | `boolean` (`true` when Team Together is off) |
 | `GetRecordGame()` | `SetRecordGame(value)` | `boolean` |
 | `GetTeamPositions()` | `SetTeamPositions(value)` | `boolean` |

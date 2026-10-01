@@ -53,7 +53,7 @@ Each running module gets its own settings submenu, named after the module and it
 | Setting | Default | Description |
 |---------|---------|-------------|
 | **Player Perspective** | `Default` | Shows the game from another player's view: `Default` (the local player), `Player 1` to `Player 8`, or `Gaia`. May cause crashes. Resets to `Default` when CONTROL starts. |
-| **Game Speed Multiplier** | `Default` | Overrides the game speed: `Default`, `1`, `1.5`, `2`, `5`, `10`, `20` or `30`. `Default` keeps the game's own speed. Resets to `Default` when CONTROL starts. `SetGameSpeedMultiplier()` changes this setting. |
+| **Game Speed Multiplier** | `Default` | Overrides the game speed: `Default`, `1`, `1.5`, `2`, `5`, `10`, `20` or `30`. `Default` keeps the game's own speed; switching back to `Default` during a match restores that speed. Resets to `Default` when CONTROL starts. `SetGameSpeedMultiplier()` changes this setting. |
 | **Spectator Mode** | Off | Shows the whole map, as a spectator sees it. |
 | **Unlock Zoom** | Off | Lets you zoom out further than the game allows. May cause rendering issues. |
 | **Chat Welcome Message** | On | Sends `[CONTROL] Have fun!` to the chat at the start of each match. |

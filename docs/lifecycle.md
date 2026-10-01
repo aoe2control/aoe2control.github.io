@@ -42,7 +42,7 @@ In **Tournament Mode**, the part of an `Update()` call above 20 ms is added to t
 
 **Signature:** `End(hasWon)`
 
-**When:** Once per match: when the match or replay ends, or when the player leaves a running match.
+**When:** Once per match: when the match or replay ends, or when the player leaves a running match. Opening the tech tree, options, hotkeys, save or load screen during a match does not end it.
 
 **Parameters:** `hasWon` is `true` when the assigned player won. It is `false` when the player leaves the match and at the end of a replay.
 

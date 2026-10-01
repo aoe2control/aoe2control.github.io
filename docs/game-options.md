@@ -57,7 +57,7 @@ end
 | `SetTreatyLength(treatyLength)` | `boolean` | Sets the treaty length. |
 | `GetPlayersCount()` | `number` | Number of player slots in use. |
 | `SetPlayersCount(playersCount)` | `boolean` | Sets the number of player slots in use. |
-| `GetLocation()` | `OptionsLocation` | Selected map. |
+| `GetLocation()` | `OptionsLocation` | Selected map: `OptionsLocation.CUSTOM_MAP_POOL` after `SetRandomMapPoolLocations()` with two or more locations. During a match, the map the game started. |
 | `SetLocation(location)` | `boolean` | Selects a map. Also clears a custom map pool set by `SetRandomMapPoolLocations()`. |
 | `SetRandomMapPoolLocations(locations)` | `boolean` | Sets a custom random map pool. See [Custom random map pools](#custom-random-map-pools). |
 
@@ -134,7 +134,9 @@ end
 
 - The array must hold 1 to 256 locations. An empty or longer array returns `false`.
 - One location does the same as `SetLocation()`.
-- Two or more locations set the location to `OptionsLocation.CUSTOM_MAP_POOL`.
+- Two or more locations set the location to `OptionsLocation.CUSTOM_MAP_POOL`, and `GetLocation()` returns that value.
+
+Known issue in 1.1.0: a match started with `DispatchStartGame()` from a map pool starts the game's default map (Coastal) instead of a map from the pool.
 
 ## Random map seed and source
 
