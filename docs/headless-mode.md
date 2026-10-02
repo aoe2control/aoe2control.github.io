@@ -36,7 +36,7 @@ The launcher is a Windows (GUI) program. PowerShell does not wait for it or set 
 | Argument | Description |
 |----------|-------------|
 | `--headless` | Runs without a window and writes status lines to standard output. |
-| `--timeout-ms <ms>` | How long to wait, in milliseconds, for CONTROL to report that it is ready or has failed. Default `120000`. The same limit applies when CONTROL is still starting in the game from an earlier launch, or still unloading. Accepts a whole number from `1` to `4294967295`. |
+| `--timeout-ms <ms>` | How long to wait, in milliseconds, for CONTROL to report that it is ready or has failed. Default `120000`. When CONTROL is still starting in the game from an earlier launch, or still unloading, the launcher first waits up to this long for that, then up to this long again for the new start, so a launch can take up to twice the value. Accepts a whole number from `1` to `4294967295`. |
 | `--override-settings <file>` | Replaces `%appdata%\CONTROL\AoE2Control\settings.ini` with the given file before CONTROL starts. |
 | `--override-module <file-or-folder>` | Copies a module file or module folder into `%appdata%\CONTROL\AoE2Control\modules\` before CONTROL starts. |
 | `--rmside-status-json`, `--rmside-ui=hidden` | Used by the AoE2RMSIDE map editor. Both are required together, need `--headless` and cannot be combined with the override options. Status lines become JSON, and the CONTROL menu and module drawings stay hidden. |
