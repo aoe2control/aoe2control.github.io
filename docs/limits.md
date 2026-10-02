@@ -82,6 +82,11 @@ With **Multithreading** on, and while the [Agent Bridge](agent-bridge.md) is on 
 - `GetFact`, `Player:GetFact`, `Object:GetAttribute` and `Object:GetObjectData` return `nil` for values the copy does not hold.
 - `GetObjectTypeData` returns `nil` for every field except `ObjectData.TRAIN_SITE`. `GetObjectTypeAttribute` returns `nil` for every attribute except `ObjectAttribute.RADIUS_X` and `ObjectAttribute.RADIUS_Y`.
 - `CheckPlacement()`, `CanPlaceObject()` and `MapTile:IsBuildable()` return `nil`.
+- `GetMapTile` returns `nil` for a tile the assigned player has not explored, unless **Modules See
+  Everything** is on.
+- `CalculatePath` and `Object:CalculatePath` search the copied tiles instead of asking the game's
+  pathfinder. The path moves between whole tiles that are explored and that nothing blocks, and is empty
+  when the start or the target tile is not one of them.
 - `GetObjectsInArea` compares the object's exact position, not its tile.
 - Garrisoned units are in the copy, at the position of the object they are in. For them
   `GetGarrisonObject()` returns that object, and only identity, class, type, owner, position and
