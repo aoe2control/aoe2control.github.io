@@ -21,7 +21,7 @@ The **Module** list shows every `{moduleName}.main.lua` and `{moduleName}.main.m
 | **Tournament Mode** | Off | Refuses game commands outside `Update()`, adds `Update()` time above 20 ms to the next interval, and blocks a list of functions. See [Limits](limits.md#tournament-mode). |
 | **Multithreading** | Off | Runs each module on its own thread, which reduces the frame-rate cost. `Render()` is not called, and some functions are blocked or return `nil`. See [Limits](limits.md#multithreading). May cause sync issues. |
 | **Modules See Everything** | Off | Modules ignore fog of war when they read map tiles, objects and players. See [Perspective And Visibility](#perspective-and-visibility). |
-| **Agent Bridge** | Off | Lets a module open the [Agent Bridge](agent-bridge.md) pipe. Any program running under your Windows user can then read the module player's view and send it commands. Not available in multiplayer. |
+| **Agent Bridge** | Off | Turns on the [Agent Bridge](agent-bridge.md). While it is on, a checkbox per player appears below it; each opens a pipe through which any program running under your Windows user can read that player's view and send its commands. Not available in multiplayer. |
 
 Changing **Multithreading** reloads every assigned module.
 

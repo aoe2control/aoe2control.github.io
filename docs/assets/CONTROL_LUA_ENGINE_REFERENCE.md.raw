@@ -65,12 +65,12 @@ A module defines up to six callbacks. All are optional. CONTROL looks them up af
 
 | Callback | When | Use for |
 |----------|------|---------|
-| `Load(playerId)` | When the slot becomes active: slot on, **Enabled** on, assigned player present (outside a match every player counts as present). Can run in the main menu. `playerId` is `1` to `8`. | `Settings.Add*`, `AgentBridge.Start()`, setup that needs only the player id. |
+| `Load(playerId)` | When the slot becomes active: slot on, **Enabled** on, assigned player present (outside a match every player counts as present). Can run in the main menu. `playerId` is `1` to `8`. | `Settings.Add*`, setup that needs only the player id. |
 | `Init()` | Once per match, when the match runs and game time is above 0. Again for the next match, and at once when the module is reloaded during a match. | Per-match setup: reset caches, read the map, `IPC.StartServer()`, create strategic components. |
 | `Update()` | Every **Update Interval** seconds of game time (default `1.0`) while a match runs. Not while paused. Missed intervals are dropped, not run back to back. | Decisions and game commands. |
 | `Render()` | Every frame while a match runs, after `Init()`. Not called with **Multithreading** on. | Drawing with `Render*` functions. |
 | `End(hasWon)` | Once per match: when the match or replay ends, or the player leaves a running match. Not when the tech tree, options, hotkeys, save or load screen opens. `hasWon` is `false` when the player leaves and at the end of a replay. | Final reads. Game commands do nothing here. |
-| `Unload()` | When the module stops in its slot: slot or **Enabled** turned off, assigned player not in the match, another module selected, the module reloaded or removed, CONTROL unloaded. Can run without `End()`. | Cleanup: `IPC.StopServer()`, `AgentBridge.Stop()`. |
+| `Unload()` | When the module stops in its slot: slot or **Enabled** turned off, assigned player not in the match, another module selected, the module reloaded or removed, CONTROL unloaded. Can run without `End()`. | Cleanup: `IPC.StopServer()`. |
 
 Rules:
 
@@ -109,9 +109,9 @@ Rules:
 - These functions do nothing and return `nil`, `false` or an empty value; CONTROL logs `Multithreading blocked ...` once per function and module load: `DispatchStartGame`, `DispatchRestartGame`, `DispatchResignGame`, `DispatchQuitGame`, `DispatchLoadGame`, `RefreshRandomMapSources`, `SetGamePaused`, `SetReplaySpeed`, `SetGameSpeedMultiplier`, `IPC.WaitForMessage`, `GetScreenSize`, `IsOnScreen`, `IsWorldPosOnScreen`, `WorldToScreen`, `WorldToMinimap`, `GetZoom`, `GetCameraPosition`.
 - `ResourceTracker`, `VillagerOccupation` and `ConstructionPlacement` need the live game; their `Update()` raises an error.
 
-### Game-state copy (Multithreading on, or an Agent Bridge running)
+### Game-state copy (Multithreading on, or the Agent Bridge on)
 
-With **Multithreading** on, and while the Agent Bridge runs, every module reads a copy of the game state taken once per frame instead of the live game. Tournament Mode does not do this.
+With **Multithreading** on, and while the Agent Bridge is on for any player, every module reads a copy of the game state taken once per frame instead of the live game. Tournament Mode does not do this.
 
 - `GetFact`, `Player:GetFact`, `Object:GetObjectData` return `nil` for values the copy does not hold. `Object:GetAttribute` returns `nil` for every attribute except `HITPOINTS`, `RADIUS_X` and `RADIUS_Y`.
 - `GetObjectTypeData` returns `nil` for every field except `ObjectData.TRAIN_SITE`. `GetObjectTypeAttribute` returns `nil` for every attribute except `ObjectAttribute.RADIUS_X` and `ObjectAttribute.RADIUS_Y`.
@@ -401,15 +401,9 @@ A module runs a Windows named-pipe server; external programs on the same PC, run
 
 ### Agent Bridge
 
-The Agent Bridge lets an external program read the module player's view and send it commands over `\\.\pipe\AoE2ControlAgentV1`, with no protocol code in the module. It is off by default: turn on **Modules > Agent Bridge** (`Agent Bridge=true` under `[modules]` in `settings.ini`). It does not work in multiplayer, even with cheats. While it runs, all modules read the [game-state copy](#game-state-copy-multithreading-on-or-an-agent-bridge-running).
+The Agent Bridge lets an external program play a player over `\\.\pipe\AoE2ControlAgentV3.P<n>`, without a Lua module. CONTROL hosts it, so it has no Lua functions. It is off by default: turn on **Modules > Agent Bridge** and the players below it (`Agent Bridge=true` and `Agent Bridge Player <n>=true` under `[modules]` in `settings.ini`). It does not work in multiplayer, even with cheats. While it is on for any player, all modules read the [game-state copy](#game-state-copy-multithreading-on-or-the-agent-bridge-on).
 
-| Function | Returns | Description |
-|----------|---------|-------------|
-| `AgentBridge.Start()` | `boolean` | Opens the pipe. Call it in `Load()`. `false` outside `Load()`, with the setting off, in multiplayer, or when another module instance runs the bridge. |
-| `AgentBridge.Tick()` | `boolean` | Publishes an observation and applies a pending action. Call it in `Update()`. `false` when nothing was published. |
-| `AgentBridge.Stop()` | `nil` | Closes the pipe. Call it in `Unload()`; until then a reloaded module cannot start the bridge again. |
-
-The pipe protocol (`negotiate`, `observe`, `act`) is described at https://aoe2control.github.io/agent-bridge/.
+The pipe protocol (`open`, `observe`, `map`, `act`, `query`) is described at https://aoe2control.github.io/agent-bridge/.
 
 ---
 
@@ -720,7 +714,7 @@ Notes:
 | **Tournament Mode** (MODULES) | Off | See [Modes](#4-modes). |
 | **Multithreading** (MODULES) | Off | See [Modes](#4-modes). Changing it reloads every module. |
 | **Modules See Everything** (MODULES) | Off | Modules ignore fog of war when reading tiles, objects and players. |
-| **Agent Bridge** (MODULES) | Off | Allows `AgentBridge.Start()`. |
+| **Agent Bridge** (MODULES) | Off | Opens the Agent Bridge pipe for each player turned on below it. |
 | **Sync** (player slot) | Off | Stores the module's settings in a shared profile (`S1`, `S2`, ...) instead of per player. |
 | **Game Speed Multiplier** (MISC) | `Default` | Speed override; `SetGameSpeedMultiplier()` changes it. Resets to `Default` when CONTROL starts. |
 | **API Profiling** (DEBUG) | Off | Fills `GetModuleTelemetry().api` for modules loaded after it is turned on. |

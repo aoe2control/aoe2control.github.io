@@ -13,7 +13,7 @@ Rules for coding agents that write CONTROL (AoE2Control) Lua modules. Look up ev
 ## Callbacks
 
 6. Define callbacks as globals: `function Update()`, not `local function Update()`. CONTROL calls `Load(playerId)`, `Init()`, `Update()`, `Render()`, `End(hasWon)` and `Unload()`; all are optional.
-7. Call `Settings.Add*` and `AgentBridge.Start()` in `Load()`. Do not read game state in `Load()`; it can run in the main menu.
+7. Call `Settings.Add*` in `Load()`. Do not read game state in `Load()`; it can run in the main menu.
 8. Give game commands (`TrainUnit`, `UnitsMove`, `ResearchTechnology` and the rest) only in `Update()`. With **Sequential Actions** on (the default), only the first command per `Update()` runs.
 9. Call `Render*` draw functions only inside `Render()`. Anywhere else they raise an error. Keep expensive work out of `Render()`; it runs every frame.
 10. A callback, including the file's top-level code, is stopped with an error after 1 second. Never write loops that wait for game state; `IPC.WaitForMessage` waits at most 500 ms.
@@ -27,7 +27,7 @@ Rules for coding agents that write CONTROL (AoE2Control) Lua modules. Look up ev
 
 ## Modes
 
-15. **Multithreading** or a running **Agent Bridge**: modules read a copy of the game state. `Render()` is not called with Multithreading. `GetFact`, `Object:GetAttribute`, `Object:GetObjectData`, `GetObjectTypeData`, `GetObjectTypeAttribute`, `CheckPlacement`, `CanPlaceObject` and `MapTile:IsBuildable` can return `nil`. Commands are queued, so `true` means queued, not done. Strategic components raise an error.
+15. **Multithreading** or the **Agent Bridge** on: modules read a copy of the game state. `Render()` is not called with Multithreading. `GetFact`, `Object:GetAttribute`, `Object:GetObjectData`, `GetObjectTypeData`, `GetObjectTypeAttribute`, `CheckPlacement`, `CanPlaceObject` and `MapTile:IsBuildable` can return `nil`. Commands are queued, so `true` means queued, not done. Strategic components raise an error.
 16. **Tournament Mode**: commands outside `Update()` are refused, draw calls draw nothing, and `Log`, `SendChatMessage`, `SetCameraPosition`, the `Dispatch*` and random-map functions, replay and speed functions, render queries and most `GameOptions` methods do nothing. Do not rely on `Log()` output there.
 17. Modules run in multiplayer only when the match has cheats enabled.
 

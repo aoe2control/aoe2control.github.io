@@ -77,7 +77,7 @@ With **Multithreading** on, each module runs on its own thread and reads a copy 
 
 ### Game-state copy
 
-With **Multithreading** on, and while the [Agent Bridge](agent-bridge.md) runs, modules read a copy of the game state taken once per frame instead of the live game. These functions then behave differently:
+With **Multithreading** on, and while the [Agent Bridge](agent-bridge.md) is on for any player, modules read a copy of the game state taken once per frame instead of the live game. These functions then behave differently:
 
 - `GetFact`, `Player:GetFact`, `Object:GetAttribute` and `Object:GetObjectData` return `nil` for values the copy does not hold.
 - `GetObjectTypeData` returns `nil` for every field except `ObjectData.TRAIN_SITE`. `GetObjectTypeAttribute` returns `nil` for every attribute except `ObjectAttribute.RADIUS_X` and `ObjectAttribute.RADIUS_Y`.
