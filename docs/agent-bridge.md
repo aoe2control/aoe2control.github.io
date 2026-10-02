@@ -5,6 +5,10 @@ player can see and sends the player's commands over a named pipe. CONTROL hosts 
 module is needed. Every command goes through the same checks and command queue as a module's
 commands, so the program can do what a module can do and nothing more.
 
+CONTROL 1.1.0 had a different bridge, opened by a Lua module with `AgentBridge.Start()` on
+`\\.\pipe\AoE2ControlAgentV1`. CONTROL 1.1.1 replaces it: the Lua functions and the old pipe are
+gone, and programs written for 1.1.0 must use the protocol on this page.
+
 ## Turning it on
 
 1. In the CONTROL menu, open **Modules** and turn on **Agent Bridge**.
@@ -19,14 +23,16 @@ The settings in `settings.ini`:
 | `Agent Bridge` | `false` | Turns the bridge on. The menu shows it under **Modules** and, while it is on, one checkbox per player below it. |
 | `Agent Bridge Player 1` to `Agent Bridge Player 8` | `false` | Opens the pipe for that player. |
 
-While the bridge is on for any player, Lua modules read the [game-state copy](limits.md#game-state-copy), as with **Multithreading**. The bridge does not depend on **Modules > Enabled**. A player can have a Lua module and a bridge
-at the same time; both send commands for the player. With **Suppress Native AI** on, a bot player
-with the bridge turned on has its built-in AI turned off, as with a module.
+While the bridge is on for any player, Lua modules read the
+[game-state copy](limits.md#game-state-copy), as with **Multithreading**. The bridge does not
+depend on **Modules > Enabled**. A player can have a Lua module and a bridge at the same time; both
+send commands for the player. With **Suppress Native AI** on, a bot player with the bridge turned on
+has its built-in AI turned off, as with a module.
 
 The bridge is refused in multiplayer matches, also with cheats enabled. In a replay, observing
 works and every command is rejected.
 
-## Transport
+## Connecting
 
 - One named pipe per player that has the bridge turned on: `\\.\pipe\AoE2ControlAgentV3.P<n>`,
   `<n>` from 1 to 8. The pipe exists while the setting is on and CONTROL is loaded.
@@ -37,7 +43,7 @@ works and every command is rejected.
   a client that connects while another request runs waits for its turn.
 - Connecting, reading and writing each time out after 5 seconds.
 
-## Envelope
+## Requests and responses
 
 Request:
 
@@ -70,7 +76,7 @@ No session. Payload `{}`. Returns:
 | `state` | `waiting_for_match`, `ready`, `multiplayer_refused`. |
 | `session_open` | `true` while a session is alive. |
 | `information_policy` | `player_view`, or `omniscient` while **Modules See Everything** is on. |
-| `counters` | `actions_accepted`, `actions_rejected`, `actions_executed`, `observations`. Counted since CONTROL loaded. |
+| `counters` | `actions_accepted`, `actions_rejected`, `actions_executed`, `observations`, counted since the bridge for this player was turned on. |
 
 ### `open`
 
@@ -179,8 +185,8 @@ Commands in version 3:
 | `gameplay.formation.v1` | `actors`, `formation` (`Formation`) | Sets the formation. |
 | `gameplay.gather_point.v1` | `actors` (buildings), `position` | Sets the gather point. |
 | `gameplay.town_bell.v1` | `target` (a town center of the player), `calling_in` | Rings the town bell or sounds the all-clear. |
-| `gameplay.back_to_work.v1` | `target` (a building of the player) | Sends the units garrisoned in it back to work. |
-| `gameplay.all_back_to_work.v1` | `target` (a building of the player) | Sends all garrisoned villagers back to work. |
+| `gameplay.back_to_work.v1` | `target` (a building of the player) | Sends the villagers garrisoned in it back to work. |
+| `gameplay.all_back_to_work.v1` | `target` (a building of the player) | Sends the villagers garrisoned in all of the player's buildings back to work. |
 | `gameplay.delete.v1` | `target` (a unit of the player) | Deletes a unit. Cannot be undone. |
 | `gameplay.destroy_building.v1` | `target` (a building of the player) | Destroys a building. Cannot be undone. |
 | `player.chat.v1` | `message` (1–200 characters) | Sends a chat message as the player. |
@@ -211,7 +217,8 @@ Entities: every object the player can see. An object the player has explored but
 (for example a gold mine in the fog) has `access: "position"` and only the fields `id`, `type_id`,
 `class_id`, `owner`, `x`, `y`, `access`. Other objects have `access: "full"` and all requested
 fields. `id` and `access` are always included. A garrisoned unit has the position of the object
-it is in and `garrison_object_id` set. The fields:
+it is in and `garrison_object_id` set; of its other fields only `type_id`, `class_id`,
+`object_type`, `owner`, `status`, `alive` and `commandable` hold values. The fields:
 
 `id`, `type_id`, `type_name`, `name`, `class_id`, `object_type`, `owner` (`null` for none),
 `x`, `y`, `z`, `tile_x`, `tile_y`, `hitpoints`, `max_hitpoints`, `alive`, `idle`, `moving`,
@@ -220,7 +227,7 @@ it is in and `garrison_object_id` set. The fields:
 `garrison_object_id`, `radius_x`, `radius_y`, `action`, `train_count`, `researching`,
 `progress_type`, `progress_value`, `access`.
 
-Positions are in tiles, as in Lua.
+Positions are in tiles, as in Lua. [Limits](limits.md#agent-bridge) lists the bridge's limits in one table.
 
 ## Reasons
 
@@ -237,7 +244,7 @@ Validation and execution (`stage: "validation"` or `"execution"`): `unavailable_
 
 | Code | Meaning |
 |---|---|
-| `invalid_request` | The envelope or payload does not match this contract. |
+| `invalid_request` | The request or its payload does not match this page. |
 | `unsupported_contract_version` | `contract_version` is not `3`. |
 | `unknown_operation` | No such operation. |
 | `invalid_session`, `session_expired` | The session id is unknown, or the session ended. |

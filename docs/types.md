@@ -133,7 +133,7 @@ A unit, building, resource or other map object. Returned by the object lookups o
 
 Resources and other objects that cannot move (`GetObjectType()` is `ObjectType.RESOURCE_OR_EYE_CANDY` or `ObjectType.ANIMATED_MAP_OBJECT`: trees, mines, bushes, decorations) have no direction, path or action. For them `GetDirection()` returns `(0, 0, 0)`, `GetPath()` returns an empty list and `GetActionTargetPosition()` returns `nil`.
 
-With Multithreading on, or while the Agent Bridge runs, modules read objects from a copy of the game state (see [Limits](limits.md#game-state-copy)). In that copy `GetAttribute()` returns `nil` for every attribute except `HITPOINTS`, `RADIUS_X` and `RADIUS_Y`, and `GetObjectData()` returns `nil` for fields the copy does not record.
+With Multithreading on, or while the Agent Bridge is on, modules read objects from a copy of the game state (see [Limits](limits.md#game-state-copy)). In that copy `GetAttribute()` returns `nil` for every attribute except `HITPOINTS`, `RADIUS_X` and `RADIUS_Y`, and `GetObjectData()` returns `nil` for fields the copy does not record.
 
 #### Fog of war and stale objects
 
@@ -196,7 +196,7 @@ Returned by `GetAssignedPlayer`, `GetPlayerById`, `GetVictoryPlayer` and `Object
 | `GetColor()` | `Color` | Returns the player's color. |
 | `GetAttribute(attribute)` | `number` | Returns a `PlayerAttribute` value. |
 | `GetUnitTypeCount(id)` | `number` | Returns how many units of a type id the player has. |
-| `GetFact(fact, parameter?)` | `number` | Returns a `Fact` value for this player; see [Facts](facts.md). `parameter` defaults to `0`. With Multithreading on, or while the Agent Bridge runs, returns `nil` for facts the game-state copy does not record. |
+| `GetFact(fact, parameter?)` | `number` | Returns a `Fact` value for this player; see [Facts](facts.md). `parameter` defaults to `0`. With Multithreading on, or while the Agent Bridge is on, returns `nil` for facts the game-state copy does not record. |
 | `IsObjectTypeAvailable(unitObjectType)` | `boolean` | Returns whether the player can currently get a unit or building type. |
 | `CanAfford(id, isBuilding?)` | `boolean` | Returns whether the player has the resources for object type `id` and, unless `isBuilding` is `true`, the population room. Does not check whether the type is available. |
 | `GetResearchState(technology)` | `ResearchState` | Returns the research state of a technology. |

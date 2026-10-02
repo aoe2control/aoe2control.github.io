@@ -258,7 +258,7 @@ These functions read the match and do not change it. Call them from `Init`, `Upd
 | `GetGameTime` | `()` | `number` | Match time in seconds. |
 | `GetClockMs` | `()` | `number` | Milliseconds on a monotonic clock with an arbitrary start. Subtract two values for a duration. |
 | `GetModuleTelemetry` | `()` | `table` or `nil` | This module instance's timing (see below). `nil` outside a module callback. |
-| `GetAllChatMessages` | `()` | `string[]` | Messages in the chat buffer. |
+| `GetAllChatMessages` | `()` | `string[]` | The newest 50 chat messages, oldest first, game notices included. |
 | `GetNewChatMessages` | `()` | `string[]` | Messages that appeared since this module instance last called it. The first call after a load returns the whole buffer. |
 | `GetLastChatMessage` | `()` | `string` or `nil` | Newest chat message, or `nil`. |
 | `GetAssignedPlayer` | `()` | `Player` | This module instance's player. |

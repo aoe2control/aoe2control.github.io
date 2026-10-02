@@ -83,6 +83,9 @@ With **Multithreading** on, and while the [Agent Bridge](agent-bridge.md) is on 
 - `GetObjectTypeData` returns `nil` for every field except `ObjectData.TRAIN_SITE`. `GetObjectTypeAttribute` returns `nil` for every attribute except `ObjectAttribute.RADIUS_X` and `ObjectAttribute.RADIUS_Y`.
 - `CheckPlacement()`, `CanPlaceObject()` and `MapTile:IsBuildable()` return `nil`.
 - `GetObjectsInArea` compares the object's exact position, not its tile.
+- Garrisoned units are in the copy, at the position of the object they are in. For them
+  `GetGarrisonObject()` returns that object, and only identity, class, type, owner, position and
+  `IsAlive()` hold values; other methods return `0`, `false` or an empty string.
 
 ## IPC
 
@@ -98,3 +101,20 @@ With **Multithreading** on, and while the [Agent Bridge](agent-bridge.md) is on 
 | `IPC.WaitForMessage` | waits at most 500 ms |
 
 [IPC API](ipc-api.md#limits) describes what happens when each limit is reached.
+
+## Agent Bridge
+
+| Limit | Value |
+|-------|-------|
+| Request | 1 MiB |
+| Response | 16 MiB |
+| Programs per player | 1 session; it ends 30 seconds after its last request |
+| Actions per `act` request | 32 |
+| Actions of one player waiting in the queue | 64 |
+| Actors per action | 256 |
+| Positions per placement query | 64 |
+| Chat message | 200 characters |
+| `act` response | waits at most 5 seconds for the game to run the actions |
+| Connect, read, write | 5 seconds each |
+
+[Agent Bridge](agent-bridge.md) describes what happens when each limit is reached.

@@ -28,7 +28,7 @@ These functions read the match: the assigned player's resources and facts, objec
 | `GetGameTime` | `()` | `number` | Returns the match time in seconds. |
 | `GetClockMs` | `()` | `number` | Returns milliseconds on a monotonic high-resolution clock with an arbitrary start. Subtract two values to measure a duration. |
 | `GetModuleTelemetry` | `()` | `table` or `nil` | Returns the calling module instance's timing. See [Module telemetry](#module-telemetry). |
-| `GetAllChatMessages` | `()` | `string[]` | Returns the messages in the chat buffer. |
+| `GetAllChatMessages` | `()` | `string[]` | Returns the newest 50 chat messages, oldest first, including game notices such as `--Villager Created--`. |
 | `GetNewChatMessages` | `()` | `string[]` | Returns the chat messages that appeared since this module instance last called it. The first call after a load returns the whole buffer. |
 | `GetLastChatMessage` | `()` | `string` or `nil` | Returns the newest chat message, or `nil` if the chat buffer is empty. |
 | `GetAssignedPlayer` | `()` | `Player` | Returns the player this module instance is assigned to. |
@@ -222,4 +222,4 @@ Each list is sorted by id. The first call after a module load reports every obje
 
 ### Multithreading
 
-With **Multithreading** on, and while the [Agent Bridge](agent-bridge.md) runs, some functions return `nil` for data the game-state copy does not hold. See [Limits](limits.md#game-state-copy).
+With **Multithreading** on, and while the [Agent Bridge](agent-bridge.md) is on, some functions return `nil` for data the game-state copy does not hold. See [Limits](limits.md#game-state-copy).

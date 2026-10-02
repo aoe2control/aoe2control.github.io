@@ -24,7 +24,7 @@ These rules apply to the functions in the [Commands](#commands) table.
 
 ### With Multithreading or the Agent Bridge
 
-With **Multithreading** on, or while the [Agent Bridge](agent-bridge.md) runs, a module reads a copy of the game state and its commands go into a queue. The game runs the queued commands on its next frame, or after the pause ends.
+With **Multithreading** on, or while the [Agent Bridge](agent-bridge.md) is on, a module reads a copy of the game state and its commands go into a queue. The game runs the queued commands on its next frame, or after the pause ends.
 
 - `true` means the command was queued, not that it succeeded.
 - A command that is refused at the call returns `false` and logs `<Call> was not sent: <reason>`, for example `UnitsMove was not sent: none of the units is the module player's, alive and visible`. Other reasons include `Sequential Actions allows no more commands in this update`, `the target is not visible to the module player`, `the target belongs to another player` and `an object is from an earlier match`.
@@ -127,7 +127,7 @@ Without Multithreading or the Agent Bridge, the `boolean` commands return `true`
 - `EnableScouting` uses Scout Cavalry, Camel Scouts and Eagle Scouts that are idle and not already scouting. It returns `false` when there are none.
 - `ResearchTechnology` returns `false` when the technology cannot be researched now or the player cannot afford it.
 
-With Multithreading on, or while the Agent Bridge runs, these checks run when the queued command executes; see [With Multithreading or the Agent Bridge](#with-multithreading-or-the-agent-bridge).
+With Multithreading on, or while the Agent Bridge is on, these checks run when the queued command executes; see [With Multithreading or the Agent Bridge](#with-multithreading-or-the-agent-bridge).
 
 ## Examples
 
