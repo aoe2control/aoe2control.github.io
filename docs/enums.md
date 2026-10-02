@@ -392,7 +392,12 @@ Used by `GetProjectilesByType()`.
     | `SNOW_SOFT_LIGHT` | `125` |
     | `SNOW_SOFT_STRONG` | `126` |
     | `ICE_SOFT` | `127` |
+    | `SOUTH_AMERICAN_FOREST` | `128` |
     | `BLACK_WALKABLE` | `129` |
+    | `WEEDS_WATER` | `130` |
+    | `SPRUCE_FOREST` | `131` |
+    | `SPRUCE_SNOW_FOREST` | `132` |
+    | `GREEN_OAK_FOREST` | `133` |
 
 ### TileVisibility
 
@@ -564,6 +569,7 @@ local villagers = GetObjectsByClass(UnitClass.VILLAGER)
     | `CONTROLLED_ANIMAL` | `961` |
     | `GOLD_FISH` | `963` |
     | `LAND_MINE` | `964` |
+    | `GOLD_HUNTABLE` | `965` |
 
 ### UnitObjectType
 

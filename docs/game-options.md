@@ -409,6 +409,8 @@ Common values:
     | `SEIZE_THE_MOUNTAIN` | `151` |
     | `CRATER` | `152` |
     | `CROSSROADS` | `153` |
+    | `MICHI` | `154` |
+    | `TEAM_MOATS` | `155` |
     | `VOLCANIC_ISLAND` | `156` |
     | `ACCLIVITY` | `157` |
     | `ERUPTION` | `158` |
@@ -469,6 +471,7 @@ Common values:
     | `STONEFRONT` | `213` |
     | `THAMES` | `214` |
     | `VULPINE` | `215` |
+    | `ARABIAN_DESERT` | `216` |
 
 ### OptionsCivilization
 
@@ -536,3 +539,6 @@ Common values:
     | `MUISCA` | `57` |
     | `MAPUCHE` | `58` |
     | `TUPI` | `59` |
+    | `SAXONS` | `60` |
+    | `VARANGIANS` | `61` |
+    | `DANES` | `62` |
