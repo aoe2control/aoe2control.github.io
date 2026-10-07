@@ -45,7 +45,7 @@ Any other argument ends the launcher with exit code `2`.
 
 ## RMS IDE Endpoint
 
-While CONTROL runs, it serves the RMS IDE endpoint, the named pipe `\\.\pipe\AoE2ControlRmsIdeV1` that AoE2RMSIDE uses. It runs however CONTROL was started, not only after a launch with the RMS IDE options. Every process running under your Windows user can connect to it and call all of its requests, including requests that start a match, end the match and unload CONTROL. Processes of other Windows users cannot connect.
+While CONTROL runs, it serves the RMS IDE endpoint, the named pipe `\\.\pipe\AoE2ControlRmsIdeV1` that AoE2RMSIDE uses. It runs however CONTROL was started, not only after a launch with the RMS IDE options. Every process running under your Windows user can connect to it and call all of its requests, including requests that start a match, end the match and unload CONTROL. Processes of other Windows users cannot connect. If another program already uses the pipe's name when CONTROL starts, the endpoint stays off, and a launch with the RMS IDE options ends with exit code `10`.
 
 ## Override Behavior
 
@@ -113,6 +113,7 @@ Headless mode exits at the first of these lines. During a match CONTROL checks m
 | `7` | The game window is not ready: not open, minimized or smaller than 640x360. | `Game window not ready` |
 | `8` | Injection failed. | The injection error, for example `Process open failed` |
 | `9` | No result within `--timeout-ms`. | `Timed out waiting for startup status`, `CONTROL is still starting in this game`, `CONTROL is still unloading in this game` |
+| `10` | Only with the RMS IDE options: the RMS IDE endpoint is missing or another process serves its pipe. | `The RMS IDE endpoint did not start in this game`, `The RMS IDE endpoint pipe is served by another process` |
 
 `Offset Error` means CONTROL does not support this game version yet. The full line is `Offset Error: game version <version> is not supported (rows <numbers>). Wait for a CONTROL update. Details: %APPDATA%\CONTROL\AoE2Control\diagnostics\latest.json`. Include the row numbers and `latest.json` when you report it.
 
