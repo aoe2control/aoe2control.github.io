@@ -24,8 +24,11 @@ work without the game, and you can always copy your files by hand.
 2. Check the settings in the dialog:
     - **RMS source:** the map to deploy. The list shows your open `.rms` and
       `.rms2` files.
-    - **Mod name:** the name of the mod folder. Use the arrow next to it to
-      reuse the name of an earlier export.
+    - **Mod name:** the name of the mod folder. The IDE suggests the map's
+      file name without its extension, or the name you last deployed that
+      map under for the profile. Use the arrow next to it to reuse the name
+      of an earlier export. A name you type or pick stays until you close
+      the dialog, even when you change the map or the profile.
     - **User profile:** the game profile to install the mod for. The IDE
       suggests one.
     - **Target directory:** the folder the mod folder goes into. The folder

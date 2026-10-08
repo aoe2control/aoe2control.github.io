@@ -26,7 +26,9 @@ double-click, use **File → Choose Default App for RMS Files…** in an
 installed build. It opens Windows' default apps settings, where you confirm
 the choice yourself.
 
-Uninstalling leaves your scripts and your deployed mods untouched.
+Uninstalling leaves your scripts and your deployed mods untouched. Your
+AoE2RMSIDE settings stay too, in `%APPDATA%\@rmside\desktop`; delete that
+folder if you want to remove them as well.
 
 ## The window
 
@@ -144,6 +146,15 @@ leave your computer.
   map.
 
 There is no project file. The IDE works on plain folders.
+
+The **Search files** box in the Explorer filters the folder tree as you type.
+The tree keeps only the matching files and folders and the folders that
+contain them, opens those folders for the search, and shows the matching part
+of each name in bold. Upper and lower case do not matter. A search with `/`
+matches paths inside the open folder, for example `maps/arabia`. **Up** and
+**Down** move through the matches, **Enter** opens the file or opens or
+closes the folder, and **Escape** clears the search. Once the box is empty,
+the tree is back as you left it.
 
 Delete in the Explorer asks before deleting. Press Enter to confirm or Escape
 to cancel. Deleted items go to the Windows Recycle Bin. To delete permanently

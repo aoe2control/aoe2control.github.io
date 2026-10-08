@@ -58,12 +58,18 @@ What the editor does for `.xs` files:
   variables, and more.
 - Completion, signature help, and hover documentation from a built-in catalog
   of XS functions. It offers only what the selected game version has.
-  Completion opens by itself after a `.` and on **Ctrl+Space**.
+  Completion opens by itself after a `.` and on **Ctrl+Space**. Choosing a
+  function inserts the call with its parentheses, puts the cursor between
+  them and opens the parameter help. If the parentheses are already there,
+  only the name changes.
 - Parameter help while you type a call: a small box shows the function's
   parameters with their names, types and default values, and marks the one
   you are typing. For some functions, the box and the hover also explain in
   plain words what each parameter does and what the function returns, with a
   link to the [AoE2DE UGC Guide](#xs-scripting).
+- The name of each parameter before its argument, in calls that pass two or
+  more arguments (see [Inlay hints](#inlay-hints)). An argument that is
+  already a variable with the parameter's name gets no hint.
 - A hint when two arguments look swapped. Say a function's parameters are
   named `columns` and `rows`, and you call it with your own variables `rows`
   and `columns` in that order: each variable sits in the place of the
@@ -71,6 +77,11 @@ What the editor does for `.xs` files:
   the two arguments; point at it to read **Check the argument order**
   (XS4027). The order may be what you want, so this is only a hint: it is not
   listed in Problems and has no quick fix.
+- Links to related places. When a problem is about another place too, such
+  as the earlier definition a duplicate name repeats, the declaration a name
+  is used before, or the function whose arguments look swapped, the message
+  links to that place in the hover and in the **Alt+F8** peek. Click the link
+  to go there.
 - Quick fixes (**Ctrl+.**, or the light bulb) where the fix is clear:
     - remove an unused variable or a self-assignment;
     - insert a missing `;` at the end of a line;
@@ -156,7 +167,9 @@ with the game's.
 The editor checks your script while you type. Problems are underlined in the
 text and listed in the **Problems** tab. Point at an underlined word to read
 the message. **Alt+F8** shows the message of the next problem right under its
-line.
+line. When a problem is about another place too, for example the line that
+sets an attribute again or the first definition of a name, the message links
+to it in both views; click the link to go there.
 
 Some problems only appear when you run the map. They are reported in
 **Output** under the run's line, with the script and line when there is one.
@@ -182,14 +195,20 @@ what you meant. Each of these lint rules has a code:
 | RMS4008 | Constant already defined | A `#const` that gives an existing name another value. The first value wins. |
 | RMS4009 | Not a comment in the game | `//` or `;` written as a comment, or `/*` and `*/` glued to other text. The game only skips text between `/*` and `*/` written apart, so it reads the words after `//` or `;` as code. |
 | RMS4010 | Number where a name is needed | A plain number where a command reads an object, terrain, effect, resource or attribute, for example `create_object 66`. The game only finds defined names there, so it ignores the whole command. Write the name instead, such as `GOLD`. Amounts and other values still take numbers. |
+| RMS4011 | Name may be undefined | A name your script defines with `#define` or `#const` that some random or conditional path to the line leaves undefined, for example when one `percent_chance` branch misspells it. On such a path the game ignores a command that needs the name, and counts a value written with the name as 0. |
 
 An unused definition (RMS4002) is not underlined: its name is shown faded,
 and Problems does not list it. After `//` or `;`, RMS4009 is a warning only
 when the game runs something after it on that line, such as a command or a
 defined name, and the warning says what runs. When the game skips every word
 there, a small dotted mark under `//` or `;` is all you see, Problems does not
-list it, and the same quick fix is offered. RMS4006 is a note, which Problems
-hides until you turn notes on in its filter. The others are warnings.
+list it, and the same quick fix is offered. RMS4011 is a hint as well: a
+small dotted mark under the name, which Problems does not list. It looks at
+every path at once, whatever seed and settings the preview uses, and names
+that the lobby or an include can define never count. Point at the mark to
+read the message, which links to the lines that define the name. RMS4006 is a
+note, which Problems hides until you turn notes on in its filter. The others
+are warnings.
 
 Lint warnings never stop you from running, deploying or live testing a map.
 The rules stay quiet wherever the game could read the code differently from
@@ -277,7 +296,9 @@ Inlay hints show extra information inside the text without changing it:
 
 - the name of each value in commands that take several numbers, for example
   `x:` and `y:` in `land_position`;
-- the value a `#const` stands for, for example `= 40`.
+- the value a `#const` stands for, for example `= 40`;
+- in XS files, the name of the parameter each argument fills, in calls that
+  pass two or more arguments.
 
 Inlay hints are on by default. Turn them off with **View → Show Inlay
 Hints** if they crowd long lines; while they are off, hold **Ctrl+Alt** to
