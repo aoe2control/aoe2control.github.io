@@ -35,7 +35,6 @@ work without the game, and you can always copy your files by hand.
     - **Enable mod** (next to **Deploy mod**): leave it on to have the IDE
       turn the mod on in the game's mod list for that profile. It changes
       only this mod's entry, and the IDE remembers the choice.
-      <!-- VERIFY-AT-PUBLISH: maintainer's new-mod Enable mod check -->
 3. Look through the file tree. It shows which files the mod will
    contain.
 4. Press **Deploy mod**.
@@ -200,8 +199,6 @@ from the preview. It saves you from setting up the lobby by hand each time.
   [Which game versions are supported?](faq.md#game-versions-and-compatibility)).
   Other versions are refused with "This game version is not supported for
   live testing."
-  <!-- VERIFY-AT-PUBLISH: Task 47 (live testing accepts exactly the versions
-  of the profiles shipped with the release) -->
 
 ### Set it up
 

@@ -17,8 +17,6 @@ Click a question to open the answer.
     It ships everything the preview needs for the verified versions, so it
     also works without the game. Without a linked game, the newest verified
     version is the default.
-    <!-- VERIFY-AT-PUBLISH: Task 47 (the list equals the verified profiles
-    shipped with the release) -->
 
     Other game versions still work when your game folder is linked. The
     **Preview game version** menu then shows your version with
@@ -109,9 +107,6 @@ Click a question to open the answer.
     Large scripts are refused before generation. The limit is 65,536
     generation steps after all includes and conditions are resolved. Most
     maps are far below it.
-    <!-- VERIFY-AT-PUBLISH: Task 47 (README says some larger official scripts
-    exceed this limit; name them or give a rough size once the release corpus
-    is certified) -->
 
 ??? question "Does AoE2RMSIDE send any data?"
     No. AoE2RMSIDE has no usage statistics, no error reporting and no
@@ -120,15 +115,8 @@ Click a question to open the answer.
     The only network request is a check for a newer release on GitHub at
     startup. It sends nothing about you or your scripts, and it never
     downloads or installs anything.
-    <!-- VERIFY-AT-PUBLISH: Task 45 -->
 
 ## RMS replication and compatibility boundary
-
-<!-- DISCLOSURE DRAFT. Plain-language rendering of the reviewed disclosure
-requirements in the plan's Fixed product decisions. Keep the parts (technical
-scope, content and provenance, affiliation, user responsibilities) separate
-from the legal-advice note. Keep the README and About dialog versions
-consistent with it. -->
 
 ### What AoE2RMSIDE is
 
@@ -161,11 +149,6 @@ marks such a run with `unverified game version`. See
   long the game takes.
 
 ### How AoE2RMSIDE is checked against the game
-
-<!-- Keep in sync with COMPATIBILITY.md ("How closely the preview matches the
-game"). Counts: distinct maps (script + seed + lobby settings, repeat runs
-once) recorded from the game and matched, per verified version. The second
-table holds the held-out measurements as measured (Task 42E step 5). -->
 
 AoE2RMSIDE is checked against maps recorded from the game itself. For each
 verified version, the game and AoE2RMSIDE generated the same maps from the
@@ -230,10 +213,6 @@ single average colors, one for each terrain, object and cliff type, measured
 from the game's textures. AoE2RMSIDE ships that list; it contains no images.
 The graphics AoE2RMSIDE draws in map icons for trees, gold, stone and player
 starts are its own.
-
-<!-- DISCLOSURE DRAFT: Texture colors palette (AGENTS.md maintainer decision
-2026-10-02). Keep README, COMPATIBILITY.md and About consistent. The docs
-describe only the two looks named here (maintainer decision 2026-10-04). -->
 
 For a linked game version that AoE2RMSIDE has not verified, it reads the data
 it needs from your installation while it runs. That data is not saved to disk

@@ -8,8 +8,6 @@ This page takes you from installing AoE2RMSIDE to your first generated map.
 
 ## Install
 
-<!-- VERIFY-AT-PUBLISH: Task 45 -->
-
 Download the installer or the portable ZIP from the
 [releases page](https://github.com/aoe2control/AoE2RMSIDE/releases).
 
@@ -97,8 +95,6 @@ These documentation pages are in English.
 With a linked game folder, object and terrain names, for example in the
 selection list, use the game's own names in your language when the game has
 them, and English otherwise.
-<!-- VERIFY-AT-PUBLISH: i18n-remaining merge (the 20 languages above and
-switching between them, checked in the release build) -->
 
 ## Link your game folder (optional)
 
