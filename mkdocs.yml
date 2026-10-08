@@ -75,6 +75,14 @@ nav:
     - settings-api.md
     - ipc-api.md
     - agent-bridge.md
+  - AoE2RMSIDE:
+    - Overview: aoe2rmside/index.md
+    - Getting started: aoe2rmside/getting-started.md
+    - Writing scripts: aoe2rmside/writing-scripts.md
+    - Preview: aoe2rmside/preview.md
+    - Map tests: aoe2rmside/map-tests.md
+    - Deploying and live testing: aoe2rmside/deploying-and-live-testing.md
+    - Compatibility, limits and troubleshooting: aoe2rmside/faq.md
   - Reference:
     - ai-agent-reference.md
     - limits.md

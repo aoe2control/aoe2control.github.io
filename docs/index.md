@@ -62,3 +62,4 @@ A CONTROL module can:
 - [Game API](commands.md): commands and facts.
 - [Automation & Session Control](session-control.md): start matches, load saves and change the game setup.
 - [Render API](render-api.md): drawing overlays.
+- [AoE2RMSIDE](aoe2rmside/index.md): the random map editor with live preview, map tests and live testing through CONTROL.
