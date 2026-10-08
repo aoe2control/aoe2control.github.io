@@ -136,7 +136,7 @@ end
 - One location does the same as `SetLocation()`.
 - Two or more locations set the location to `OptionsLocation.CUSTOM_MAP_POOL`, and `GetLocation()` returns that value.
 
-Known issue in 1.1.0: a match started with `DispatchStartGame()` from a map pool starts the game's default map (Coastal) instead of a map from the pool.
+Known issue in 1.1.0 and 1.1.1: a match started with `DispatchStartGame()` from a map pool starts the game's default map (Coastal) instead of a map from the pool.
 
 ## Random map seed and source
 

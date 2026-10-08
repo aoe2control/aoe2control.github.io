@@ -1,6 +1,6 @@
 # CONTROL Lua Engine Reference
 
-This file describes the Lua API of CONTROL (AoE2Control) 1.1.0 for coding agents that write CONTROL modules. Use only the functions, methods, tables and enums listed here. CONTROL is not the AoE2 `.per` AI scripting language, and it has no other game-engine API.
+This file describes the Lua API of CONTROL (AoE2Control) 1.1.1 for coding agents that write CONTROL modules. Use only the functions, methods, tables and enums listed here. CONTROL is not the AoE2 `.per` AI scripting language, and it has no other game-engine API.
 
 Full documentation: [AoE2Control Documentation](https://aoe2control.github.io/). If this file and the site disagree, the site is correct.
 
@@ -547,7 +547,7 @@ With **Modules See Everything** off, attribute, fact, count, cost, research and 
 | `GetTreatyLength()` | `SetTreatyLength(treatyLength)` | `number` |
 | `GetPlayersCount()` | `SetPlayersCount(playersCount)` | `number` of player slots in use |
 | `GetLocation()` | `SetLocation(location)` | `OptionsLocation`; during a match, the map the game started. The setter also clears a custom map pool. |
-| — | `SetRandomMapPoolLocations(locations)` | Array of 1 to 256 `OptionsLocation` values. One entry acts like `SetLocation()`; two or more set the location to `OptionsLocation.CUSTOM_MAP_POOL`, which `GetLocation()` then returns. Known issue in 1.1.0: `DispatchStartGame()` then starts the game's default map (Coastal), not a pool map. |
+| — | `SetRandomMapPoolLocations(locations)` | Array of 1 to 256 `OptionsLocation` values. One entry acts like `SetLocation()`; two or more set the location to `OptionsLocation.CUSTOM_MAP_POOL`, which `GetLocation()` then returns. Known issue in 1.1.0 and 1.1.1: `DispatchStartGame()` then starts the game's default map (Coastal), not a pool map. |
 | `GetTeamsNotTogether()` | `SetTeamsNotTogether(value)` | `boolean` (`true` when Team Together is off) |
 | `GetRecordGame()` | `SetRecordGame(value)` | `boolean` |
 | `GetTeamPositions()` | `SetTeamPositions(value)` | `boolean` |
