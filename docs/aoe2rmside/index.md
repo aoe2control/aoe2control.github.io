@@ -4,6 +4,12 @@ description: "AoE2RMSIDE is a Windows editor for Age of Empires II: Definitive E
 
 # AoE2RMSIDE
 
+<div class="video-embed">
+<iframe src="https://www.youtube-nocookie.com/embed/fo5muymjaPU" title="AoE2RMSIDE launch video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+
+[Watch the AoE2RMSIDE launch video on YouTube](https://youtu.be/fo5muymjaPU)
+
 AoE2RMSIDE is a desktop editor for Age of Empires II: Definitive Edition
 random map scripts (RMS). It is code-first: you write the script, and the
 preview shows the result. Press **Run** and the map appears next to the code.
