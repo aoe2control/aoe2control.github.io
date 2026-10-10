@@ -232,8 +232,9 @@ Not in the catalog: camera, game speed, pause, saving, starting and ending match
 
 Entities: every object the player can see. An object the player has explored but cannot see now
 (for example a gold mine in the fog) has `access: "position"` and only the fields `id`, `type_id`,
-`class_id`, `owner`, `x`, `y`, `access`. Other objects have `access: "full"` and all requested
-fields. `id` and `access` are always included. A garrisoned unit has the position of the object
+`class_id`, `owner`, `x`, `y`, `access`; an action can name it as its `target`, as with the game's
+right-click in the fog. Other objects have `access: "full"` and all requested fields. `id` and
+`access` are always included. A garrisoned unit has the position of the object
 it is in and `garrison_object_id` set; of its other fields only `type_id`, `class_id`,
 `object_type`, `owner`, `status`, `alive` and `commandable` hold values. The fields:
 

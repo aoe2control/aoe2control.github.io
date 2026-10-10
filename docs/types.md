@@ -141,7 +141,7 @@ Unless **Modules See Everything** is on ([Perspective And Visibility](interface-
 
 An `Object` you keep from an earlier frame can go into the fog or stop existing. Calling a method on it then raises a Lua error. Check `IsVisible()` before you use a kept object, or fetch objects again in the current frame.
 
-Animals and resources on explored tiles that are not visible allow only `IsVisible()`, `IsExplored()`, `GetId()`, `GetPosition()`, `GetClass()` and `GetUnitObjectType()`. Other methods raise an error until the object is visible again.
+Animals and resources on explored tiles that are not visible allow only `IsVisible()`, `IsExplored()`, `GetId()`, `GetPosition()`, `GetClass()` and `GetUnitObjectType()`. Other methods raise an error until the object is visible again. Such an object can be the target of a command, for example `UnitsTargetObject(villagers, mine)`, as with a right-click in the fog.
 
 ### Sprites
 
