@@ -305,7 +305,7 @@ Wood, gold and stone villagers go to the closest resource that has one of the pl
 
 Finds free building spots and orders villagers to build. It takes builders from the `VillagerOccupation`, which then leaves those villagers out of its own assignments.
 
-In the methods below, `structureType` is a `UnitObjectType`. `padding` is the number of free tiles kept around the new building (default `1`). Placement also keeps a band of tiles around town centers free (see `SetTownCenterPadding()`) unless `bypassTownCenterPadding` is `true` (default `false`).
+In the methods below, `structureType` is a `UnitObjectType`. `padding` is the number of free tiles kept around the new building (default `1`). Placement also keeps a band of tiles around town centers free (see `SetTownCenterPadding()`) unless `bypassTownCenterPadding` is `true` (default `false`). Unexplored tiles count as blocked. With **Modules See Everything** off, buildings, walls and town centers the player has not seen do not count; see [Placement and paths in the fog](facts.md#placement-and-paths-in-the-fog).
 
 | Method | Returns | Description |
 |--------|---------|-------------|
@@ -315,7 +315,7 @@ In the methods below, `structureType` is a `UnitObjectType`. `padding` is the nu
 | `BuildStructure(structureType, targetPos, direction?, padding?, bypassTownCenterPadding?)` | `boolean` | Same, with the villager closest to `targetPos` as the builder. |
 | `BuildStructureAtTown(structureType, targetPos?, padding?, bypassTownCenterPadding?)` | `boolean` | Builds near the player's first town center. See below. |
 | `FindBestPosition(structureType, targetPos, direction, padding, bypassTownCenterPadding?)` | `Vector3` | Returns the spot `BuildStructure` would use for a `PlacementDirection`, without building. Returns `(-1, -1, -1)` when there is none. |
-| `GetValidFarmPlacementTile()` | `MapTile` or `nil` | Returns a free farm tile within the farm distance of one of the player's town centers, or else of a mill. The distances are set on the `VillagerOccupation`. |
+| `GetValidFarmPlacementTile()` | `MapTile` or `nil` | Returns a free farm tile within the farm distance of one of the player's town centers, or else of a mill. The distances are set on the `VillagerOccupation`. Returns `nil` while modules read the [game-state copy](limits.md#game-state-copy). |
 | `QueueBuildingRequest(structureType, targetPosition, priority?, padding?, bypassTownCenterPadding?, builderUnitId?, requireScouting?)` | `nil` | Queues a building near `targetPosition`. See below. |
 | `QueueBuildingRequestAtTown(structureType, priority?, padding?, bypassTownCenterPadding?, builderUnitId?, requireScouting?)` | `nil` | Queues a building near the player's first town center. `requireScouting` defaults to `false`. |
 | `ProcessBuildingRequests()` | `nil` | Works on up to 3 queued requests, highest priority first. |

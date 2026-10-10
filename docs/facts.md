@@ -202,6 +202,8 @@ player can know:
 - `CalculatePath` and `Object:CalculatePath` search the explored tiles that `MapTile:IsWalkable()`
   reports as walkable, from tile centre to tile centre, instead of asking the game's pathfinder.
   With **Modules See Everything** on, they return the game's path.
+- `ConstructionPlacement` builds its grid from the same tiles and leaves out buildings, walls
+  and town centers the player does not know. It checks its chosen spot like `CheckPlacement`.
 
 ### Keeping references
 
