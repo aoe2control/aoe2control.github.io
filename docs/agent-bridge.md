@@ -24,7 +24,8 @@ The settings in `settings.ini`:
 | `Agent Bridge Player 1` to `Agent Bridge Player 8` | `false` | Opens the pipe for that player. |
 
 While the bridge is on for any player, Lua modules read the
-[game-state copy](limits.md#game-state-copy), as with **Multithreading**. The bridge does not
+[game-state copy](limits.md#game-state-copy). Unlike **Multithreading**, the bridge does not block
+functions such as `DispatchStartGame()` or `SetGameSpeedMultiplier()`. The bridge does not
 depend on **Modules > Enabled**. A player can have a Lua module and a bridge at the same time; both
 send commands for the player. With **Suppress Native AI** on, a bot player with the bridge turned on
 has its built-in AI turned off, as with a module.
@@ -54,6 +55,8 @@ Request:
 `session` is required for every operation except `status` and `open`, and is omitted there.
 Unknown keys are rejected.
 
+Responses can gain new fields within version 3. Ignore fields you do not know.
+
 Response: `{ "ok": true, "data": { ... } }` or
 `{ "ok": false, "error": { "code": "...", "message": "..." } }`.
 
@@ -76,6 +79,7 @@ No session. Payload `{}`. Returns:
 | `state` | `waiting_for_match`, `ready`, `multiplayer_refused`. |
 | `session_open` | `true` while a session is alive. |
 | `information_policy` | `player_view`, or `omniscient` while **Modules See Everything** is on. |
+| `last_result` | `null`, or the result of the last match that ended while the bridge was on: `world` (the `world` of that match's observations), `winner` (the id of the player the game names as the winner, `null` when it names none) and `won` (`true` when `winner` is the bridge's player). It stays until another match ends. |
 | `counters` | `actions_accepted`, `actions_rejected`, `actions_executed`, `observations`, counted since the bridge for this player was turned on. |
 
 ### `open`
@@ -101,7 +105,7 @@ Payload `{}`. Returns the map as base64 byte arrays, row by row (`index = y * wi
 | `terrain` | Terrain id (`Terrain` enum); `255` for a tile the player has not explored. |
 | `elevation` | Elevation; `255` for an unexplored tile. |
 | `visibility` | `0` unexplored, `1` explored, `2` visible. With `omniscient`, every tile reads `2`. |
-| `passable` | Bit 0: land units can stand there (nothing blocks it). Bit 1: the terrain lets land units move, whatever stands on it. `0` for an unexplored tile and for water. |
+| `passable` | Bit 0: land units can stand there (nothing blocks it). Bit 1: the terrain lets land units move, whatever stands on it. `0` for an unexplored tile and for water. On an explored tile out of sight, bit 0 counts only the objects the player knows there: gaia objects such as trees, mines and cliffs. Buildings and walls out of sight do not count, also ones the player saw before. |
 
 ### `act`
 
@@ -142,11 +146,16 @@ later observations.
 Read-only questions about the newest observation.
 
 - `{ "kind": "path", "from": {"x": 10.5, "y": 20.5}, "to": {"x": 40.0, "y": 22.0}, "radius": 0.5 }`
-  returns `points`, a list of `{x, y}`, empty when there is no path. `radius` is optional.
+  returns `points`, a list of `{x, y}`, empty when there is no path. `radius` is optional. The
+  search uses bit 0 of `map.passable`.
 - `{ "kind": "placement", "object_type": 70, "positions": [{"x": 30, "y": 41}, ...] }` checks 1 to
   64 positions with the game's own placement check for the player. Runs on the game's next update.
   Returns `results`, one per position: `{ "result": <PlacementResult id>, "name": "CAN_PLACE",
-  "blocking_object": <id or null> }`.
+  "blocking_object": <id or null> }`. Unless the policy is `omniscient`, `blocking_object` names
+  only an object the player knows: one it sees, or a resource, animal or other gaia object on an
+  explored tile. When the game names another object, the result is `BLOCKED` with
+  `blocking_object: null` if the footprint covers a tile the player knows is blocked (see
+  `map.passable`), and otherwise the result of the check without objects.
 
 ### `close`
 
@@ -204,9 +213,10 @@ Not in the catalog: camera, game speed, pause, saving, starting and ending match
 | `world_turn`, `game_time_ms` | Game time of the observation. |
 | `information_policy` | `player_view` or `omniscient`. |
 | `match` | `map_width`, `map_height`, `player_count`, `victory_condition`, `replay`. |
-| `player` | The bridge's player: `id`, `name`, `civilization_id`, `civilization_name`, `player_type`, `color`, `has_won`, `attributes` (a list of numbers by `ResourceType` id), `facts` (object of fact name to value), `diplomacy` (list by player id). |
+| `player` | The bridge's player: `id`, `name`, `civilization_id`, `civilization_name`, `player_type`, `color`, `has_won` (`false` while the match runs; `status.last_result` has the result), `attributes` (a list of numbers by `ResourceType` id), `facts` (object of fact name to value), `diplomacy` (list by player id). |
 | `players` | Every player: `id`, `name`, `civilization_id`, `player_type`, `color`, `has_won`, `diplomacy`. Includes `attributes` only for the bridge's player and, with `omniscient`, for every player. |
-| `object_types` | For the bridge's player, every valid object type: `id`, `available`, `can_afford`, `can_afford_without_population`, `cost` (list of `{resource, amount}`), `train_site`, `count`, `count_with_queued`. |
+| `object_types` | For the bridge's player, every valid object type: `id`, `available`, `can_afford`, `can_afford_without_population`, `cost` (list of `{resource, amount}`), `train_site`, `count`, `count_with_queued`, `stats` (see [Stats](#stats); `null` for types the player has none of, has none queued of and cannot make now). |
+| `visible_object_types` | One entry per type of another player's object, gaia included, that `entities` lists with `access: "full"`: `owner`, `id` and `stats` (see [Stats](#stats)), as the owner has the type. |
 | `technologies` | For the bridge's player, every technology that is not `NOT_AVAILABLE`: `id`, `state` (`ResearchState`), `can_afford`, `cost`. |
 | `entities` | The objects the player can see (see below). |
 | `chat` | The chat messages the game holds. |
@@ -228,6 +238,20 @@ it is in and `garrison_object_id` set; of its other fields only `type_id`, `clas
 `progress_type`, `progress_value`, `access`.
 
 Positions are in tiles, as in Lua. [Limits](limits.md#agent-bridge) lists the bridge's limits in one table.
+
+### Stats
+
+The values a player reads in the unit panel, with the owner's upgrades:
+
+| Field | Content |
+|---|---|
+| `attack`, `melee_armor`, `pierce_armor` | As the unit panel shows them. |
+| `range`, `min_range` | In tiles. |
+| `reload_time` | Seconds between attacks. |
+| `accuracy` | Percent. |
+| `speed` | Tiles per second. |
+| `line_of_sight` | In tiles. |
+| `attacks`, `armors` | One `{ "class", "amount" }` per attack or armor class of the type. Damage against a target is computed from these lists. Empty for a type without attacks or armor. |
 
 ## Reasons
 

@@ -129,11 +129,11 @@ A unit, building, resource or other map object. Returned by the object lookups o
 | `GetPosition()` | `Vector3` | Returns the world position. |
 | `GetCurrentMapTile()` | `MapTile` or `nil` | Returns the map tile the object stands on. |
 | `GetPath()` | `Vector3[]` | Returns the waypoints of the path the unit follows. Empty when the unit is not moving. |
-| `CalculatePath(targetPos)` | `Vector3[]` | Asks the game's pathfinder for a path from the object's position to the `Vector3` `targetPos`, sized for the object. Returns the waypoints. |
+| `CalculatePath(targetPos)` | `Vector3[]` | Returns a path from the object's position to the `Vector3` `targetPos`, sized for the object. With **Modules See Everything** on, it is the game's path; otherwise see [Placement and paths in the fog](facts.md#placement-and-paths-in-the-fog). |
 
 Resources and other objects that cannot move (`GetObjectType()` is `ObjectType.RESOURCE_OR_EYE_CANDY` or `ObjectType.ANIMATED_MAP_OBJECT`: trees, mines, bushes, decorations) have no direction, path or action. For them `GetDirection()` returns `(0, 0, 0)`, `GetPath()` returns an empty list and `GetActionTargetPosition()` returns `nil`.
 
-With Multithreading on, or while the Agent Bridge is on, modules read objects from a copy of the game state (see [Limits](limits.md#game-state-copy)). In that copy `GetAttribute()` returns `nil` for every attribute except `HITPOINTS`, `RADIUS_X` and `RADIUS_Y`, and `GetObjectData()` returns `nil` for fields the copy does not record.
+With Multithreading on, or while the Agent Bridge is on, modules read objects from a copy of the game state (see [Limits](limits.md#game-state-copy)). In that copy `GetAttribute()` returns `nil` for every attribute except `HITPOINTS`, `RADIUS_X`, `RADIUS_Y` and the [combat values](limits.md#combat-values-in-the-copy), and `GetObjectData()` returns `nil` for fields the copy does not record.
 
 #### Fog of war and stale objects
 
@@ -168,8 +168,8 @@ Returned by `GetMapTile`, `GetAllMapTiles`, `Object:GetCurrentMapTile()` and `Co
 | `GetTerrain()` | `Terrain` | Returns the tile's terrain id. Returns `Terrain.UNKNOWN` for unexplored tiles. |
 | `GetElevation()` | `number` | Returns the tile's elevation. Returns `0` for unexplored tiles. |
 | `GetTileVisibility()` | `TileVisibility` | Returns the assigned player's visibility of the tile. |
-| `IsBuildable()` | `boolean` | Returns whether the game would let the assigned player place a 1x1 building (an outpost) on the tile now: terrain, slope and objects, including units, are checked. Unexplored tiles return `false`. With Multithreading on, returns `nil`. For a real building type, use `CheckPlacement`. |
-| `IsWalkable()` | `boolean` | Returns whether land units can be on the tile: its terrain is navigatable and the game marks no blocking object on it (buildings, trees, mines). Units standing there do not count. A town center blocks only the tiles under its centre, so the rest of its footprint is walkable; `IsBuildable()` is `false` on the whole footprint. Unexplored tiles return `false`. |
+| `IsBuildable()` | `boolean` | Returns whether the game would let the assigned player place a 1x1 building (an outpost) on the tile now: terrain, slope and objects, including units, are checked. Unexplored tiles return `false`. Objects the player does not know count as described in [Placement and paths in the fog](facts.md#placement-and-paths-in-the-fog). With Multithreading on, returns `nil`. For a real building type, use `CheckPlacement`. |
+| `IsWalkable()` | `boolean` | Returns whether land units can be on the tile: its terrain is navigatable and the game marks no blocking object on it (buildings, trees, mines). Units standing there do not count. A town center blocks only the tiles under its centre, so the rest of its footprint is walkable; `IsBuildable()` is `false` on the whole footprint. Unexplored tiles return `false`. On an explored tile out of sight, only objects the player knows count; see [Placement and paths in the fog](facts.md#placement-and-paths-in-the-fog). |
 | `IsNavigatable()` | `boolean` | Returns whether the tile's terrain lets land units move, whatever stands on it. Water returns `false`. Unexplored tiles return `false`. |
 | `GetObjectCount()` | `number` | Returns how many objects are on the tile. Returns `0` unless the tile is `TileVisibility.VISIBLE`. |
 | `GetObjects()` | `Object[]` | Returns the objects on the tile. Returns an empty list unless the tile is `TileVisibility.VISIBLE`. |

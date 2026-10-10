@@ -40,9 +40,9 @@ These functions read the match: the assigned player's resources and facts, objec
 | `GetMapTile` | `(x, y)` | `MapTile` or `nil` | Returns the tile at integer map coordinates, or `nil` outside the map. |
 | `GetMapTile` | `(position)` | `MapTile` or `nil` | Rounds the `Vector2` position down to whole tile coordinates and returns that tile. |
 | `GetAllMapTiles` | `()` | `MapTile[]` | Returns every tile of the map. |
-| `CheckPlacement` | `(objectTypeId, position)` | `PlacementResult, number?` | Runs the game's placement check for the assigned player and an object type centred on a `Vector2` or `Vector3` position. Returns the `PlacementResult`, plus the blocking object's id for `PlacementResult.BLOCKED`. Unexplored ground gives `PlacementResult.UNEXPLORED` unless **Modules See Everything** is on. Returns `nil` for an unknown object type. |
+| `CheckPlacement` | `(objectTypeId, position)` | `PlacementResult, number?` | Runs the game's placement check for the assigned player and an object type centred on a `Vector2` or `Vector3` position. Returns the `PlacementResult`, plus the blocking object's id for `PlacementResult.BLOCKED`. Unexplored ground gives `PlacementResult.UNEXPLORED` unless **Modules See Everything** is on. Returns `nil` for an unknown object type. See [Placement and paths in the fog](#placement-and-paths-in-the-fog). |
 | `CanPlaceObject` | `(objectTypeId, position)` | `boolean` or `nil` | Returns `true` when `CheckPlacement` returns `PlacementResult.CAN_PLACE`, and `nil` when `CheckPlacement` returns `nil`. |
-| `CalculatePath` | `(startPos, targetPos, collisionRadius?)` | `Vector3[]` | Returns the game's path between two `Vector3` positions for a unit of `collisionRadius` (default `0`). Returns an empty list when there is no path. |
+| `CalculatePath` | `(startPos, targetPos, collisionRadius?)` | `Vector3[]` | Returns a path between two `Vector3` positions for a unit of `collisionRadius` (default `0`). Returns an empty list when there is no path. See [Placement and paths in the fog](#placement-and-paths-in-the-fog). |
 | `GetObjectsInArea` | `(pos1, pos2)` | `Object[]` | Returns the objects whose tile lies inside the rectangle with corners `pos1` and `pos2` (`Vector2`, edges included). |
 | `GetObjectsInArea` | `(pos1, pos2, unitClass, owner)` | `Object[]` | Same, but only objects of `unitClass` owned by player id `owner`. Pass `nil` for either filter to skip it. |
 | `GetObjectStates` | `(objects)` | `table` | Reads several objects in one call. See [Object states](#object-states). |
@@ -185,6 +185,23 @@ end
 - Projectiles are `Object` values with `ObjectType.PROJECTILE`. The projectile functions follow the same visibility rule.
 
 With **Modules See Everything** off, `MapTile` methods and the player data of other players (resources, facts, technologies) are also limited to what the assigned player may know. See [Types](types.md).
+
+### Placement and paths in the fog
+
+With **Modules See Everything** off, placement checks and path searches use only what the assigned
+player can know:
+
+- On an explored tile out of sight, a tile counts as blocked only under an object the player knows
+  there: gaia objects such as trees, mines and cliffs. Buildings and walls out of sight do not
+  count, also ones the player saw before. `MapTile:IsWalkable()` follows this rule.
+- `CheckPlacement` returns the blocking object's id only for an object the player knows: one it
+  sees, or a resource, animal or other gaia object on an explored tile. When the game names another
+  object, the result is `PlacementResult.BLOCKED` without an id if the footprint covers a tile the
+  player knows is blocked, and otherwise the result of the check without objects.
+  `MapTile:IsBuildable()` follows this rule.
+- `CalculatePath` and `Object:CalculatePath` search the explored tiles that `MapTile:IsWalkable()`
+  reports as walkable, from tile centre to tile centre, instead of asking the game's pathfinder.
+  With **Modules See Everything** on, they return the game's path.
 
 ### Keeping references
 

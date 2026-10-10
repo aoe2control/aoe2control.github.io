@@ -113,8 +113,9 @@ Rules:
 
 With **Multithreading** on, and while the Agent Bridge is on for any player, every module reads a copy of the game state taken once per frame instead of the live game. Tournament Mode does not do this.
 
-- `GetFact`, `Player:GetFact`, `Object:GetObjectData` return `nil` for values the copy does not hold. `Object:GetAttribute` returns `nil` for every attribute except `HITPOINTS`, `RADIUS_X` and `RADIUS_Y`.
-- `GetObjectTypeData` returns `nil` for every field except `ObjectData.TRAIN_SITE`. `GetObjectTypeAttribute` returns `nil` for every attribute except `ObjectAttribute.RADIUS_X` and `ObjectAttribute.RADIUS_Y`.
+- `GetFact`, `Player:GetFact`, `Object:GetObjectData` return `nil` for values the copy does not hold.
+- `GetObjectTypeData` returns `nil` for every field except `ObjectData.TRAIN_SITE`.
+- `GetObjectTypeAttribute` and `Object:GetAttribute` return `nil` except for `RADIUS_X`, `RADIUS_Y` (and `HITPOINTS` for objects) and these combat values, with the owner's upgrades: `SHOWN_ATTACK`, `SHOWN_MELEE_ARMOR`, `WEAPON_RANGE`, `MINIMUM_WEAPON_RANGE`, `SPEED_OF_ATTACK`, `HIT_CHANCE`, `SPEED`, `LINE_OF_SIGHT`, and `WEAPON` and `ARMOR` per class (`nil` for a class the type has no value for). Types: those the assigned player has, has queued or can make now. Objects: the player's own, and other players' objects it can see.
 - `CheckPlacement()`, `CanPlaceObject()` and `MapTile:IsBuildable()` return `nil`.
 - `GetObjectsInArea` compares the object's exact position, not its tile.
 - Commands go into a queue that the game runs on its next frame. `true` means queued, not succeeded. A command refused at the call returns `false` and logs `<Call> was not sent: <reason>`. A queued command can still fail when it runs.
@@ -252,9 +253,9 @@ These functions read the match and do not change it. Call them from `Init`, `Upd
 | `GetProjectilesByType` | `(projectileType)` | `Object[]` | Visible projectiles of a `ProjectileType`. |
 | `GetObjectTypeData` | `(objectTypeId, objectData)` | `number` or `nil` | `ObjectData` value of a unit type with the assigned player's technologies and bonuses. |
 | `GetObjectTypeAttribute` | `(objectTypeId, objectAttribute, damageType)` | `number` or `nil` | `ObjectAttribute` value of a unit type for the assigned player. `damageType` is the armor or attack class for `ARMOR` and `WEAPON`; pass `0` otherwise. |
-| `CheckPlacement` | `(objectTypeId, position)` | `PlacementResult, number?` | The game's placement check for the assigned player, centred on a `Vector2` or `Vector3`. Second value: the blocking object's id for `PlacementResult.BLOCKED`. Unexplored ground gives `UNEXPLORED` unless **Modules See Everything** is on. `nil` for an unknown type. |
+| `CheckPlacement` | `(objectTypeId, position)` | `PlacementResult, number?` | The game's placement check for the assigned player, centred on a `Vector2` or `Vector3`. Second value: the blocking object's id for `PlacementResult.BLOCKED`, only for an object the player knows (see below). Unexplored ground gives `UNEXPLORED` unless **Modules See Everything** is on. `nil` for an unknown type. |
 | `CanPlaceObject` | `(objectTypeId, position)` | `boolean` or `nil` | `true` when `CheckPlacement` returns `CAN_PLACE`; `nil` when it returns `nil`. |
-| `CalculatePath` | `(startPos, targetPos, collisionRadius?)` | `Vector3[]` | The game's path between two `Vector3` positions for a unit of `collisionRadius` (default `0`). Empty when there is no path. |
+| `CalculatePath` | `(startPos, targetPos, collisionRadius?)` | `Vector3[]` | Path between two `Vector3` positions for a unit of `collisionRadius` (default `0`). Empty when there is no path. The game's path with **Modules See Everything** on; otherwise a tile search over what the player knows (see below). |
 | `GetGameTime` | `()` | `number` | Match time in seconds. |
 | `GetClockMs` | `()` | `number` | Milliseconds on a monotonic clock with an arbitrary start. Subtract two values for a duration. |
 | `GetModuleTelemetry` | `()` | `table` or `nil` | This module instance's timing (see below). `nil` outside a module callback. |
@@ -280,6 +281,8 @@ A cost list is an array of `{ resourceId = ResourceType, amount = number }`.
 **Object lists.** `GetObjectsByType(s)`, `GetObjectsByClass(es)` and `GetObjectsInArea` return objects of every owner: living units, buildings, resources, and dead animals that still carry food. Unfinished buildings (foundations) are left out; `Player:GetFoundations()` returns them.
 
 **Visibility.** With **Modules See Everything** off (the default), object lookups (including `GetObjectById` and the projectile functions) return what the assigned player can see, plus animals and resources on explored tiles outside its vision. `MapTile` methods and other players' resources, facts and technologies are limited the same way.
+
+**Placement and paths in the fog.** With **Modules See Everything** off, an explored tile out of sight counts as blocked only under an object the player knows there (gaia objects such as trees, mines and cliffs); buildings and walls out of sight do not count, also ones seen before. `MapTile:IsWalkable()` follows this. `CheckPlacement` names a blocking object only when the player knows it (it sees it, or it is a resource, animal or other gaia object on an explored tile); for another object the result is `BLOCKED` without an id when the footprint covers a tile the player knows is blocked, otherwise the result without the object check. `MapTile:IsBuildable()` follows this. `CalculatePath` and `Object:CalculatePath` search the explored walkable tiles from tile centre to tile centre instead of asking the game's pathfinder.
 
 **Keeping references.** An `Object`, `Player` or `MapTile` is valid during the callback that returned it. Keep ids or positions across callbacks and look objects up again.
 
@@ -478,7 +481,7 @@ The pipe protocol (`open`, `observe`, `map`, `act`, `query`) is described at htt
 | `GetElevation()` | `number` | Elevation; `0` for unexplored tiles. |
 | `GetTileVisibility()` | `TileVisibility` | The assigned player's visibility of the tile. |
 | `IsBuildable()` | `boolean` | Whether a 1x1 building could be placed now (terrain, slope, objects and units checked). `false` when unexplored. For a real building type, use `CheckPlacement`. |
-| `IsWalkable()` | `boolean` | Navigatable terrain with no blocking object (buildings, trees, mines); units do not count. `false` when unexplored. |
+| `IsWalkable()` | `boolean` | Navigatable terrain with no blocking object (buildings, trees, mines); units do not count. `false` when unexplored. On an explored tile out of sight only known objects count (see below). |
 | `IsNavigatable()` | `boolean` | Terrain lets land units move, whatever stands on it. Water is `false`. `false` when unexplored. |
 | `GetObjectCount()` | `number` | Objects on the tile; `0` unless the tile is `VISIBLE`. |
 | `GetObjects()` | `Object[]` | Objects on the tile; empty unless the tile is `VISIBLE`. |

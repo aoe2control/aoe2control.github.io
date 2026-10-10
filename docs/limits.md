@@ -80,17 +80,29 @@ With **Multithreading** on, each module runs on its own thread and reads a copy 
 With **Multithreading** on, and while the [Agent Bridge](agent-bridge.md) is on for any player, modules read a copy of the game state taken once per frame instead of the live game. These functions then behave differently:
 
 - `GetFact`, `Player:GetFact`, `Object:GetAttribute` and `Object:GetObjectData` return `nil` for values the copy does not hold.
-- `GetObjectTypeData` returns `nil` for every field except `ObjectData.TRAIN_SITE`. `GetObjectTypeAttribute` returns `nil` for every attribute except `ObjectAttribute.RADIUS_X` and `ObjectAttribute.RADIUS_Y`.
+- `GetObjectTypeData` returns `nil` for every field except `ObjectData.TRAIN_SITE`.
+- `GetObjectTypeAttribute` and `Object:GetAttribute` return `nil` for every attribute except `RADIUS_X`, `RADIUS_Y` and the [combat values](#combat-values-in-the-copy). `Object:GetAttribute` also returns `HITPOINTS`.
 - `CheckPlacement()`, `CanPlaceObject()` and `MapTile:IsBuildable()` return `nil`.
 - `GetMapTile` returns `nil` for a tile the assigned player has not explored, unless **Modules See
   Everything** is on.
 - `CalculatePath` and `Object:CalculatePath` search the copied tiles instead of asking the game's
-  pathfinder. The path moves between whole tiles that are explored and that nothing blocks, and is empty
-  when the start or the target tile is not one of them.
+  pathfinder. The path moves between whole tiles that are explored and that `MapTile:IsWalkable()`
+  reports as walkable, and is empty when the start or the target tile is not one of them.
 - `GetObjectsInArea` compares the object's exact position, not its tile.
 - Garrisoned units are in the copy, at the position of the object they are in. For them
   `GetGarrisonObject()` returns that object, and only identity, class, type, owner, position and
   `IsAlive()` hold values; other methods return `0`, `false` or an empty string.
+
+#### Combat values in the copy
+
+The copy holds these `ObjectAttribute` values, with the owner's upgrades: `SHOWN_ATTACK`,
+`SHOWN_MELEE_ARMOR`, `WEAPON_RANGE`, `MINIMUM_WEAPON_RANGE`, `SPEED_OF_ATTACK`, `HIT_CHANCE`,
+`SPEED`, `LINE_OF_SIGHT`, and `WEAPON` and `ARMOR` per class. `WEAPON` and `ARMOR` return `nil` for
+a class the type has no value for.
+
+- `GetObjectTypeAttribute` has them for the types the assigned player has, has queued or can make now.
+- `Object:GetAttribute` has them for the player's own objects of those types, and for other
+  players' objects the player can see.
 
 ## IPC
 

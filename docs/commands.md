@@ -32,7 +32,7 @@ With **Multithreading** on, or while the [Agent Bridge](agent-bridge.md) is on, 
 
 ### Blocked Functions
 
-Some functions on this page are refused with **Multithreading** or **Tournament Mode** on. A refused call logs `Lua error: Multithreading blocked Lua function '<name>'.` (or `Tournament Mode blocked ...`) once per module load and returns `false`, `nil`, an empty string or an empty table.
+Some functions on this page are refused with **Multithreading** or **Tournament Mode** on. The Agent Bridge does not refuse them. A refused call logs `Lua error: Multithreading blocked Lua function '<name>'.` (or `Tournament Mode blocked ...`) once per module load and returns `false`, `nil`, an empty string or an empty table.
 
 | Functions | Multithreading | Tournament Mode |
 |-----------|----------------|-----------------|
