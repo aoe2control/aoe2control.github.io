@@ -93,6 +93,42 @@ The setup has eight player slots. `playerIndex` is `0` to `7`: slot `0` is playe
 
 `SetAssignedPlayerCivilization()` writes the slot of the player the module is assigned to (`GetAssignedPlayerId()`). It returns `false` when that id is not `1` to `8`. Tournament Mode does not block it.
 
+### AI scripts
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `GetPlayerAI(playerIndex)` | `string` or `nil` | Name of the slot's AI script, or `nil` when the slot is not a computer or the index is outside `0` to `7`. |
+| `SetPlayerAI(playerIndex, name)` | `boolean` | Makes the slot a computer that runs the named AI script. |
+| `GetAvailableAIs()` | table of `AIScript` | The AI scripts the lobby offers, in the lobby's order. |
+
+An `AIScript` has two fields:
+
+- `Name`: the name to pass to `SetPlayerAI()`. It is the script's file name without `.ai`.
+- `Source`: `"builtin"` for the game's own AI, `"install"` for scripts in the game's install folder, and `"custom"` for scripts in your profile folder or in an enabled mod.
+
+The game's default AI is named `PromiDE`; `RandomGame` is the AI the lobby shows as "AI (CD version)".
+
+`SetPlayerAI()` returns `false` when the name is not in `GetAvailableAIs()`. Names are case-sensitive. The game would replace an unknown name with its default AI when the match starts, so CONTROL refuses it instead and writes a log line.
+
+`GetAvailableAIs()` reads the AI folders on each call. A script that is in two places is listed twice. With **Multithreading** on, `SetPlayerAI()` returns `false` and `GetAvailableAIs()` returns an empty table.
+
+Slots at or after `GetPlayersCount()` are closed when the match starts, whatever their AI script. In a single-player setup, slot `0` is the human player; keep it human.
+
+```lua
+function Load()
+    local options = GetCurrentGameOptions()
+    if not options then
+        return
+    end
+
+    for _, script in ipairs(options:GetAvailableAIs()) do
+        Log(script.Name .. " (" .. script.Source .. ")")
+    end
+
+    options:SetPlayerAI(1, "PromiDE")
+end
+```
+
 ## Example
 
 ```lua
