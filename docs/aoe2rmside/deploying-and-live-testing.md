@@ -122,7 +122,9 @@ enlarged icon change how it is drawn:
 - The look button switches between **Minimap colors** and **Texture colors**
   (the default), like the preview's
   [Look](preview.md#perspective-and-look).
-- **Terrain relief** shades the terrain by its height.
+- **Terrain relief** shades the terrain by its height. In Diamond view the
+  icon shows the land raised, like the
+  [preview](preview.md#terrain-relief-in-diamond-view).
 
 Below the enlarged icon you can also:
 

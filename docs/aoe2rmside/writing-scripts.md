@@ -399,6 +399,64 @@ checked and indented like a multi-line one, and Enter after it adds no second
 - Maps you open from the game's installation are read-only. Use
   **File → Save As…** or **Clone for Editing** to make an editable copy.
 
+## External language servers
+
+AoE2RMSIDE checks RMS and XS scripts with its own analysis, so the editor help
+above works without anything else. If you also have a separate language
+server for RMS or XS installed, AoE2RMSIDE can use it alongside its own
+analysis. A language server is a program that checks scripts for editors.
+AoE2RMSIDE works with any that follows the standard Language Server Protocol
+and is tested with [XS Check](https://github.com/Divy1211/xs-check), a
+language server for XS.
+
+### Where AoE2RMSIDE finds one
+
+AoE2RMSIDE never downloads or installs a language server. When it starts, it
+looks for one you have installed, named `xs-check-lsp` for XS or
+`rms-check-lsp` for RMS:
+
+- in a folder on your `PATH`,
+- in Rust's program folder `%USERPROFILE%\.cargo\bin`, where `cargo install`
+  puts it,
+- in the XS extension for Visual Studio Code (`divy.vscode-xs`), which brings
+  XS Check with it.
+
+A program inside the folder you have open in AoE2RMSIDE is never used. When
+AoE2RMSIDE finds a server, **Output** says which one it uses for which files.
+A program that does not answer like a language server is not used, and
+Output says why.
+
+### Settings
+
+**View → External Language Servers** lists every server AoE2RMSIDE found, with
+two settings each. The menu only appears when a server was found.
+
+- **Use External Language Server** (on by default) uses the server for its
+  files. Turn it off to go back to AoE2RMSIDE's own analysis alone.
+- **Fill Gaps with Built-in Knowledge** (on by default) keeps AoE2RMSIDE's own
+  errors, completion and hover for everything the server does not cover. Turn
+  it off to see only the server's results.
+
+### What the server provides
+
+The server provides errors and warnings, completion, hover, signature help
+and go to definition. When you point at one of its findings, the message
+names the server as its source. When the server and AoE2RMSIDE report the
+same problem, only the server's finding is shown. Coloring, quick fixes,
+rename, the outline, formatting, include links, inlay hints and the map
+preview always come from AoE2RMSIDE.
+
+The server checks a file once it is saved on disk. A new file that has never
+been saved uses AoE2RMSIDE's own analysis until you save it.
+
+### When the server has problems
+
+If the server cannot start, stops, or stops answering, Output says what
+happened and AoE2RMSIDE's own analysis takes over at once. AoE2RMSIDE starts
+the server again up to three times within ten minutes. After that it stays
+off until you turn it on again in **View → External Language Servers** or
+restart AoE2RMSIDE.
+
 ## Definition Files
 
 A Definition File is an `.inc` include file that gives readable names to

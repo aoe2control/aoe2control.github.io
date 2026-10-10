@@ -209,6 +209,18 @@ switch what is drawn:
 - elevation: **Elevation off**, **Terrain relief** (the default) or
   **Height map**.
 
+### Terrain relief in Diamond view
+
+In **Diamond view** with **Terrain relief**, the land is shown in 3D. Each
+elevation level lifts the ground by half a tile's height, and a step of more
+than one level becomes a steep wall. Objects stand on the ground, and a hill
+never hides them. Pointing, selecting, highlighting from code and jumps from
+map tests always use the tile you see, also in the live stages while a map is
+being generated.
+
+In **Top-down view**, Terrain relief keeps the terrain flat and shades it by
+its height.
+
 ### Connections
 
 The connection button cycles through three states each time you click it:
