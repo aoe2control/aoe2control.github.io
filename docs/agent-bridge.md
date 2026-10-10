@@ -89,7 +89,14 @@ Payload `{ "client_name": "my-agent" }`, 1 to 64 printable ASCII characters. Ret
 
 ### `observe`
 
-Payload `{}` or `{ "entity_fields": ["id", "type_id", ...] }` to limit the per-object fields.
+Payload `{}`, or any of these fields:
+
+| Field | Values |
+|---|---|
+| `entity_fields` | `["id", "type_id", ...]`: the per-object fields `entities` lists (see `catalog.entity_fields`). Default: all. |
+| `object_types` | `"all"` (default): every valid object type. `"relevant"`: only the types the player can make now, has, or has queued. `"none"`: an empty list. |
+| `technologies` | `"all"` (default) or `"none"` (an empty list). |
+
 Returns the newest observation (see [Observation](#observation)). Fails with
 `observation_unavailable` before a match runs.
 
