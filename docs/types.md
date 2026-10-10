@@ -255,7 +255,7 @@ These classes run a simple economy for the assigned player. Create them in `Init
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `Update()` | `nil` | Rebuilds the lists below. The lists do not change between calls. |
+| `Update()` | `nil` | Rebuilds the lists below. Objects the game removes after this call drop out of them. |
 | `GetConvertibleLivestock(position, radius)` | `Object[]` | Returns visible, living livestock owned by Gaia within `radius` tiles of the `Vector3` `position`. |
 | `GetOwnedLivestock()` | `Object[]` | Returns the assigned player's livestock, dead or alive. |
 | `GetDeadLivestock(position, radius)` | `Object[]` | Returns the assigned player's dead livestock within `radius` tiles of `position`. |
