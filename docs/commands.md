@@ -17,7 +17,7 @@ These rules apply to the functions in the [Commands](#commands) table.
 - Call commands from `Update()`. From another callback they still run, but log a warning once per module load. **Tournament Mode** refuses them outside `Update()`.
 - Commands act for the module's assigned player. Units and buildings in the list that this player does not own are dropped. If none are left, the command does nothing and returns `false`.
 - **Sequential Actions** (on by default) allows one command per `Update()`. Further commands in the same update do nothing and return `false`.
-- **Auto Move Camera** (on by default) moves the camera to each command's target. Only one module moves the camera: the one assigned to your own player, or else the one with the lowest player id.
+- **Auto Move Camera** (on by default) moves the camera to each command's target. Only one module moves the camera: the one assigned to your own player, or else the one with the lowest player id. The [Agent Bridge](agent-bridge.md) for your own player moves it too.
 - Object lists must be Lua arrays of `Object` values with no gaps, such as `{ villager1, villager2 }`. Anything else raises a Lua error.
 - A function whose return type is `nil` gives no result. Read the game state on a later update to see whether it worked.
 - `SetCameraPosition` and `SendChatMessage` are exceptions: they also work in replays and on end screens, from any callback, and do not count toward **Sequential Actions**.
@@ -51,7 +51,7 @@ These functions work at any time, in menus as well as in a match.
 |----------|-----------|---------|-------------|
 | `Log` | `(message)` | `nil` | Writes `[MODULE] <message>` to the CONTROL log. |
 | `SetEngineUIVisibility` | `(visible)` | `nil` | Opens (`true`) or closes (`false`) the CONTROL menu, the window that Shift toggles. |
-| `UnloadEngine` | `()` | `nil` | Unloads CONTROL from the game, as the Delete key does. |
+| `UnloadEngine` | `()` | `nil` | Unloads CONTROL from the game, as the Delete key does. While `DispatchQuitGame()` or a start is in progress, it waits until that has finished, for up to 30 seconds. |
 | `GetAssignedPlayerId` | `()` | `number` | Returns the player id (`1` to `8`) this module instance is assigned to. Works in `Load()`, before the match starts. |
 | `AssignAndLoadModule` | `(playerId, moduleName)` | `boolean` | Assigns a module to player `1` to `8` and loads it, or reloads it if it is already assigned. |
 
@@ -100,7 +100,7 @@ These functions work at any time, in menus as well as in a match.
 | `TrainUnit` | `(trainSources, unitId, amount)` | `boolean` | Like `TrainUnit(unitId, amount)`, but only uses buildings of the types in `trainSources`. |
 | `UnitsTargetObject` | `(units, target)` | `boolean` | Orders the player's units to act on an object, for example to attack it, gather from it or repair it. |
 | `UnitsBuildStructure` | `(builders, structureId, position)` | `boolean` | Orders the player's builders to build a structure at a `Vector3` world position. |
-| `UnitsMove` | `(units, position)` | `boolean` | Orders the player's units to move to a `Vector3` world position. |
+| `UnitsMove` | `(units, position, queue?)` | `boolean` | Orders the player's units to move to a `Vector3` world position. With `queue` set to `true`, adds the position to their waypoints, as shift-click does, instead of replacing their orders. |
 | `EnableScouting` | `()` | `boolean` | Sets the player's idle scouts to auto-scout. |
 | `ResearchTechnology` | `(technology)` | `boolean` | Researches a `Technology` at one of the player's buildings that can research it. |
 | `DeleteUnit` | `(unit)` | `nil` | Deletes one of the player's units. |

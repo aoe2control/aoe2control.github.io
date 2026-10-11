@@ -12,7 +12,8 @@ gone, and programs written for 1.1.0 must use the protocol on this page.
 ## Turning it on
 
 1. In the CONTROL menu, open **Modules** and turn on **Agent Bridge**.
-2. Below it, turn on the players the bridge may control.
+2. In the section of each player the bridge may control (**Player 1** to **Player 8**, further down in
+   **Modules**), turn on **Agent Bridge**.
 3. Connect your program to `\\.\pipe\AoE2ControlAgentV3.P1` (for player 1), open a session and
    start observing.
 
@@ -20,7 +21,7 @@ The settings in `settings.ini`:
 
 | Setting (group `[modules]`) | Default | Effect |
 |---|---|---|
-| `Agent Bridge` | `false` | Turns the bridge on. The menu shows it under **Modules** and, while it is on, one checkbox per player below it. |
+| `Agent Bridge` | `false` | Turns the bridge on. The menu shows it under **Modules** and, while it is on, an **Agent Bridge** checkbox in each player's section. |
 | `Agent Bridge Player 1` to `Agent Bridge Player 8` | `false` | Opens the pipe for that player. |
 
 While the bridge is on for any player, Lua modules read the
@@ -187,7 +188,7 @@ Commands in version 3:
 | `gameplay.research.v1` | `technology`, `producer` (optional) | Researches a technology. |
 | `gameplay.target.v1` | `actors`, `target` | Right-clicks a target: gather, attack, build, repair, garrison, as the game decides. |
 | `gameplay.build.v1` | `actors`, `object_type`, `position` | Places a building foundation and sends the builders. |
-| `gameplay.move.v1` | `actors`, `position` | Moves units. |
+| `gameplay.move.v1` | `actors`, `position`, `queue` (optional, default `false`) | Moves units. With `queue: true`, adds the position to the units' waypoints, as shift-click does, instead of replacing their orders. |
 | `gameplay.enable_scouting.v1` | none | Sends the player's idle scout to explore. |
 | `gameplay.auto_scout.v1` | `actors` | Sends units to explore. |
 | `gameplay.patrol.v1` | `actors`, `position` | Patrols to a position. |

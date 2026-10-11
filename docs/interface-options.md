@@ -15,13 +15,13 @@ The **Module** list shows every `{moduleName}.main.lua` and `{moduleName}.main.m
 | **Enabled** | On | Turns all module slots on or off. |
 | **Update Interval** | `1.0` | Seconds of game time between `Update()` calls. The slider goes from 0.1 to 2.0; a value set in `settings.ini` can be as low as 0.01. |
 | **Sequential Actions** | On | Allows one game command per `Update()` call. Further commands in the same call are refused. |
-| **Auto Move Camera** | On | Moves the camera to the target of each executed command. Only one module moves the camera: the one on the local player's slot, or else the one with the lowest player number. |
+| **Auto Move Camera** | On | Moves the camera to the target of each executed command. Only one module moves the camera: the one on the local player's slot, or else the one with the lowest player number. The Agent Bridge for the local player's slot moves it too. |
 | **Command Visualization** | On | Draws an overlay for each executed command. |
 | **Suppress Native AI** | On | Turns off the built-in AI of a computer player while a module is assigned to its slot. |
 | **Tournament Mode** | Off | Refuses game commands outside `Update()`, adds `Update()` time above 20 ms to the next interval, and blocks a list of functions. See [Limits](limits.md#tournament-mode). |
 | **Multithreading** | Off | Runs each module on its own thread, which reduces the frame-rate cost. `Render()` is not called, and some functions are blocked or return `nil`. See [Limits](limits.md#multithreading). May cause sync issues. |
 | **Modules See Everything** | Off | Modules ignore fog of war when they read map tiles, objects and players. See [Perspective And Visibility](#perspective-and-visibility). |
-| **Agent Bridge** | Off | Turns on the [Agent Bridge](agent-bridge.md). While it is on, a checkbox per player appears below it; each opens a pipe through which any program running under your Windows user can read that player's view and send its commands. Not available in multiplayer. |
+| **Agent Bridge** | Off | Turns on the [Agent Bridge](agent-bridge.md). While it is on, each player section below has an **Agent Bridge** checkbox; each opens a pipe through which any program running under your Windows user can read that player's view and send its commands. Not available in multiplayer. |
 
 Changing **Multithreading** reloads every assigned module.
 
@@ -33,6 +33,7 @@ The MODULES submenu has one section for each player, **Player 1** to **Player 8*
 
 | Control | Description |
 |---------|-------------|
+| **Agent Bridge** | Shown while **Agent Bridge** in the settings above is on. Opens the [Agent Bridge](agent-bridge.md) pipe for this player. |
 | **Enabled** | Turns the slot on or off without clearing the selected module. |
 | **Sync** | Stores the module's settings in a shared profile instead of per player, so several slots can use the same values. |
 | **Module** | Selects the module for the slot. Selecting the same module again reloads it from its files. |
