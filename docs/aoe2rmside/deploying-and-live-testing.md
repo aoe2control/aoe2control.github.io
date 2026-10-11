@@ -108,23 +108,35 @@ and the whole box has a stronger fill. Clicking the icon itself also turns
 generation on (see below). The IDE draws a
 512×512 image from the generated map: the terrain, cliffs, trees, gold and
 stone, and a marker for each player's start. Other objects are left out, like
-in the game's own map icons. The icon you see is the icon that is saved and
-deployed.
+in the game's own map icons, unless you turn on **Minimap objects** (below).
+The icon you see is the icon that is saved and deployed.
 
-Point at the icon to show **Save image…** in its top-right corner.
+Point at the icon to show **Save image…** in its top-right corner. It opens a
+small menu with the image sizes **256 × 256 px**, **512 × 512 px**,
+**1024 × 1024 px** and **1536 × 1536 px**. Every size is drawn fresh, so the
+larger ones stay sharp. The deployed icon is always 512 × 512 px.
+
+You can make and save map icons before you select your game folder: the
+deploy dialog then shows the icon, drawn from the current preview, above
+**Select game folder**.
 
 Click the icon to enlarge it. If **Generate map icon** is off, clicking the
-icon turns it on. The buttons in the bottom-left corner of the
-enlarged icon change how it is drawn:
+icon turns it on. While the icon is enlarged, the deploy dialog is hidden; it
+comes back unchanged when you close the icon. The buttons in the bottom-left
+corner of the enlarged icon change how it is drawn:
 
 - **Top-down view** / **Diamond view** draws the icon like the preview's
   perspective: the square-tiled diamond or the flatter 2:1 diamond.
 - The look button switches between **Minimap colors** and **Texture colors**
   (the default), like the preview's
   [Look](preview.md#perspective-and-look).
-- **Terrain relief** shades the terrain by its height. In Diamond view the
-  icon shows the land raised, like the
-  [preview](preview.md#terrain-relief-in-diamond-view).
+- **Minimap objects** draws the objects as small squares, like the preview's
+  [Minimap objects](preview.md#minimap-objects). While it is on, the trees and
+  gold-and-stone graphics are switched off. Town Center castles are only drawn
+  when the spawn markers are hidden.
+- The elevation button cycles through **Elevation off**, **Terrain relief**
+  and **3D elevation** (the default), like the preview's
+  [Elevation](preview.md#elevation). In Top-down view it skips 3D elevation.
 
 Below the enlarged icon you can also:
 
@@ -134,7 +146,8 @@ Below the enlarged icon you can also:
 - choose the spawn markers: each click on the marker button moves on from
   **Player squares** (the default) to **Nomad feet** to **No spawn markers**.
   The size next to it sets how large the markers are, as a share of the map
-  width;
+  width (with Minimap objects and no spawn markers, it sizes the Town Center
+  castles instead);
 - choose how trees, and gold and stone, are drawn (below).
 
 All choices are remembered for the next icon.

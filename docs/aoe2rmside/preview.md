@@ -202,24 +202,43 @@ next to the toolbar buttons to show that the map has keyboard focus.
 After [Perspective, Look and Tile grid](#perspective-and-look), the map tools
 switch what is drawn:
 
-- **Objects and Town Center footprint**;
+- objects: **Objects and Town Center footprint** (the default), **Minimap
+  objects** or **Objects off** (see [Minimap objects](#minimap-objects));
 - **Cliff edges**;
 - **Connection terrain changes** and the connection button (only for maps
   with connections, see [Connections](#connections));
-- elevation: **Elevation off**, **Terrain relief** (the default) or
-  **Height map**.
+- elevation: **Elevation off**, **Terrain relief**, **3D elevation** (the
+  default) or **Height map** (see [Elevation](#elevation)).
 
-### Terrain relief in Diamond view
+### Minimap objects
 
-In **Diamond view** with **Terrain relief**, the land is shown in 3D. Each
-elevation level lifts the ground by half a tile's height, and a step of more
-than one level becomes a steep wall. Objects stand on the ground, and a hill
-never hides them. Pointing, selecting, highlighting from code and jumps from
-map tests always use the tile you see, also in the live stages while a map is
-being generated.
+**Minimap objects** draws every object as a small square, like a spectator
+minimap:
 
-In **Top-down view**, Terrain relief keeps the terrain flat and shades it by
-its height.
+- The squares keep the same size on screen while you zoom, so when you look at
+  the whole map, objects next to each other merge, and a forest becomes one
+  dark green area. Zoomed in, a square is never smaller than its tile.
+- Trees are dark green and a little smaller than the other squares. Gold is
+  orange, stone grey, relics white, berry bushes light green, sheep and hunt
+  brown, and fish light blue. Player objects, walls included, are in the
+  player color.
+- Each Town Center is a castle in its player's color with a black outline.
+- Decorations, birds and helper objects are left out.
+
+### Elevation
+
+- **Terrain relief** keeps the terrain flat and shades its slopes, so hills
+  and valleys stand out.
+- **3D elevation** shows the land in 3D in **Diamond view**. Each elevation
+  level lifts the ground by half a tile's height, and a step of more than one
+  level becomes a steep wall. Objects stand on the ground, and a hill never
+  hides them. Pointing, selecting, highlighting from code and jumps from map
+  tests always use the tile you see, also in the live stages while a map is
+  being generated. **Top-down view** has no 3D: there the button skips 3D
+  elevation and the map shows Terrain relief, and going back to Diamond view
+  brings 3D back.
+- **Height map** shades every tile by its height. Objects are darker on low
+  ground and lighter on high ground, so they match the tiles they stand on.
 
 ### Connections
 
