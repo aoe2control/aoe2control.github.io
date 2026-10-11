@@ -186,7 +186,7 @@ Commands in version 3:
 |---|---|---|
 | `gameplay.train.v1` | `object_type`, `amount` (1–100, default 1), `producers` (optional) | Trains or builds units of a type. Without `producers`, the game uses the player's most common building that can make it. Counts units already queued: asking for 2 when 1 is queued queues 1 more. |
 | `gameplay.research.v1` | `technology`, `producer` (optional) | Researches a technology. |
-| `gameplay.target.v1` | `actors`, `target` | Right-clicks a target: gather, attack, build, repair, garrison, as the game decides. |
+| `gameplay.target.v1` | `actors`, `target`, `queue` (optional, default `false`) | Right-clicks a target: gather, attack, build, repair, garrison, as the game decides. With `queue: true`, adds the order after the units' current orders, as shift-right-click does. |
 | `gameplay.build.v1` | `actors`, `object_type`, `position` | Places a building foundation and sends the builders. |
 | `gameplay.move.v1` | `actors`, `position`, `queue` (optional, default `false`) | Moves units. With `queue: true`, adds the position to the units' waypoints, as shift-click does, instead of replacing their orders. |
 | `gameplay.enable_scouting.v1` | none | Sends the player's idle scout to explore. |
@@ -244,7 +244,14 @@ it is in and `garrison_object_id` set; of its other fields only `type_id`, `clas
 `scouting`, `status` (2 finished, 0 foundation), `commandable` (the player can command it),
 `target_object_id`, `target_position` (`{x, y}`), `action_target_position` (`{x, y}` or `null`),
 `garrison_object_id`, `radius_x`, `radius_y`, `action`, `train_count`, `researching`,
-`progress_type`, `progress_value`, `access`.
+`progress_type`, `progress_value`, `carry_resource`, `carry_amount`, `access`.
+
+`carry_resource` and `carry_amount` are the resource a unit carries and how much, as the unit panel
+shows them. `carry_resource` is a `ResourceType` id (0 food, 1 wood, 2 stone, 3 gold) or `null`
+when the unit carries nothing; food from hunting, farms, berries and fish is 0. `carry_amount` is
+rounded down; for a farm it is the food left in it. Both are `null` for other players' units. A
+villager that switches to another source of the same resource keeps its load; one that switches
+to another resource loses it unless it drops it off first.
 
 Positions are in tiles, as in Lua. [Limits](limits.md#agent-bridge) lists the bridge's limits in one table.
 

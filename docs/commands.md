@@ -98,7 +98,7 @@ These functions work at any time, in menus as well as in a match.
 | `TrainUnit` | `(unitId, amount)` | `boolean` | Makes sure `amount` units of type `unitId` are in production. |
 | `TrainUnit` | `(trainSources, unitId)` | `boolean` | Like `TrainUnit(unitId)`, but only uses buildings of the `UnitObjectType` values in `trainSources`. |
 | `TrainUnit` | `(trainSources, unitId, amount)` | `boolean` | Like `TrainUnit(unitId, amount)`, but only uses buildings of the types in `trainSources`. |
-| `UnitsTargetObject` | `(units, target)` | `boolean` | Orders the player's units to act on an object, for example to attack it, gather from it or repair it. |
+| `UnitsTargetObject` | `(units, target, queue?)` | `boolean` | Orders the player's units to act on an object, for example to attack it, gather from it or repair it. With `queue` set to `true`, adds the order after their current orders, as shift-right-click does. |
 | `UnitsBuildStructure` | `(builders, structureId, position)` | `boolean` | Orders the player's builders to build a structure at a `Vector3` world position. |
 | `UnitsMove` | `(units, position, queue?)` | `boolean` | Orders the player's units to move to a `Vector3` world position. With `queue` set to `true`, adds the position to their waypoints, as shift-click does, instead of replacing their orders. |
 | `EnableScouting` | `()` | `boolean` | Sets the player's idle scouts to auto-scout. |
