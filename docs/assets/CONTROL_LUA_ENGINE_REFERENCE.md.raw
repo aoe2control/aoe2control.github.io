@@ -209,6 +209,12 @@ Select a map and seed with the `GameOptions` methods `SetRandomMapSource()` and 
 | `SetUnitStanceSeekShelter` | `(units)` | `nil` | Orders units to seek shelter. |
 | `SetUnitCombatStance` | `(units, stance)` | `nil` | Sets a `UnitCombatStance`. |
 | `SetFormation` | `(units, formation)` | `nil` | Sets a `Formation`, as the game's formation buttons do. Takes effect when the units next move together. `ObjectData.FORMATION_ID` does not report it. |
+| `QueueFarmReseeds` | `(amount)` | `boolean` | Adds farms to the reseed queue, as the Mill button does. The game takes the cost now and adds as many of `amount` (1–40) as the player can afford; the queue holds 40. Civilizations with pastures queue pastures. `false` when farms are unavailable, the queue is full or the player cannot afford one. |
+| `CancelFarmReseeds` | `(amount)` | `boolean` | Removes up to `amount` farms from the queue and refunds them. |
+| `SetAutoFarmReseed` | `(enabled)` | `boolean` | Automatic farm reseeding on or off: the game queues a farm when one expires and the player can pay. Sends nothing when already set or a change is on its way. |
+| `QueueFishTrapRebuilds` | `(amount)` | `boolean` | Same as `QueueFarmReseeds` for fish traps (Dock button). |
+| `CancelFishTrapRebuilds` | `(amount)` | `boolean` | Same as `CancelFarmReseeds` for fish traps. |
+| `SetAutoFishTrapRebuild` | `(enabled)` | `boolean` | Same as `SetAutoFarmReseed` for fish traps. |
 
 Command rules:
 
@@ -505,6 +511,10 @@ The pipe protocol (`open`, `observe`, `map`, `act`, `query`) is described at htt
 | `IsEnemyTo(player)` | `boolean` | Enemy of another `Player`. |
 | `GetColor()` | `Color` | Player color. |
 | `GetAttribute(attribute)` | `number` | `PlayerAttribute` value. |
+| `GetFarmReseedQueue()` | `number` | Farms (or pastures) in the reseed queue, 0–40. |
+| `GetFishTrapRebuildQueue()` | `number` | Fish traps in the rebuild queue, 0–40. |
+| `IsAutoFarmReseedEnabled()` | `boolean` | Automatic farm reseeding is on. |
+| `IsAutoFishTrapRebuildEnabled()` | `boolean` | Automatic fish trap rebuilding is on. |
 | `GetUnitTypeCount(id)` | `number` | Units of a type id. |
 | `GetFact(fact, parameter?)` | `number` or `nil` | `Fact` value; `parameter` defaults to `0`. |
 | `IsObjectTypeAvailable(unitObjectType)` | `boolean` | The player can currently get the type. |

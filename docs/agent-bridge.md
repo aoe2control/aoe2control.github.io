@@ -206,6 +206,9 @@ Commands in version 3:
 | `gameplay.all_back_to_work.v1` | `target` (a building of the player) | Sends the villagers garrisoned in all of the player's buildings back to work. |
 | `gameplay.delete.v1` | `target` (a unit of the player) | Deletes a unit. Cannot be undone. |
 | `gameplay.destroy_building.v1` | `target` (a building of the player) | Destroys a building. Cannot be undone. |
+| `gameplay.queue_reseeds.v1` | `queue` (`FARM` 50 or `FISH_TRAP` 199), `amount` (1–40, default 1) | Adds farms or fish traps to the player's reseed queue, as the Mill and Dock buttons do. The queue holds up to 40. The game takes the cost now and adds as many of `amount` as the player can afford. A civilization with pastures queues pastures in the farm queue. |
+| `gameplay.cancel_reseeds.v1` | `queue`, `amount` (1–40, default 1) | Removes farms or fish traps from the reseed queue and refunds their cost. |
+| `gameplay.auto_reseed.v1` | `queue`, `enabled` | Turns automatic reseeding on or off. While it is on, the game queues a farm or fish trap when one expires and the player can pay. |
 | `player.chat.v1` | `message` (1–200 characters) | Sends a chat message as the player. |
 
 `actors` lists 1 to 256 different object ids. Each actor must be the player's, alive and fully
@@ -221,7 +224,7 @@ Not in the catalog: camera, game speed, pause, saving, starting and ending match
 | `world_turn`, `game_time_ms` | Game time of the observation. |
 | `information_policy` | `player_view` or `omniscient`. |
 | `match` | `map_width`, `map_height`, `player_count`, `victory_condition`, `replay`. |
-| `player` | The bridge's player: `id`, `name`, `civilization_id`, `civilization_name`, `player_type`, `color`, `has_won` (`false` while the match runs; `status.last_result` has the result), `attributes` (a list of numbers by `ResourceType` id), `facts` (object of fact name to value), `diplomacy` (list by player id). |
+| `player` | The bridge's player: `id`, `name`, `civilization_id`, `civilization_name`, `player_type`, `color`, `has_won` (`false` while the match runs; `status.last_result` has the result), `attributes` (a list of numbers by `ResourceType` id), `facts` (object of fact name to value), `diplomacy` (list by player id), `reseeds` (`farm_queue`, `fish_trap_queue`, `auto_farm`, `auto_fish_trap`). |
 | `players` | Every player: `id`, `name`, `civilization_id`, `player_type`, `color`, `has_won`, `diplomacy`. Includes `attributes` only for the bridge's player and, with `omniscient`, for every player. |
 | `object_types` | For the bridge's player, every valid object type: `id`, `available`, `can_afford`, `can_afford_without_population`, `cost` (list of `{resource, amount}`), `train_site`, `count`, `count_with_queued`, `stats` (see [Stats](#stats); `null` for types the player has none of, has none queued of and cannot make now). |
 | `visible_object_types` | One entry per type of another player's object, gaia included, that `entities` lists with `access: "full"`: `owner`, `id` and `stats` (see [Stats](#stats)), as the owner has the type. |
@@ -278,7 +281,7 @@ Validation and execution (`stage: "validation"` or `"execution"`): `unavailable_
 `unavailable_sources`, `missing_target`, `unavailable_target`, `foreign_target`,
 `invalid_payload`, `queue_unavailable`, `module_unavailable`, `unavailable_object_type`,
 `unavailable_technology`, `population_capacity`, `unaffordable`, `already_satisfied`,
-`command_unavailable`. They mean the same as the Lua command rejections in the module log.
+`command_unavailable`, `queue_full`. They mean the same as the Lua command rejections in the module log.
 
 ## Error codes
 

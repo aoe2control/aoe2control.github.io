@@ -119,6 +119,12 @@ These functions work at any time, in menus as well as in a match.
 | `SetUnitStanceSeekShelter` | `(units)` | `nil` | Orders the player's units to seek shelter. |
 | `SetUnitCombatStance` | `(units, stance)` | `nil` | Sets the `UnitCombatStance` of the player's units: `AGGRESSIVE`, `DEFENSIVE`, `NO_ATTACK` or `STAND_GROUND`. |
 | `SetFormation` | `(units, formation)` | `nil` | Sets the `Formation` of the player's units (`LINE`, `BOX`, `STAGGERED` or `FLANK`), as the game's formation buttons do. It takes effect when the units next move together. `ObjectData.FORMATION_ID` does not report it. |
+| `QueueFarmReseeds` | `(amount)` | `boolean` | Adds farms to the player's reseed queue, as the Mill's Reseed Farm button does. A villager replants a queued farm when its farm expires. The game takes the cost now and adds as many of `amount` (1–40) as the player can afford; the queue holds up to 40. A civilization with pastures queues pastures. |
+| `CancelFarmReseeds` | `(amount)` | `boolean` | Removes up to `amount` (1–40) farms from the reseed queue and refunds their cost. |
+| `SetAutoFarmReseed` | `(enabled)` | `boolean` | Turns automatic farm reseeding on or off. While it is on, the game queues a farm when one expires and the player can pay. The game's own option turns it on for the local player at the start of a match. |
+| `QueueFishTrapRebuilds` | `(amount)` | `boolean` | Adds fish traps to the player's rebuild queue, as the Dock's Rebuild Fish Trap button does. Works like `QueueFarmReseeds`. |
+| `CancelFishTrapRebuilds` | `(amount)` | `boolean` | Removes up to `amount` (1–40) fish traps from the rebuild queue and refunds their cost. |
+| `SetAutoFishTrapRebuild` | `(enabled)` | `boolean` | Turns automatic fish trap rebuilding on or off. |
 
 Without Multithreading or the Agent Bridge, the `boolean` commands return `true` when the order was given to the game, and `false` when it was not:
 
@@ -126,6 +132,8 @@ Without Multithreading or the Agent Bridge, the `boolean` commands return `true`
 - `UnitsBuildStructure` returns `false` when the player cannot afford the structure. It does not check the position; use `CheckPlacement` from [Facts](facts.md) first.
 - `EnableScouting` uses Scout Cavalry, Camel Scouts and Eagle Scouts that are idle and not already scouting. It returns `false` when there are none.
 - `ResearchTechnology` returns `false` when the technology cannot be researched now or the player cannot afford it.
+- `QueueFarmReseeds` and `QueueFishTrapRebuilds` return `false` when the player cannot get farms (or pastures) or fish traps yet, the queue already holds 40, or the player cannot afford one. `Player:GetFarmReseedQueue()` and `Player:GetFishTrapRebuildQueue()` read the queues.
+- `SetAutoFarmReseed` and `SetAutoFishTrapRebuild` send nothing when the setting already has that value or a change to it is on its way, so calling them every update is fine.
 
 With Multithreading on, or while the Agent Bridge is on, these checks run when the queued command executes; see [With Multithreading or the Agent Bridge](#with-multithreading-or-the-agent-bridge).
 

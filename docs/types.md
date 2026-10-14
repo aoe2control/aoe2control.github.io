@@ -195,6 +195,10 @@ Returned by `GetAssignedPlayer`, `GetPlayerById`, `GetVictoryPlayer` and `Object
 | `IsEnemyTo(player)` | `boolean` | Returns whether this player is an enemy of another `Player`. |
 | `GetColor()` | `Color` | Returns the player's color. |
 | `GetAttribute(attribute)` | `number` | Returns a `PlayerAttribute` value. |
+| `GetFarmReseedQueue()` | `number` | Returns how many farms (or pastures) the player has in the reseed queue, 0 to 40. |
+| `GetFishTrapRebuildQueue()` | `number` | Returns how many fish traps the player has in the rebuild queue, 0 to 40. |
+| `IsAutoFarmReseedEnabled()` | `boolean` | Returns whether automatic farm reseeding is on. |
+| `IsAutoFishTrapRebuildEnabled()` | `boolean` | Returns whether automatic fish trap rebuilding is on. |
 | `GetUnitTypeCount(id)` | `number` | Returns how many units of a type id the player has. |
 | `GetFact(fact, parameter?)` | `number` | Returns a `Fact` value for this player; see [Facts](facts.md). `parameter` defaults to `0`. With Multithreading on, or while the Agent Bridge is on, returns `nil` for facts the game-state copy does not record. |
 | `IsObjectTypeAvailable(unitObjectType)` | `boolean` | Returns whether the player can currently get a unit or building type. |
