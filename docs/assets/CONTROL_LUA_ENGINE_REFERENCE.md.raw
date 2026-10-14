@@ -215,6 +215,8 @@ Select a map and seed with the `GameOptions` methods `SetRandomMapSource()` and 
 | `QueueFishTrapRebuilds` | `(amount)` | `boolean` | Same as `QueueFarmReseeds` for fish traps (Dock button). |
 | `CancelFishTrapRebuilds` | `(amount)` | `boolean` | Same as `CancelFarmReseeds` for fish traps. |
 | `SetAutoFishTrapRebuild` | `(enabled)` | `boolean` | Same as `SetAutoFarmReseed` for fish traps. |
+| `SetGoal` | `(goalId, value)` | `boolean` | Sets goal `goalId` (1–16384) of the player's AI script (`.per`) to a 32-bit whole number. The player must be a computer player whose script runs: turn Suppress Native AI off. `false` for an id out of range, a human player, a replay or multiplayer. Not a game command; not in the recorded game; does not count toward Sequential Actions. |
+| `SetGoals` | `(firstGoalId, values)` | `boolean` | Sets the goals from `firstGoalId` on to the list `values`. The script sees all of them in its next rule pass, never part of them. |
 
 Command rules:
 
@@ -515,6 +517,8 @@ The pipe protocol (`open`, `observe`, `map`, `act`, `query`) is described at htt
 | `GetFishTrapRebuildQueue()` | `number` | Fish traps in the rebuild queue, 0–40. |
 | `IsAutoFarmReseedEnabled()` | `boolean` | Automatic farm reseeding is on. |
 | `IsAutoFishTrapRebuildEnabled()` | `boolean` | Automatic fish trap rebuilding is on. |
+| `GetGoal(goalId)` | `number` or `nil` | Goal `goalId` (1–16384) of the player's AI script; `nil` for a player without a script, a player the module may not read, or an id out of range. |
+| `GetGoals(firstGoalId, lastGoalId)` | `table` or `nil` | Goals `firstGoalId` to `lastGoalId` as a list (`values[1]` is goal `firstGoalId`); `nil` as for `GetGoal`. |
 | `GetUnitTypeCount(id)` | `number` | Units of a type id. |
 | `GetFact(fact, parameter?)` | `number` or `nil` | `Fact` value; `parameter` defaults to `0`. |
 | `IsObjectTypeAvailable(unitObjectType)` | `boolean` | The player can currently get the type. |

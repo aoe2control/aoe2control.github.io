@@ -199,6 +199,8 @@ Returned by `GetAssignedPlayer`, `GetPlayerById`, `GetVictoryPlayer` and `Object
 | `GetFishTrapRebuildQueue()` | `number` | Returns how many fish traps the player has in the rebuild queue, 0 to 40. |
 | `IsAutoFarmReseedEnabled()` | `boolean` | Returns whether automatic farm reseeding is on. |
 | `IsAutoFishTrapRebuildEnabled()` | `boolean` | Returns whether automatic fish trap rebuilding is on. |
+| `GetGoal(goalId)` | `number` or `nil` | Returns goal `goalId` (1–16384) of the player's AI script. `nil` when the player is not a computer player with an AI script, the module may not read this player, or the id is out of range. See [AI Goals](commands.md#ai-goals). |
+| `GetGoals(firstGoalId, lastGoalId)` | `table` or `nil` | Returns the goals `firstGoalId` to `lastGoalId` as a list: `values[1]` is goal `firstGoalId`. `nil` in the same cases as `GetGoal`. |
 | `GetUnitTypeCount(id)` | `number` | Returns how many units of a type id the player has. |
 | `GetFact(fact, parameter?)` | `number` | Returns a `Fact` value for this player; see [Facts](facts.md). `parameter` defaults to `0`. With Multithreading on, or while the Agent Bridge is on, returns `nil` for facts the game-state copy does not record. |
 | `IsObjectTypeAvailable(unitObjectType)` | `boolean` | Returns whether the player can currently get a unit or building type. |

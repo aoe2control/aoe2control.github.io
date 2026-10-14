@@ -97,6 +97,7 @@ Payload `{}`, or any of these fields:
 | `entity_fields` | `["id", "type_id", ...]`: the per-object fields `entities` lists (see `catalog.entity_fields`). Default: all. |
 | `object_types` | `"all"` (default): every valid object type. `"relevant"`: only the types the player can make now, has, or has queued. `"none"`: an empty list. |
 | `technologies` | `"all"` (default) or `"none"` (an empty list). |
+| `start_goal`, `end_goal` | Goal ids from 1 to 16384, given together, `start_goal` not above `end_goal`. `player.goals` then lists the player's AI script goals in that range. See [AI goals](#ai-goals). |
 
 Returns the newest observation (see [Observation](#observation)). Fails with
 `observation_unavailable` before a match runs.
@@ -176,7 +177,8 @@ Payload `{}`. Ends the session.
 - `commands`: one entry per command: `id`, `description` and `args`, a list of
   `{ "name", "type", "required", ... }`. Types: `object_ids` (with `min` and `max` count),
   `object_id`, `position` (`{x, y}` in tiles), `integer` (with `min` and `max`), `boolean`,
-  `enum` (with `values`, a list of `{ "name", "value" }`) and `string` (with `max_length`).
+  `enum` (with `values`, a list of `{ "name", "value" }`), `string` (with `max_length`) and
+  `integers` (a list of 32-bit integers, with `min` and `max` count).
 - `entity_fields`: the per-object fields `observe` can return.
 - `facts`: the fact ids in `player.facts`.
 
@@ -209,6 +211,7 @@ Commands in version 3:
 | `gameplay.queue_reseeds.v1` | `queue` (`FARM` 50 or `FISH_TRAP` 199), `amount` (1–40, default 1) | Adds farms or fish traps to the player's reseed queue, as the Mill and Dock buttons do. The queue holds up to 40. The game takes the cost now and adds as many of `amount` as the player can afford. A civilization with pastures queues pastures in the farm queue. |
 | `gameplay.cancel_reseeds.v1` | `queue`, `amount` (1–40, default 1) | Removes farms or fish traps from the reseed queue and refunds their cost. |
 | `gameplay.auto_reseed.v1` | `queue`, `enabled` | Turns automatic reseeding on or off. While it is on, the game queues a farm or fish trap when one expires and the player can pay. |
+| `player.set_goals.v1` | `start_goal` (1–16384), `goals` (1–16384 integers) | Writes `goals` to the player's AI script goals, the first value to goal `start_goal`. The goals must end at goal 16384 or before. See [AI goals](#ai-goals). |
 | `player.chat.v1` | `message` (1–200 characters) | Sends a chat message as the player. |
 
 `actors` lists 1 to 256 different object ids. Each actor must be the player's, alive and fully
@@ -224,7 +227,7 @@ Not in the catalog: camera, game speed, pause, saving, starting and ending match
 | `world_turn`, `game_time_ms` | Game time of the observation. |
 | `information_policy` | `player_view` or `omniscient`. |
 | `match` | `map_width`, `map_height`, `player_count`, `victory_condition`, `replay`. |
-| `player` | The bridge's player: `id`, `name`, `civilization_id`, `civilization_name`, `player_type`, `color`, `has_won` (`false` while the match runs; `status.last_result` has the result), `attributes` (a list of numbers by `ResourceType` id), `facts` (object of fact name to value), `diplomacy` (list by player id), `reseeds` (`farm_queue`, `fish_trap_queue`, `auto_farm`, `auto_fish_trap`). |
+| `player` | The bridge's player: `id`, `name`, `civilization_id`, `civilization_name`, `player_type`, `color`, `has_won` (`false` while the match runs; `status.last_result` has the result), `attributes` (a list of numbers by `ResourceType` id), `facts` (object of fact name to value), `diplomacy` (list by player id), `reseeds` (`farm_queue`, `fish_trap_queue`, `auto_farm`, `auto_fish_trap`), `goals` (only when `observe` names `start_goal` and `end_goal`: the AI script goals in that range, or `null` when the player is not a computer player with an AI script). |
 | `players` | Every player: `id`, `name`, `civilization_id`, `player_type`, `color`, `has_won`, `diplomacy`. Includes `attributes` only for the bridge's player and, with `omniscient`, for every player. |
 | `object_types` | For the bridge's player, every valid object type: `id`, `available`, `can_afford`, `can_afford_without_population`, `cost` (list of `{resource, amount}`), `train_site`, `count`, `count_with_queued`, `stats` (see [Stats](#stats); `null` for types the player has none of, has none queued of and cannot make now). |
 | `visible_object_types` | One entry per type of another player's object, gaia included, that `entities` lists with `access: "full"`: `owner`, `id` and `stats` (see [Stats](#stats)), as the owner has the type. |
@@ -272,6 +275,33 @@ The values a player reads in the unit panel, with the owner's upgrades:
 | `line_of_sight` | In tiles. |
 | `attacks`, `armors` | One `{ "class", "amount" }` per attack or armor class of the type. Damage against a target is computed from these lists. Empty for a type without attacks or armor. |
 
+## AI goals
+
+A computer player's AI script (`.per`) keeps 16384 goals, numbered from 1. The bridge reads them with
+`observe` (`start_goal`, `end_goal`) and writes them with `player.set_goals.v1`, so your program and
+an AI script that run for the same player can pass values to each other. For example, the program
+sets goal 200 to 1 while it controls the army, and the script answers in goal 201:
+
+```lisp
+(defrule (goal 200 1) => (set-goal 201 1))
+```
+
+```json
+{ "command": "player.set_goals.v1", "args": { "start_goal": 200, "goals": [1] } }
+```
+
+An `observe` with `"start_goal": 200, "end_goal": 201` then returns `player.goals` as `[1, 1]`.
+
+- The player must be a computer player whose AI script runs. Turn **Suppress Native AI** off;
+  while it is on, the bridge turns the script off. A human player's action is rejected with
+  `no_ai_script`.
+- A write happens on the game thread between two AI updates. The script never sees part of one
+  `player.set_goals.v1` action: it sees all of its values in its next rule pass.
+- An observation copies the goals between two AI updates, so it never shows part of one rule pass.
+- A write changes goals on this computer only. It is not a game command and is not in the recorded
+  game. In a replay it is rejected with `replay`. It is rejected with `multiplayer` when CONTROL
+  cannot read whether the match is a multiplayer match.
+
 ## Reasons
 
 Argument errors (`stage: "arguments"`): `unknown_command`, `invalid_arguments`.
@@ -281,7 +311,7 @@ Validation and execution (`stage: "validation"` or `"execution"`): `unavailable_
 `unavailable_sources`, `missing_target`, `unavailable_target`, `foreign_target`,
 `invalid_payload`, `queue_unavailable`, `module_unavailable`, `unavailable_object_type`,
 `unavailable_technology`, `population_capacity`, `unaffordable`, `already_satisfied`,
-`command_unavailable`, `queue_full`. They mean the same as the Lua command rejections in the module log.
+`command_unavailable`, `queue_full`, `multiplayer`, `no_ai_script`. They mean the same as the Lua command rejections in the module log.
 
 ## Error codes
 

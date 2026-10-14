@@ -125,6 +125,8 @@ These functions work at any time, in menus as well as in a match.
 | `QueueFishTrapRebuilds` | `(amount)` | `boolean` | Adds fish traps to the player's rebuild queue, as the Dock's Rebuild Fish Trap button does. Works like `QueueFarmReseeds`. |
 | `CancelFishTrapRebuilds` | `(amount)` | `boolean` | Removes up to `amount` (1–40) fish traps from the rebuild queue and refunds their cost. |
 | `SetAutoFishTrapRebuild` | `(enabled)` | `boolean` | Turns automatic fish trap rebuilding on or off. |
+| `SetGoal` | `(goalId, value)` | `boolean` | Sets goal `goalId` (1–16384) of the player's AI script to `value`. See [AI Goals](#ai-goals). |
+| `SetGoals` | `(firstGoalId, values)` | `boolean` | Sets the goals from `firstGoalId` on to the values of the list `values`, in one write. See [AI Goals](#ai-goals). |
 
 Without Multithreading or the Agent Bridge, the `boolean` commands return `true` when the order was given to the game, and `false` when it was not:
 
@@ -136,6 +138,36 @@ Without Multithreading or the Agent Bridge, the `boolean` commands return `true`
 - `SetAutoFarmReseed` and `SetAutoFishTrapRebuild` send nothing when the setting already has that value or a change to it is on its way, so calling them every update is fine.
 
 With Multithreading on, or while the Agent Bridge is on, these checks run when the queued command executes; see [With Multithreading or the Agent Bridge](#with-multithreading-or-the-agent-bridge).
+
+## AI Goals
+
+A computer player's AI script (`.per`) keeps 16384 goals, numbered from 1. A module on that player
+reads them with `Player:GetGoal()` and `Player:GetGoals()` and writes them with `SetGoal()` and
+`SetGoals()`, so the module and the script can pass values to each other.
+
+```lua
+function Update()
+    -- Tell the script that the module controls the army now.
+    SetGoal(200, 1)
+    -- The script answers in goal 201.
+    local answer = GetAssignedPlayer():GetGoal(201)
+end
+```
+
+```lisp
+(defrule (goal 200 1) => (set-goal 201 1))
+```
+
+- The player must be a computer player whose AI script runs. Turn **Suppress Native AI** off;
+  while it is on, CONTROL turns the script off for a player that has a module.
+- Values are whole numbers from -2147483648 to 2147483647. Another value raises an error.
+- `SetGoal` and `SetGoals` return `false` for a goal id out of range, for a human player, in a
+  replay and in multiplayer. With Multithreading or the Agent Bridge on, the write waits in the
+  command queue and the checks run there.
+- A write happens on the game thread between two AI updates. The script never sees part of one
+  `SetGoals` call: it sees all of its values in its next rule pass.
+- A write changes goals on this computer only. It is not a game command, is not in the recorded
+  game and does not count toward **Sequential Actions**.
 
 ## Examples
 
