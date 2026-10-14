@@ -1,6 +1,6 @@
 # CONTROL Lua Engine Reference
 
-This file describes the Lua API of CONTROL (AoE2Control) 1.1.1 for coding agents that write CONTROL modules. Use only the functions, methods, tables and enums listed here. CONTROL is not the AoE2 `.per` AI scripting language, and it has no other game-engine API.
+This file describes the Lua API of CONTROL (AoE2Control) 1.1.2 for coding agents that write CONTROL modules. Use only the functions, methods, tables and enums listed here. CONTROL is not the AoE2 `.per` AI scripting language, and it has no other game-engine API. A module can pass values to a computer player's `.per` script through its goals (`SetGoal`, `Player:GetGoal`).
 
 Full documentation: [AoE2Control Documentation](https://aoe2control.github.io/). If this file and the site disagree, the site is correct.
 
@@ -130,7 +130,7 @@ With **Multithreading** on, and while the Agent Bridge is on for any player, eve
 |----------|-----------|---------|-------------|
 | `Log` | `(message)` | `nil` | Writes `[MODULE] <message>` to the CONTROL log window. |
 | `SetEngineUIVisibility` | `(visible)` | `nil` | Opens (`true`) or closes (`false`) the CONTROL menu. |
-| `UnloadEngine` | `()` | `nil` | Unloads CONTROL from the game. |
+| `UnloadEngine` | `()` | `nil` | Unloads CONTROL from the game. While `DispatchQuitGame()` or a start is in progress, waits until it has finished, for up to 30 seconds. |
 | `GetAssignedPlayerId` | `()` | `number` | Player id (`1` to `8`) of this module instance. Works in `Load()`. |
 | `AssignAndLoadModule` | `(playerId, moduleName)` | `boolean` | Assigns a module (name without `.main.lua`/`.main.module`) to player `1` to `8` and loads it, or reloads it. Applied after the current callback returns. `false` for a bad player id or malformed name; an unknown name is ignored. |
 
@@ -188,9 +188,9 @@ Select a map and seed with the `GameOptions` methods `SetRandomMapSource()` and 
 | `TrainUnit` | `(unitId, amount)` | `boolean` | Makes sure `amount` units of type `unitId` are in production: trains the difference, or returns `false` if enough are in production. |
 | `TrainUnit` | `(trainSources, unitId)` | `boolean` | Like `TrainUnit(unitId)`, using only buildings whose `UnitObjectType` is in the array `trainSources`. |
 | `TrainUnit` | `(trainSources, unitId, amount)` | `boolean` | Like `TrainUnit(unitId, amount)`, using only buildings of the types in `trainSources`. |
-| `UnitsTargetObject` | `(units, target)` | `boolean` | Orders units to act on an object: attack, gather, repair and so on. |
+| `UnitsTargetObject` | `(units, target, queue?)` | `boolean` | Orders units to act on an object: attack, gather, repair and so on. `queue` `true` adds the order after their current orders, as shift-right-click does. |
 | `UnitsBuildStructure` | `(builders, structureId, position)` | `boolean` | Orders builders to build a structure at a `Vector3` position. `false` when the player cannot afford it. Does not check the position; use `CheckPlacement` first. |
-| `UnitsMove` | `(units, position)` | `boolean` | Orders units to move to a `Vector3` position. |
+| `UnitsMove` | `(units, position, queue?)` | `boolean` | Orders units to move to a `Vector3` position. `queue` `true` adds a waypoint, as shift-click does. |
 | `EnableScouting` | `()` | `boolean` | Sets idle Scout Cavalry, Camel Scouts and Eagle Scouts that are not scouting to auto-scout. `false` when there are none. |
 | `ResearchTechnology` | `(technology)` | `boolean` | Researches a `Technology` at a building that can research it. `false` when it cannot be researched now or the player cannot afford it. |
 | `DeleteUnit` | `(unit)` | `nil` | Deletes one of the player's units. |
@@ -478,7 +478,8 @@ The pipe protocol (`open`, `observe`, `map`, `act`, `query`) is described at htt
 
 - Resources and other objects that cannot move (`ObjectType.RESOURCE_OR_EYE_CANDY`, `ObjectType.ANIMATED_MAP_OBJECT`) return `(0, 0, 0)` from `GetDirection()`, an empty list from `GetPath()` and `nil` from `GetActionTargetPosition()`.
 - A kept `Object` that went into the fog or stopped existing raises a Lua error on most method calls. Check `IsVisible()` first, or fetch objects again.
-- Animals and resources on explored but not visible tiles allow only `IsVisible()`, `IsExplored()`, `GetId()`, `GetPosition()`, `GetClass()` and `GetUnitObjectType()`.
+- Animals and resources on explored but not visible tiles allow only `IsVisible()`, `IsExplored()`, `GetId()`, `GetPosition()`, `GetClass()` and `GetUnitObjectType()`. Commands can target them, as a right-click in the fog does.
+- When CONTROL cannot read a unit's current action, order or path, `GetActionTargetPosition()` and `GetTargetObject()` return `nil`, `GetPath()` returns an empty list, and `IsMoving()` and `IsScouting()` return `false`.
 
 ### MapTile
 
@@ -564,7 +565,7 @@ With **Modules See Everything** off, attribute, fact, count, cost, research and 
 | `GetTreatyLength()` | `SetTreatyLength(treatyLength)` | `number` |
 | `GetPlayersCount()` | `SetPlayersCount(playersCount)` | `number` of player slots in use |
 | `GetLocation()` | `SetLocation(location)` | `OptionsLocation`; during a match, the map the game started. The setter also clears a custom map pool. |
-| — | `SetRandomMapPoolLocations(locations)` | Array of 1 to 256 `OptionsLocation` values. One entry acts like `SetLocation()`; two or more set the location to `OptionsLocation.CUSTOM_MAP_POOL`, which `GetLocation()` then returns. Known issue in 1.1.0 and 1.1.1: `DispatchStartGame()` then starts the game's default map (Coastal), not a pool map. |
+| — | `SetRandomMapPoolLocations(locations)` | Array of 1 to 256 `OptionsLocation` values. One entry acts like `SetLocation()`; two or more set the location to `OptionsLocation.CUSTOM_MAP_POOL`, which `GetLocation()` then returns. Known issue in 1.1.0 to 1.1.2: `DispatchStartGame()` then starts the game's default map (Coastal), not a pool map. |
 | `GetTeamsNotTogether()` | `SetTeamsNotTogether(value)` | `boolean` (`true` when Team Together is off) |
 | `GetRecordGame()` | `SetRecordGame(value)` | `boolean` |
 | `GetTeamPositions()` | `SetTeamPositions(value)` | `boolean` |
@@ -577,6 +578,8 @@ With **Modules See Everything** off, attribute, fact, count, cost, research and 
 | `GetRandomMapSeed()` | `SetRandomMapSeed(seed)` | `number` or `nil`: fixed seed `0` to `4294967295`; `nil` when the game picks it. `ClearRandomMapSeed()` removes the fixed seed. |
 | `GetRandomMapSource()` | `SetRandomMapSource(source)` | `RandomMapSource` or `nil`, from `GetAvailableRandomMapSources()`. |
 
+`GetAvailableAIs()` returns the AI scripts the lobby offers as a list of `{ Name, Source }`; `Source` is `"builtin"`, `"install"` or `"custom"`. With Multithreading on it returns an empty table. The game's default AI is `PromiDE`.
+
 Player slots: `playerIndex` is `0` to `7` (slot `0` is player 1). Out of range: setters return `false`, getters `0`.
 
 | Getter | Setter | Value |
@@ -585,6 +588,7 @@ Player slots: `playerIndex` is `0` to `7` (slot `0` is player 1). Out of range: 
 | `GetPlayerHandicapPercentage(playerIndex)` | `SetPlayerHandicapPercentage(playerIndex, handicapPercentage)` | Handicap percentage |
 | `GetPlayerColor(playerIndex)` | `SetPlayerColor(playerIndex, color)` | Color index |
 | `GetPlayerCivilization(playerIndex)` | `SetPlayerCivilization(playerIndex, civilization)` | `OptionsCivilization`; the setter turns off random civilization |
+| `GetPlayerAI(playerIndex)` | `SetPlayerAI(playerIndex, name)` | AI script name. The getter returns `nil` for a slot that is not a computer. The setter makes the slot a computer that runs the script; `false` for a name not in `GetAvailableAIs()` (case-sensitive), during a match and with Multithreading on. |
 | — | `SetAssignedPlayerCivilization(civilization)` | Writes the slot of `GetAssignedPlayerId()`. `false` when that id is not `1` to `8`. Not blocked by Tournament Mode. |
 
 `SetRandomMapSeed()`, `ClearRandomMapSeed()` and `SetRandomMapSource()` work only in single-player setup: they return `false` during a match, in multiplayer, in a replay, while a match starts or quits, and when the capability flag (`requestedSeed` or `selection`) is `false`. `SetRandomMapSource()` also rejects a source from an older catalog generation; call `GetAvailableRandomMapSources()` again after `RefreshRandomMapSources()`.

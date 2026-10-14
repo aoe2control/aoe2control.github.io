@@ -17,7 +17,7 @@ The **Module** list shows every `{moduleName}.main.lua` and `{moduleName}.main.m
 | **Sequential Actions** | On | Allows one game command per `Update()` call. Further commands in the same call are refused. |
 | **Auto Move Camera** | On | Moves the camera to the target of each executed command. Only one module moves the camera: the one on the local player's slot, or else the one with the lowest player number. The Agent Bridge for the local player's slot moves it too. |
 | **Command Visualization** | On | Draws an overlay for each executed command. |
-| **Suppress Native AI** | On | Turns off the built-in AI of a computer player while a module is assigned to its slot. |
+| **Suppress Native AI** | On | Turns off the built-in AI of a computer player while a module is assigned to its slot. Turn it off when a module works with the player's AI script through its [goals](commands.md#ai-goals). |
 | **Tournament Mode** | Off | Refuses game commands outside `Update()`, adds `Update()` time above 20 ms to the next interval, and blocks a list of functions. See [Limits](limits.md#tournament-mode). |
 | **Multithreading** | Off | Runs each module on its own thread, which reduces the frame-rate cost. `Render()` is not called, and some functions are blocked or return `nil`. See [Limits](limits.md#multithreading). May cause sync issues. |
 | **Modules See Everything** | Off | Modules ignore fog of war when they read map tiles, objects and players. See [Perspective And Visibility](#perspective-and-visibility). |

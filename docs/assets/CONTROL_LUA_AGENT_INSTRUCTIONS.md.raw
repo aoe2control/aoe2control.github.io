@@ -21,7 +21,7 @@ Rules for coding agents that write CONTROL (AoE2Control) Lua modules. Look up ev
 
 ## Nil checks and stale objects
 
-12. Check for `nil` before use: `GetAssignedPlayer()`, `GetPlayerById()`, `GetObjectById()`, `GetMapTile()`, `GetCurrentGameOptions()`, `Object:GetTargetObject()`, `Object:GetCurrentMapTile()`, `Player:GetSelectedObject()`, `GetFact()` and `ParseJSON()` can return `nil`.
+12. Check for `nil` before use: `GetAssignedPlayer()`, `GetPlayerById()`, `GetObjectById()`, `GetMapTile()`, `GetCurrentGameOptions()`, `Object:GetTargetObject()`, `Object:GetCurrentMapTile()`, `Player:GetSelectedObject()`, `Player:GetGoal()`, `GameOptions:GetPlayerAI()`, `GetFact()` and `ParseJSON()` can return `nil`.
 13. Keep object ids or positions across callbacks, not `Object` values. A kept object that went into the fog or no longer exists raises an error on most methods. Check `IsVisible()` or fetch it again.
 14. Object lists do not include unfinished buildings; use `Player:GetFoundations()`. `Object:GetName()` is the current graphic's name and changes with the activity; use `GetTypeName()` or `GetUnitObjectType()` to identify a type.
 

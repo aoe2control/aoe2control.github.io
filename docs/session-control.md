@@ -43,6 +43,8 @@ The other functions return `false` in these cases:
 | `DispatchQuitGame` | The game is in the menu, multiplayer or a replay, or an earlier start or quit is still in progress. Logged as `[SESSION_QUIT] rejected=<reason>`. |
 | `DispatchLoadGame` | A match is running, the game is multiplayer, or the name is not in `GetAvailableSaveFiles()`. |
 
+A start or quit that has not finished after 30 seconds gives up. When the game's quit makes no progress for 5 seconds, CONTROL asks it to quit again.
+
 `DispatchLoadGame()` takes a file name exactly as `GetAvailableSaveFiles()` returns it, not a path. A file ending in `.aoe2record` loads as a replay.
 
 ## Working With `GameOptions`
@@ -100,7 +102,7 @@ These functions list the random maps the game knows, select one for the next mat
 | `sessionActive` | `boolean` | A single-player match is running. |
 | `multiplayer` | `boolean` | The game is in multiplayer. |
 | `replay` | `boolean` | A replay is loaded. |
-| `lifecycleTransitionPending` | `boolean` | A start or quit is still in progress. |
+| `lifecycleTransitionPending` | `boolean` | A start or quit is still in progress. After `DispatchQuitGame()` it stays `true` until the main menu shows. |
 | `cleanStartContract` | `string` | Always `"explicit-quit-then-start"`. |
 | `capabilityRevision` | `number` | `2`. |
 

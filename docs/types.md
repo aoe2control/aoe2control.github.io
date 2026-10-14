@@ -131,6 +131,8 @@ A unit, building, resource or other map object. Returned by the object lookups o
 | `GetPath()` | `Vector3[]` | Returns the waypoints of the path the unit follows. Empty when the unit is not moving. |
 | `CalculatePath(targetPos)` | `Vector3[]` | Returns a path from the object's position to the `Vector3` `targetPos`, sized for the object. With **Modules See Everything** on, it is the game's path; otherwise see [Placement and paths in the fog](facts.md#placement-and-paths-in-the-fog). |
 
+When CONTROL cannot read a unit's current action, order or path, `GetActionTargetPosition()` and `GetTargetObject()` return `nil`, `GetPath()` returns an empty list, and `IsMoving()` and `IsScouting()` return `false`.
+
 Resources and other objects that cannot move (`GetObjectType()` is `ObjectType.RESOURCE_OR_EYE_CANDY` or `ObjectType.ANIMATED_MAP_OBJECT`: trees, mines, bushes, decorations) have no direction, path or action. For them `GetDirection()` returns `(0, 0, 0)`, `GetPath()` returns an empty list and `GetActionTargetPosition()` returns `nil`.
 
 With Multithreading on, or while the Agent Bridge is on, modules read objects from a copy of the game state (see [Limits](limits.md#game-state-copy)). In that copy `GetAttribute()` returns `nil` for every attribute except `HITPOINTS`, `RADIUS_X`, `RADIUS_Y` and the [combat values](limits.md#combat-values-in-the-copy), and `GetObjectData()` returns `nil` for fields the copy does not record.
