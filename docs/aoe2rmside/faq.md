@@ -87,7 +87,7 @@ Click a question to open the answer.
     and computer players again. A live test needs a player in P1.
 
 ??? question "Why does my map behave strangely, and the game does the same?"
-    AoE2RMSIDE copies the game's behavior, including its odd
+    AoE2RMSIDE deliberately copies the game's behavior, including its odd
     corners. If the game handles some code in a surprising way, the preview
     does the same, so what you see is what players get.
 
@@ -104,7 +104,7 @@ Click a question to open the answer.
 ??? question "How large can maps and scripts be?"
     Maps up to Ludicrous (480×480) are supported.
 
-    Large scripts are refused before generation. The limit is 65,536
+    Very large scripts are refused before generation. The limit is 65,536
     generation steps after all includes and conditions are resolved. Most
     maps are far below it.
 
@@ -112,9 +112,11 @@ Click a question to open the answer.
     No. AoE2RMSIDE has no usage statistics, no error reporting and no
     automatic uploads.
 
-    The only network request is a check for a newer release on GitHub at
-    startup. It sends nothing about you or your scripts, and it never
-    downloads or installs anything.
+    At startup it checks GitHub for a newer release. The check sends nothing
+    about you or your scripts, and you can turn it off under **Help → Check
+    for New Versions at Startup**. AoE2RMSIDE downloads something only when
+    you choose **Update** in the installed version: the new release's
+    installer and its checksum list, from the AoE2RMSIDE releases on GitHub.
 
 ## RMS replication and compatibility boundary
 
@@ -140,7 +142,7 @@ be used, but its maps carry no guarantee that they match the game. Output
 marks such a run with `unverified game version`. See
 [Which game versions are supported?](#game-versions-and-compatibility).
 
-- **Quirks are part of compatibility.** AoE2RMSIDE may reproduce
+- **Quirks are part of compatibility.** AoE2RMSIDE may deliberately reproduce
   the game's unusual behavior so that maps behave the same in the game.
 - **Identical results need identical input.** The same map only comes out when
   the complete script with all its includes, the seed, the lobby settings,
@@ -249,7 +251,7 @@ advice.
     turn notes on there to see them.
 
     Both lists follow the newest lines. Scroll up and they stay where you
-    are; scroll back to the bottom, or press **Jump to latest**, and they
+    are; scroll back to the bottom, or press **Jump to Latest**, and they
     follow again.
 
 ??? question "My script uses the game's include files and will not run."

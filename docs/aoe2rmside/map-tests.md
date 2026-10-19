@@ -74,7 +74,7 @@ Line by line:
    **Pin executed script**.
 3. Switch to your `.rmstest` tab and press **Run** (or F5).
 
-The preview updates as maps are generated. While the test runs, a progress
+The preview shows the latest finished map, up to twice a second. While the test runs, a progress
 bar on the right side of the bottom panel bar shows **Testing**. Point at it
 to see how many maps are done, for example "Testing maps, 30% (12 of 40
 maps)". The total counts the maps the test has asked for so far, so it grows
@@ -111,7 +111,13 @@ Use `print("gold:", count)` or `"gold: {}".format(count)` to build text.
 
 The editor helps with map tests too: suggestions and documentation for the
 `rms` functions, **Go to Definition** (F12) for your own functions and
-names, **Go to Symbol** and **Format Document**. The right-click menu lists
+names, **Go to Symbol** and **Format Document**. Suggestions stay closed
+inside text in quotes and in comments. While you type the arguments of a
+call, a small box shows the parameters of the call the cursor is in and
+marks the one you are typing; this also works for `sample` and `map`
+functions under the names your loop gives them, such as `m.objects(`. The
+outline row below the code lists your functions (see
+[Outline row](writing-scripts.md#outline-row)). The right-click menu lists
 only what works in map tests.
 
 Map tests cannot read or write files, use the network or pick random numbers.
@@ -178,7 +184,8 @@ current settings, the same ones an ordinary Run uses. See
 
 You can also write a list of seeds yourself, for example `[5, 17, 42]`.
 
-`rms.generate(target, seeds)` shows each finished map in the preview. With
+`rms.generate(target, seeds)` shows the latest finished map in the preview,
+up to twice a second, and the last map of the run when it ends. With
 `preview = False` the preview stays as it is, which is useful for long runs.
 
 AoE2RMSIDE generates several maps at the same time. By default
@@ -381,25 +388,27 @@ the number of findings. The first line is a summary such as
 
 Below the summary, findings are grouped by the check that recorded them: one
 group per `expect` or `report` line of your test, in the order of your test.
-A group shows the check's message and how many findings it has. If the
-message is different for each finding (for example because it contains the
-seed), the group is called "Check on line 12" and each finding shows its own
-message.
+The list uses the same layout as Output. A group's header shows the check's
+message, how many findings it has, and at the right the check's line in your
+test, such as `21:13`. If the message is different for each finding (for
+example because it contains the seed), the group is called "Check on line 12"
+and each finding shows its own message.
 
-Each finding shows its seed and the values you recorded with it, for example
-`seed 17 · player: 1 · gold_nearby: 4`. **Details** under a finding shows your
-`code`, the line of your test, the map file and the values in full. When the
-same finding is recorded several times on one seed (for example once per
-player), it is shown once with a count such as `×2`.
+The findings are indented under their check. Each one shows the values you
+recorded with it, for example `player: 1 · gold_nearby: 4`, and its seed at
+the right, such as `seed 17`. **Details** under a finding opens a small box
+with your `code`, the line of your test, the map file and the values in full.
+When the same finding is recorded several times on one seed (for example once
+per player), it is shown once with a count such as `×2`.
 
 - **Click a finding** (or its seed) to generate that same map in the preview.
   This works as long as the test script is open and neither the test, the
   map nor the game version has changed since the run. If it cannot, Output
   says why.
-- **Click the line number** in front of a check (such as `21:13`) to go to
-  that line of your test.
-- Click the arrow before a check to collapse or expand it. A check with many
-  findings shows the first 100; **Show 100 more** shows the next ones.
+- **Click the line number** at the right of a check's header to go to that
+  line of your test.
+- Click a check's header to collapse or expand it. A check with many
+  findings shows the first 100; **Show 100 More** shows the next ones.
 
 If the test stops early, it records no new results. This happens when the
 test script has a mistake, a map fails to generate, a limit is reached, or you
@@ -441,7 +450,7 @@ Map tests have fixed limits so a test cannot freeze your computer:
 | Test script size | 1 MiB |
 
 The memory a test may use depends on your computer, up to a fixed maximum.
-Large batches of the largest maps can still reach it. The test then
+Very large batches of the largest maps can still reach it. The test then
 stops and asks you to generate fewer seeds per run.
 
 The script itself also has a step limit. Looping over every tile of every

@@ -21,11 +21,12 @@ result.
 ## What you can do with it
 
 - **Write scripts** with error checking, lint warnings with quick fixes,
-  completion, hover documentation, inlay hints and formatting, for RMS and
-  for the XS scripts your maps load. See [Writing scripts](writing-scripts.md).
+  completion, ready-made snippets, hover documentation, inlay hints and
+  formatting, for RMS and for the XS scripts your maps load, and find text
+  across all your files. See [Writing scripts](writing-scripts.md).
 - **Preview the map** for any seed, map size, player count, game setting and
-  lobby option, in minimap colors or texture colors. See
-  [Preview](preview.md).
+  lobby option, in minimap colors or texture colors, beside your code or
+  behind it, and copy or save the picture. See [Preview](preview.md).
 - **Test many seeds at once.** A map test generates dozens or hundreds of maps
   and checks each one for problems you describe, such as missing gold or
   players without a land path. See [Map tests](map-tests.md).
@@ -36,6 +37,9 @@ result.
 - **Use it in your language.** Menus, dialogs and messages are available in
   20 languages. See
   [Interface language](getting-started.md#interface-language).
+- **Choose your colors.** A light or dark theme, and six color schemes for
+  the code in the editor. See
+  [Theme and editor colors](getting-started.md#theme-and-editor-colors).
 
 ## Requirements
 
@@ -70,9 +74,22 @@ Each release has an installer and a portable ZIP.
 The app is not code-signed, so Windows SmartScreen may warn you the first time
 you start it.
 
-AoE2RMSIDE does not update itself. When a newer release is available, it
-shows a short note with a link in the Output panel when it starts. Download
-the new version from the releases page yourself.
+When a newer release is available, AoE2RMSIDE shows a short note with a
+link in the Output panel when it starts.
+
+If you used the installer, AoE2RMSIDE updates itself: choose **Update** at
+the right of the Output panel's bar, or **Update now** in the note. After you
+confirm, it downloads the new installer, checks it against the checksums
+published with the release, asks about unsaved changes, then closes, installs
+the update and opens again. Your settings stay as they are. If you change
+your mind at the unsaved-changes question, the download is kept until you
+close AoE2RMSIDE, so the next **Update** does not download it again.
+
+The portable ZIP does not update itself: download the new ZIP from the
+releases page.
+
+To stop the check at startup, turn off **Help → Check for New Versions at
+Startup**.
 
 ## Learn random map scripting
 

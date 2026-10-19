@@ -39,11 +39,17 @@ The window has three areas side by side:
 - the **preview** on the right, where the generated map appears.
 
 Below them, the bottom panel has the **Output** and **Problems** tabs. Output
-shows each run as one line (script, seed, size, players, time and result) that
-opens to show its messages, plus deployments, live tests and anything that went
-wrong, in plain words with a **Details** part for bug reports. Problems lists
-the errors and warnings in your scripts, grouped by file; click a line number
-to go there. Output does not repeat them.
+shows each run as a group headed by the script name. While the group is open,
+a small table under the name lists the seed, map size, players, duration and
+result, and the run's messages follow, indented under it. A closed group fits
+on one line (script, seed, size, players, time and result). Output also lists
+deployments, live tests and anything that went wrong, in plain words. Each
+message starts with an icon for its kind (error, warning or note) and shows
+its time at the right. Errors and warnings can have a **Details** part for bug
+reports, which opens in a small box under the message. Problems lists the
+errors and warnings in your scripts in the same layout, grouped by file;
+click a problem, or its line number at the right, to go there. Output does not
+repeat them. Click the header of a group to open or close it.
 
 The buttons next to the tabs show how many errors, warnings and notes there
 are, and turn each kind on or off. Output shows all three by default. The
@@ -52,15 +58,51 @@ from Output; a run that is still going keeps its messages.
 Problems hides notes by default; turn them on to see small hints such as
 names in the game's own files that count as 0. Both lists follow the newest
 lines. Scroll up and they stay where you are, even while new lines arrive;
-scroll back to the bottom, or press **Jump to latest**, and they follow
+scroll back to the bottom, or press **Jump to Latest**, and they follow
 again.
 
-The buttons at the far left of the title bar and on the editor tab bar
-collapse and expand the Explorer and the preview. **View → Reset Layout**
-restores the default sizes. **View → Theme** switches between System, Light
-and Dark. The **View** menu also holds **Show Live Generation Stages** for the
-preview, **Show Inlay Hints** and **Lint Rules** for the editor, and
-**Language…** for the interface language.
+The button at the far left of the title bar collapses and expands the
+Explorer. The layout button at the right end of the editor tab bar switches
+between **Side by side**, **Preview behind editor**, where the map fills the
+editor's area too and shows through the editor, and **Editor only** (see
+[Workspace layouts](preview.md#workspace-layouts)). To resize the areas, drag
+the gaps between them: while you point at one, a short bar shows on it and
+follows the pointer. The separators work with the mouse only.
+**View → Reset Layout** restores the default sizes and the **Side by side**
+layout. **View → Theme…** sets the app theme and the editor colors (see
+[Theme and editor colors](#theme-and-editor-colors)). The
+**View** menu also holds **Show Live Generation Stages** for the preview,
+**Show Outline Row**, **Show Inlay Hints** and **Lint Rules** for the editor,
+and **Language…** for the interface language.
+
+## Theme and editor colors
+
+**View → Theme…** opens the **Theme** panel. Every choice in it applies at
+once, and AoE2RMSIDE remembers it the next time you start the app. Close the
+panel with its **x** or **Escape**.
+
+- **App theme** switches the whole window between **System**, **Light** and
+  **Dark**. **System** follows the Windows setting for apps.
+- **Editor colors** chooses the colors of the code in the editor:
+  **Default**, **Solarized**, **Catppuccin**, **Gruvbox**, **Ayu** or **One**.
+  Each card shows a short sample in the scheme's light colors on the left and
+  its dark colors on the right. The editor uses the light half while the app
+  is light and the dark half while it is dark, so one choice fits both.
+  Scroll the row sideways to see every card.
+- Click a card to choose it, or move between the cards with the arrow keys.
+  The chosen card has a check mark.
+- **Background blur** decides how the map looks through the preview's
+  buttons, panels and menus, and through the editor where it lies over the
+  map (**Preview behind editor**): **Clear** (the default) or **Blurred**.
+  Point at either choice for a short explanation.
+
+An editor color scheme changes only the colors of the text: commands, names,
+numbers, comments and the colors of matching brackets, in RMS scripts, XS
+files and map tests alike. The editor's background, the current line, the
+selection and the rest of the window keep the colors of the app theme.
+**Default** keeps the editor's original colors.
+
+![The Theme panel with the app theme and the editor colors](images/theme-panel.png)
 
 ## Interface language
 
@@ -77,7 +119,8 @@ language, or English if it does not speak that language. To switch:
 2. Open the list in the **Language** dialog and pick a language. Each
    language is listed by its own name. The first entry,
    **Windows display language**, follows Windows again.
-3. Menus, dialogs and messages change at once. Press **Close**.
+3. Menus, dialogs and messages change at once. Close the dialog with its
+   **x** or **Escape**.
 
 AoE2RMSIDE remembers your choice. The code editor's own small menus, such as
 its right-click menu and search box, change the next time you start the app;
@@ -116,20 +159,21 @@ To link a folder yourself:
 
 1. Open the **Preview game version** menu on the right side of the bottom
    panel bar.
-2. Choose **Select game folder**.
+2. Choose **Select Game Folder**.
 3. Pick the game's installation folder. In your Steam library this is
    `steamapps\common\AoE2DE`, the folder that contains `AoE2DE_s.exe`. For
    the Xbox app or the Microsoft Store, pick the folder the game is
    installed in, the one that contains `AoE2DE.exe`.
 
-You can also use **Select game folder** in the Run options menu (the arrow
+You can also use **Select Game Folder** in the Run options menu (the arrow
 next to the Run button). While a folder is linked, **File → Open Game Folder**
 opens it in Windows Explorer and **File → Unlink Game Folder** removes the
 link.
 
 AoE2RMSIDE only reads your game folder; it never changes the game's files.
-Graphics from your own game installation are only read locally and never
-leave your computer.
+Graphics from your own game installation are only read locally, and the
+application never uploads or sends them anywhere; only a picture you copy or
+save yourself can contain them.
 
 ## Open your scripts
 
@@ -154,7 +198,15 @@ of each name in bold. Upper and lower case do not matter. A search with `/`
 matches paths inside the open folder, for example `maps/arabia`. **Up** and
 **Down** move through the matches, **Enter** opens the file or opens or
 closes the folder, and **Escape** clears the search. Once the box is empty,
-the tree is back as you left it.
+the tree is back as you left it. While the box has focus, it widens over the
+**Open File** and **Open Folder** buttons; they come back when you leave the
+box. Clicking into the box again selects its text, so what you type replaces
+the last search.
+
+The same box also finds text inside your files: click **Search file
+contents** at its end, or press **Ctrl+Shift+F** (**File → Find in
+Files…**). To search one folder only, right-click it and choose **Find in
+Files…**. See [Find in files](writing-scripts.md#find-in-files).
 
 Delete in the Explorer asks before deleting. Press Enter to confirm or Escape
 to cancel. Deleted items go to the Windows Recycle Bin. To delete permanently
@@ -189,14 +241,17 @@ whenever you want a fresh start.
 
 Press the **Run** button (the play icon on the editor tab bar) or **F5**.
 
-The map appears in the preview. Output shows the run as one line, for example
-`Untitled-1.rms · seed 1234 · 168×168 · 2 players · 0.4 s · Generated`. Only
-the newest run is open; older runs fold away and open with their arrow.
+The map appears in the preview. Output shows the run as a group headed by the
+script name, with its **Seed**, **Map size**, **Players**, **Duration** and
+**Result** (for example `Generated`) in a small table below. Only the newest
+run is open; older runs fold into one line, for example
+`Untitled-1.rms · seed 1234 · 168×168 · 2 players · 0.4 s · Generated`.
+Click the header of a run to open or close it.
 
 If your script uses commands that none of the maps recorded from the game
-used, the line ends with a note such as `3 commands not compared against the game`
-instead of `Generated`. Open the line with its arrow to see these commands
-listed; click one to go to the first place your script uses it. The map is
+used, the result is a note such as `3 commands not compared against the game`
+instead of `Generated`. Open the run to see these commands listed below its
+table; click one to go to the first place your script uses it. The map is
 still generated; the note only tells you where the preview may differ from
 the game. See
 [How AoE2RMSIDE is checked against the game](faq.md#how-aoe2rmside-is-checked-against-the-game).

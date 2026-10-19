@@ -48,7 +48,9 @@ once when the match starts.
 
 What the editor does for `.xs` files:
 
-- Syntax coloring that matches your RMS theme, folding and an outline.
+- Syntax coloring in the same editor colors as your RMS scripts (see
+  [Theme and editor colors](getting-started.md#theme-and-editor-colors)),
+  folding and an outline.
   **Ctrl+/** toggles `//` comments and **Shift+Alt+A** toggles `/* */`
   comments.
 - Checks as you type, listed in **Problems** like RMS problems: syntax
@@ -58,7 +60,8 @@ What the editor does for `.xs` files:
   variables, and more.
 - Completion, signature help, and hover documentation from a built-in catalog
   of XS functions. It offers only what the selected game version has.
-  Completion opens by itself after a `.` and on **Ctrl+Space**. Choosing a
+  Completion opens by itself after a `.` and on **Ctrl+Space**, but not
+  inside strings and comments. Choosing a
   function inserts the call with its parentheses, puts the cursor between
   them and opens the parameter help. If the parentheses are already there,
   only the name changes.
@@ -276,8 +279,11 @@ appears.
 - After `if` and `elseif` you get the labels a lobby can define. After
   `#include` you get the files of your open folder, one folder level at a
   time.
-- Snippets insert whole constructs, such as a `create_object` block, with
-  placeholders. Press Tab to move from one placeholder to the next.
+- Snippets insert whole constructs, such as a `create_object` block, or a
+  commented pattern for a common task, such as **Gold and stone near every
+  player**, with placeholders. Press Tab to move from one placeholder to the
+  next. To browse them all, use **Insert Snippet…** (see
+  [Inserting a snippet](#inserting-a-snippet)).
 - Press Enter at the end of a block command such as `create_object GOLD`, or
   after a `{` that is not closed yet, and the editor adds the braces with the
   cursor on an indented line between them. `if` ... `endif` and
@@ -289,6 +295,54 @@ appears.
   not list version differences.
 
 Editor help is built into AoE2RMSIDE and works offline.
+
+### Inserting a snippet
+
+**Edit → Insert Snippet…**, or **Insert Snippet…** in the editor's
+right-click menu, opens a searchable list of snippets. It works in RMS
+scripts; XS files and map tests have no snippets.
+
+- The list shows the snippets that fit where the cursor is, the same ones
+  completion offers there. Turn on **Show all** to list every snippet. When
+  nothing fits, the list says so.
+- Type in the search box to narrow the list. Every word you type must appear
+  in a snippet's name or description; upper and lower case do not matter.
+- **Inserted text** next to the list shows what the highlighted snippet adds,
+  in the editor's colors, with each placeholder showing its default value,
+  and names the sections the snippet fits in.
+- **Up** and **Down** move through the list. **Enter** or a click inserts the
+  highlighted snippet, and **Escape** closes the list without inserting
+  anything.
+
+The snippet goes in at the cursor, or replaces the selected text, and takes
+the indentation of its line. Press Tab to move through its placeholders. One
+Undo removes the whole snippet.
+
+![The Insert Snippet list with a pattern and the text it inserts](images/insert-snippet.png)
+
+Besides the blocks that completion also offers, such as `create_land`,
+`create_object`, `if` … `endif` and `start_random` … `end_random`, the list
+has commented patterns for common map-making tasks:
+
+- Player lands with a standard base
+- Forest around the map edge
+- A lake in the middle of the map
+- Small forests between the players
+- Hills spread over the map
+- A few short cliffs
+- Paths between all players
+- Town Center and starting units
+- Gold and stone near every player
+- Berries and deer near every player
+- Sheep and boar near every player
+- Scattered gold and stone
+- Relics away from the players
+- A random main terrain
+
+Each pattern belongs in one section, for example `<OBJECTS_GENERATION>` for
+gold and stone, so place the cursor in that section first. Its comments
+explain the values, so you can adjust them to your map. Snippet names,
+descriptions and comments are in English in every interface language.
 
 ### Inlay hints
 
@@ -346,6 +400,67 @@ linked game folder with its local version selected.
 Right after you type a new include line, the right-click item and the
 Ctrl+click link can take a moment to appear.
 
+#### Outline row
+
+A slim row below the code shows where the cursor is: the section and the
+block, for example `› <OBJECTS_GENERATION> › create_object GOLD`. It follows
+the cursor as you move through the script and type.
+
+- Each part of the row is one button, made of its arrow and its name. Click
+  it to open a list of its neighbors, each with its line number: the first
+  button lists every section of the file, and the second lists the blocks of
+  the section. Choose an entry to jump there. The list works with the
+  keyboard too: the arrow keys, typing the start of an entry, **Enter** and
+  **Escape**.
+- While the cursor is not inside a section, for example above the first one,
+  the first button shows only its arrow and still lists the sections. The
+  same goes for the second button between the blocks of a section.
+- In RMS scripts the row shows sections and the blocks directly inside them,
+  such as `create_land` or `create_object GOLD`. A block inside `if` or
+  `start_random` counts as part of its section. XS files show functions and
+  rules, and map tests show functions. The row stays hidden in a file that
+  has none of these.
+- **View → Show Outline Row** turns the row off and on. It is on by default.
+
+#### Find in files
+
+The **Search files** box at the top of the Explorer also searches inside
+your files. Click **Search file contents** at the end of the box (the box then
+reads **Find in files**), or choose **File → Find in Files…** (Ctrl+Shift+F),
+which works while you type in the editor too. Find in Files opens the
+Explorer if it is collapsed, searches the whole open folder and selects the
+text in the box, so you can type right away. It needs an open folder.
+
+- The tree shows only the files whose text contains what you type, and the
+  folders above them. Each file shows how many times the text occurs in it,
+  and each folder shows the total for the files below it.
+- The text is found as you write it, without wildcards. Upper and lower case
+  do not matter unless you turn on **Match case**. With **Whole word** on,
+  the text only counts where no letter, digit or `_` touches it, so `GOLD`
+  does not find `GOLD_RANGE`. Both buttons appear next to **Search file
+  contents** while it is on.
+- The files the Explorer lists are searched: maps, include files, XS files
+  and map tests. A file with unsaved changes is searched as it is in the
+  editor.
+- To search only one folder, right-click it in the Explorer and choose
+  **Find in Files…**. A line such as **in maps** under the box shows the
+  limit; its **x** searches the whole open folder again, and so does turning
+  off **Search file contents**.
+- Click a file, or press **Enter** on it, to open it with the first
+  occurrence selected and the editor's find box open on your text, with the
+  same **Match case** and **Whole word** choices. Click the file again, or
+  press **Enter** again, to move to the next occurrence; after the last one
+  it starts at the first again. **Enter** and **F3** in the editor's find box
+  move on as well.
+- Files larger than 4 MiB are not searched, and one search reads at most
+  4,096 files or 64 MiB. A note under the results says when files were left
+  out.
+
+![Find in files limited to one folder, with counts and an opened match](images/find-in-files.png)
+
+The search by file name is described under
+[Open your scripts](getting-started.md#open-your-scripts).
+
 ### Formatting
 
 **Edit → Format Document** (Shift+Alt+F) tidies the indentation of the
@@ -392,12 +507,19 @@ checked and indented like a multi-line one, and Enter after it adds no second
 
 ### Other conveniences
 
+- Drag a tab along the tab row to change the order of the tabs. The other
+  tabs move aside as you drag, and **Escape** puts the tab back. A tab name
+  too long for its tab scrolls to show its end while you point at the tab.
 - Ctrl+mouse wheel changes the editor font size.
 - Ctrl+click opens a web link in a comment.
 - If AoE2RMSIDE closes while you have unsaved changes, it recovers them the
   next time it starts.
-- Maps you open from the game's installation are read-only. Use
-  **File → Save As…** or **Clone for Editing** to make an editable copy.
+- Maps you open from the game's installation or from a subscribed mod are
+  read-only, and so are the files of mods AoE2RMSIDE deploys, because updates
+  or the next deployment would replace your edits. When you start typing in
+  one, a message says why and offers a **Save As…** link that saves an
+  editable copy. **Clone for Editing** in **File → Browse Installed Maps…**
+  copies a map together with its include files.
 
 ## External language servers
 

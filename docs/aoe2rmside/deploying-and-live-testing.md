@@ -28,22 +28,22 @@ work without the game, and you can always copy your files by hand.
       file name without its extension, or the name you last deployed that
       map under for the profile. Use the arrow next to it to reuse the name
       of an earlier export. A name you type or pick stays until you close
-      the dialog, even when you change the map or the profile.
+      the dialog, also when you change the map or the profile.
     - **User profile:** the game profile to install the mod for. The IDE
       suggests one.
     - **Target directory:** the folder the mod folder goes into. The folder
       button next to it opens it in Windows Explorer.
     - **Map icon** (to the right of the fields): see [Map icons](#map-icons)
       below.
-    - **Enable mod** (next to **Deploy mod**): leave it on to have the IDE
+    - **Enable mod** (next to **Deploy Mod**): leave it on to have the IDE
       turn the mod on in the game's mod list for that profile. It changes
       only this mod's entry, and the IDE remembers the choice.
 3. Look through the file tree. It shows which files the mod will
    contain.
-4. Press **Deploy mod**.
+4. Press **Deploy Mod**.
 
-After deploying, the confirmation shows the mod's folder. **Open mods
-folder** shows it in Windows Explorer; **Finish** (or Enter) closes the
+After deploying, the confirmation shows the mod's folder. **Open Mods
+Folder** shows it in Windows Explorer; **Finish** (or Enter) closes the
 confirmation.
 
 The game shows a new map and its icon only after it restarts. Restart the
@@ -89,7 +89,10 @@ check the same before they change anything in the game.
 If the preview does not already show the selected map, opening the dialog
 generates it. That way the IDE deploys the files the map used.
 
-If a mod with the same name already exists, the IDE asks before replacing it.
+If a mod with the same name already exists, the IDE asks before replacing it
+(**Replace existing mod?**, confirmed with **Replace Mod**). The question opens
+over the deploy dialog, which stays open behind it, dimmed and blurred like
+the rest of the window.
 
 ### Play it in the game
 
@@ -111,19 +114,29 @@ stone, and a marker for each player's start. Other objects are left out, like
 in the game's own map icons, unless you turn on **Minimap objects** (below).
 The icon you see is the icon that is saved and deployed.
 
-Point at the icon to show **Save image…** in its top-right corner. It opens a
-small menu with the image sizes **256 × 256 px**, **512 × 512 px**,
-**1024 × 1024 px** and **1536 × 1536 px**. Every size is drawn fresh, so the
-larger ones stay sharp. The deployed icon is always 512 × 512 px.
+Point at the icon, or move to it with Tab, to show **Copy image** and
+**Save image…** at its bottom. In the enlarged icon (below), the two buttons
+sit in its top-right corner.
 
-You can make and save map icons before you select your game folder: the
-deploy dialog then shows the icon, drawn from the current preview, above
-**Select game folder**.
+- **Copy image** puts the icon on the clipboard as a PNG, at 512 × 512 px,
+  the size that is deployed. When the IDE uses your own PNG (see below), it
+  copies that file's picture as it is.
+- **Save image…** opens a small menu with the image sizes **256 × 256 px**,
+  **512 × 512 px**, **1024 × 1024 px** and **1536 × 1536 px**. Every size is
+  drawn fresh, so the larger ones stay sharp. The deployed icon is always
+  512 × 512 px.
+
+To copy or save the preview itself as it looks on screen, right-click the map
+(see [Copy or save the map as an image](preview.md#copy-or-save-the-map-as-an-image)).
+
+You can make and save map icons before you select your game folder: the deploy
+dialog then shows the icon, drawn from the current preview, above
+**Select Game Folder**.
 
 Click the icon to enlarge it. If **Generate map icon** is off, clicking the
-icon turns it on. While the icon is enlarged, the deploy dialog is hidden; it
-comes back unchanged when you close the icon. The buttons in the bottom-left
-corner of the enlarged icon change how it is drawn:
+icon turns it on. While the icon is enlarged, the deploy dialog is hidden;
+it comes back unchanged when you close the icon. The buttons in the
+bottom-left corner of the enlarged icon change how it is drawn:
 
 - **Top-down view** / **Diamond view** draws the icon like the preview's
   perspective: the square-tiled diamond or the flatter 2:1 diamond.
@@ -131,9 +144,9 @@ corner of the enlarged icon change how it is drawn:
   (the default), like the preview's
   [Look](preview.md#perspective-and-look).
 - **Minimap objects** draws the objects as small squares, like the preview's
-  [Minimap objects](preview.md#minimap-objects). While it is on, the trees and
-  gold-and-stone graphics are switched off. Town Center castles are only drawn
-  when the spawn markers are hidden.
+  [Minimap objects](preview.md#minimap-objects). While it is on, the trees
+  and gold-and-stone graphics are switched off. Town Center castles are only
+  drawn when the spawn markers are hidden.
 - The elevation button cycles through **Elevation off**, **Terrain relief**
   and **3D elevation** (the default), like the preview's
   [Elevation](preview.md#elevation). In Top-down view it skips 3D elevation.
@@ -141,7 +154,7 @@ corner of the enlarged icon change how it is drawn:
 Below the enlarged icon you can also:
 
 - choose the seed the icon is drawn from, roll a **Random seed** (the dice),
-  or go back with **Use editor seed**;
+  or go back with **Use Editor Seed**;
 - switch **Smooth terrain transitions** on or off;
 - choose the spawn markers: each click on the marker button moves on from
   **Player squares** (the default) to **Nomad feet** to **No spawn markers**.
@@ -223,7 +236,7 @@ from the preview. It saves you from setting up the lobby by hand each time.
 1. Open the Run options (the arrow next to the Run button).
 2. Choose **Select AoE2Control** and select the AoE2Control executable
    (installing it: [Installation](../getting-started.md#installation)).
-   (Without a linked game folder, this row offers **Select game folder**
+   (Without a linked game folder, this row offers **Select Game Folder**
    first.)
    The download button next to it opens the
    [AoE2Control releases page](https://github.com/aoe2control/AoE2Control/releases).
