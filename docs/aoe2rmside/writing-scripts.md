@@ -276,12 +276,16 @@ appears.
 - Suggestions open by themselves after a space wherever a name is expected,
   for example after `create_object`, after `<` for a section header and
   after `#` for a directive. **Ctrl+Space** opens them anywhere.
+- At the start of a line outside `{ }`, with nothing typed yet or after `<`,
+  the section headers your script does not have yet come first, in the order
+  the sections belong in the script. Sections the script already has come
+  last.
 - After `if` and `elseif` you get the labels a lobby can define. After
   `#include` you get the files of your open folder, one folder level at a
   time.
 - Snippets insert whole constructs, such as a `create_object` block, or a
-  commented pattern for a common task, such as **Gold and stone near every
-  player**, with placeholders. Press Tab to move from one placeholder to the
+  pattern for a common task, such as **Gold and stone near every player**,
+  with placeholders. Press Tab to move from one placeholder to the
   next. To browse them all, use **Insert Snippet…** (see
   [Inserting a snippet](#inserting-a-snippet)).
 - Press Enter at the end of a block command such as `create_object GOLD`, or
@@ -318,12 +322,27 @@ The snippet goes in at the cursor, or replaces the selected text, and takes
 the indentation of its line. Press Tab to move through its placeholders. One
 Undo removes the whole snippet.
 
+Most snippets belong in one section, for example `<OBJECTS_GENERATION>` for
+gold and stone. When the cursor is somewhere else, AoE2RMSIDE asks first:
+
+- If the script already has that section, **Insert There** adds the snippet
+  at the end of that section.
+- If the script does not have the section yet, **Create Section** adds it in
+  its proper place among the other sections and inserts the snippet there.
+- **Insert Here** keeps the snippet at the cursor, and **Cancel** goes back
+  to the list.
+
+Even then, one Undo removes everything that was added.
+
 ![The Insert Snippet list with a pattern and the text it inserts](images/insert-snippet.png)
 
 Besides the blocks that completion also offers, such as `create_land`,
 `create_object`, `if` … `endif` and `start_random` … `end_random`, the list
-has commented patterns for common map-making tasks:
+has patterns for common map-making tasks:
 
+- New map skeleton (only in a file without sections yet: every section in
+  its order, with player lands and starting units, so the map generates
+  right away)
 - Player lands with a standard base
 - Forest around the map edge
 - A lake in the middle of the map
@@ -337,12 +356,29 @@ has commented patterns for common map-making tasks:
 - Sheep and boar near every player
 - Scattered gold and stone
 - Relics away from the players
-- A random main terrain
+- Fish in the water
 
-Each pattern belongs in one section, for example `<OBJECTS_GENERATION>` for
-gold and stone, so place the cursor in that section first. Its comments
-explain the values, so you can adjust them to your map. Snippet names,
-descriptions and comments are in English in every interface language.
+Point at any word of an inserted pattern to read what it does, then adjust
+the values to your map. Snippet names, descriptions and the few comments are
+in English in every interface language.
+
+#### Your own snippets
+
+Keep code you use often as your own snippet: select it (or select nothing to
+start empty) and choose **Save as Snippet…** in the editor's right-click menu
+or the **Edit** menu. Give it a name, the section it belongs in (or **Any
+section**) and, if you like, a short description. The code can still be
+changed in the dialog, with the same highlighting, suggestions and
+descriptions as in the editor, fitted to the section you chose. Your snippets appear first under **My snippets** in
+Insert Snippet…, go into their section the same way as the built-in ones, and
+are inserted as written, without placeholders. The **Edit** and **Delete** buttons
+on a snippet's row change or remove it; deleting asks first.
+
+To share snippets with other scripters, choose **Export Snippets…** in
+Insert Snippet…: it saves all your snippets to one file you can send or
+post. Someone who receives such a file chooses **Import Snippets…** to add
+them to their own. A snippet whose name is already taken gets a number after
+its name, so nothing is overwritten.
 
 ### Inlay hints
 

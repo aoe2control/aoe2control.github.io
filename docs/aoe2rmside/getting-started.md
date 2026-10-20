@@ -191,6 +191,15 @@ save yourself can contain them.
 
 There is no project file. The IDE works on plain folders.
 
+The Explorer lists your random map scripts, include and definition files,
+map tests and XS scripts, and every folder. Files of other types, such as
+text notes or images, are not listed. A folder with none of the listed files
+anywhere inside it is shown slightly faded, so you can see at a glance that
+nothing relevant is in it yet. Faded folders work like any other: open them,
+create a new script or folder in them, rename or delete them. As soon as a
+script exists inside, the folder and the folders above it show at full
+strength again.
+
 The **Search files** box in the Explorer filters the folder tree as you type.
 The tree keeps only the matching files and folders and the folders that
 contain them, opens those folders for the search, and shows the matching part
