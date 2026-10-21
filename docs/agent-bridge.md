@@ -68,6 +68,12 @@ player fails with `player_in_use` while the session is alive. A session ends wit
 the bridge setting for the player is turned off, when CONTROL unloads, or 30 seconds after its
 last request. A new match does not end a session; observations then report the new `world`.
 
+CONTROL copies the game state only when a session's request needs it, so the bridge costs
+almost nothing while no program asks. `observe`, `map`, `act` and `query` wait for the next frame,
+at most 2 seconds, and answer from a copy made in that frame. While the game does not draw frames,
+they answer from the last copy without waiting. A Lua module that runs at the same time still
+reads a copy every frame.
+
 ## Operations
 
 ### `status`
@@ -95,7 +101,7 @@ Payload `{}`, or any of these fields:
 | Field | Values |
 |---|---|
 | `entity_fields` | `["id", "type_id", ...]`: the per-object fields `entities` lists (see `catalog.entity_fields`). Default: all. |
-| `object_types` | `"all"` (default): every valid object type. `"relevant"`: only the types the player can make now, has, or has queued. `"none"`: an empty list. |
+| `object_types` | `"all"` (default): every valid object type. `"relevant"`: only the types the player can make now, has, or has queued. `"tech_tree"`: only the types with `in_tech_tree` set. `"none"`: an empty list. |
 | `technologies` | `"all"` (default) or `"none"` (an empty list). |
 | `start_goal`, `end_goal` | Goal ids from 1 to 16384, given together, `start_goal` not above `end_goal`. `player.goals` then lists the player's AI script goals in that range. See [AI goals](#ai-goals). |
 
@@ -213,6 +219,22 @@ Commands in version 3:
 | `gameplay.auto_reseed.v1` | `queue`, `enabled` | Turns automatic reseeding on or off. While it is on, the game queues a farm or fish trap when one expires and the player can pay. |
 | `player.set_goals.v1` | `start_goal` (1–16384), `goals` (1–16384 integers) | Writes `goals` to the player's AI script goals, the first value to goal `start_goal`. The goals must end at goal 16384 or before. See [AI goals](#ai-goals). |
 | `player.chat.v1` | `message` (1–200 characters) | Sends a chat message as the player. |
+| `gameplay.unload.v1` | `actors` (buildings, transport ships, rams or siege towers of the player), `position` (optional) | Unloads every unit garrisoned in them. With `position`, the units unload there; a transport ship sails to the nearest shore first. Without it, they unload next to the object. |
+| `gameplay.stop.v1` | `actors` | Stops units: they drop their orders. |
+| `gameplay.attack_ground.v1` | `actors`, `position`, `queue` (optional, default `false`) | Attacks a position with units that can attack the ground, such as mangonels and trebuchets. With `queue: true`, adds it after the units' current orders. |
+| `gameplay.cancel_train.v1` | `target` (a building of the player), `object_type`, `amount` (1–100, default 1) | Removes up to `amount` units of the type from the building's production queue, the most recently queued first. The game refunds them. Rejected with `already_satisfied` when none is queued. |
+| `gameplay.cancel_research.v1` | `target` (a building of the player), `technology` | Removes the technology from the building's production queue. The game refunds it. Rejected with `already_satisfied` when the building does not research it. |
+| `gameplay.pack.v1` | `actors` | Packs units that unpack to attack, such as trebuchets. |
+| `gameplay.unpack.v1` | `actors`, `position` (optional) | Unpacks units. With `position`, they move there and unpack. |
+| `gameplay.gate.v1` | `actors` (gates of the player), `locked` | Locks or unlocks gates. Sends nothing for a gate that is in that state or whose change is on its way; rejected with `already_satisfied` when no gate changes. An object that is no gate: `unsupported_object`. |
+| `gameplay.drop_relic.v1` | `target` (a monk of the player) | Drops the relic the monk carries. |
+| `gameplay.market_sell.v1` | `target` (a market of the player), `resource` (`FOOD` 0, `WOOD` 1, `STONE` 2), `lots` (1–100, default 1) | Sells `lots` lots of 100 for gold. The price falls after each lot. |
+| `gameplay.market_buy.v1` | `target` (a market of the player), `resource` (`FOOD` 0, `WOOD` 1, `STONE` 2), `lots` (1–100, default 1) | Buys `lots` lots of 100 with gold. The price rises after each lot. |
+| `player.tribute.v1` | `player` (1–8, another player), `resource` (`FOOD` 0, `WOOD` 1, `STONE` 2, `GOLD` 3), `amount` (1–100000) | Sends resources. The game ignores it unless the player has a finished market. The player also pays the tribute fee, `amount` times `player.attributes[46]`. When the player cannot pay `amount` and the fee, the game sends what the player has. |
+| `player.diplomacy.v1` | `player` (1–8, another player), `stance` (`ALLY` 0, `NEUTRAL` 1, `ENEMY` 3) | Sets the player's stance toward the other player. The game ignores it when the lobby locked the teams. |
+| `player.flare.v1` | `position` | Shows a flare at the position to the player and its allies. |
+| `player.resign.v1` | none | Resigns the player. Cannot be undone. |
+| `gameplay.transform.v1` | `actors` | Switches units that have a second form to it, as their transform button does. Other units ignore it. |
 
 `actors` lists 1 to 256 different object ids. Each actor must be the player's, alive and fully
 visible to the player; otherwise the action is rejected with `unavailable_actor`.
@@ -227,15 +249,22 @@ Not in the catalog: camera, game speed, pause, saving, starting and ending match
 | `world_turn`, `game_time_ms` | Game time of the observation. |
 | `information_policy` | `player_view` or `omniscient`. |
 | `match` | `map_width`, `map_height`, `player_count`, `victory_condition`, `replay`. |
-| `player` | The bridge's player: `id`, `name`, `civilization_id`, `civilization_name`, `player_type`, `color`, `has_won` (`false` while the match runs; `status.last_result` has the result), `attributes` (a list of numbers by `ResourceType` id), `facts` (object of fact name to value), `diplomacy` (list by player id), `reseeds` (`farm_queue`, `fish_trap_queue`, `auto_farm`, `auto_fish_trap`), `goals` (only when `observe` names `start_goal` and `end_goal`: the AI script goals in that range, or `null` when the player is not a computer player with an AI script). |
-| `players` | Every player: `id`, `name`, `civilization_id`, `player_type`, `color`, `has_won`, `diplomacy`. Includes `attributes` only for the bridge's player and, with `omniscient`, for every player. |
-| `object_types` | For the bridge's player, every valid object type: `id`, `available`, `can_afford`, `can_afford_without_population`, `cost` (list of `{resource, amount}`), `train_site`, `count`, `count_with_queued`, `stats` (see [Stats](#stats); `null` for types the player has none of, has none queued of and cannot make now). |
+| `player` | The bridge's player: `id`, `name`, `civilization_id`, `civilization_name`, `player_type`, `color`, `has_won` (`false` while the match runs; `status.last_result` has the result), `attributes` (a list of numbers by `ResourceType` id), `facts` (object of fact name to value; version 4 removes it), `housing_headroom` (the population the player's houses and town centers still have room for), `market_prices` (`buy` and `sell`: the gold for 100 food, wood and stone, by `ResourceType` id), `diplomacy` (list by player id), `reseeds` (`farm_queue`, `fish_trap_queue`, `auto_farm`, `auto_fish_trap`), `goals` (only when `observe` names `start_goal` and `end_goal`: the AI script goals in that range, or `null` when the player is not a computer player with an AI script). |
+| `players` | Every player: `id`, `name`, `civilization_id`, `player_type`, `color`, `has_won`, `diplomacy`, `current_age` (0 Dark Age to 3 Imperial Age), `current_age_time` (seconds since the player reached that age), `score`. The last three are `null` for gaia and before the game clock runs; `player` has them too. Includes `attributes` only for the bridge's player and, with `omniscient`, for every player. |
+| `object_types` | For the bridge's player, every valid object type: `id`, `name`, `class_id`, `category` (as for entities), `max_hitpoints`, `radius_x`, `radius_y` (half the size in tiles; a building takes `2 * radius_x` by `2 * radius_y` tiles), `base_id` (see below), `in_tech_tree` (see below), `available`, `can_afford`, `can_afford_without_population`, `cost` (list of `{resource, amount}`), `train_site`, `count`, `count_with_queued`, `stats` (see [Stats](#stats); `null` for types outside the tech tree that the player has none of and has none queued of). `count` and `count_with_queued` can include units of other types of the same line. |
 | `visible_object_types` | One entry per type of another player's object, gaia included, that `entities` lists with `access: "full"`: `owner`, `id` and `stats` (see [Stats](#stats)), as the owner has the type. |
 | `technologies` | For the bridge's player, every technology that is not `NOT_AVAILABLE`: `id`, `state` (`ResearchState`), `can_afford`, `cost`. |
 | `entities` | The objects the player can see (see below). |
 | `chat` | The chat messages the game holds. |
 | `pending_actions` | Actions of this player that wait in the queue. |
 | `recent_results` | The last 64 action results of the session, as in `act`, with `action_id`. |
+
+Object types: `in_tech_tree` is `true` when the player can still get the type in this match: the
+player can make it now, it is the first type of a line the player has objects of, or a technology
+the player can still get enables the type or upgrades a type of the tech tree to it. It follows the
+game's technology states and effects. `base_id` is the first type of the type's line, found by
+following the upgrades of technologies back: 70 for every house, 4 for Archer, Crossbowman and
+Arbalester. It is the type's own id when no technology upgrades another type to it.
 
 Entities: every object the player can see. An object the player has explored but cannot see now
 (for example a gold mine in the fog) has `access: "position"` and only the fields `id`, `type_id`,
@@ -245,7 +274,7 @@ right-click in the fog. Other objects have `access: "full"` and all requested fi
 it is in and `garrison_object_id` set; of its other fields only `type_id`, `class_id`,
 `object_type`, `owner`, `status`, `alive` and `commandable` hold values. The fields:
 
-`id`, `type_id`, `type_name`, `name`, `class_id`, `object_type`, `owner` (`null` for none),
+`id`, `type_id`, `type_name`, `name`, `class_id`, `category` (`ObjectType`: 70 units, 80 buildings and so on), `object_type` (the same value as `category`; version 4 removes it), `owner` (`null` for none),
 `x`, `y`, `z`, `tile_x`, `tile_y`, `hitpoints`, `max_hitpoints`, `alive`, `idle`, `moving`,
 `scouting`, `status` (2 finished, 0 foundation), `commandable` (the player can command it),
 `target_object_id`, `target_position` (`{x, y}`), `action_target_position` (`{x, y}` or `null`),
@@ -255,7 +284,9 @@ it is in and `garrison_object_id` set; of its other fields only `type_id`, `clas
 `carry_resource` and `carry_amount` are the resource a unit carries and how much, as the unit panel
 shows them. `carry_resource` is a `ResourceType` id (0 food, 1 wood, 2 stone, 3 gold) or `null`
 when the unit carries nothing; food from hunting, farms, berries and fish is 0. `carry_amount` is
-rounded down; for a farm it is the food left in it. Both are `null` for other players' units. A
+rounded down; for a farm it is the food left in it. For a gaia object with `access: "full"`, such
+as a tree, mine, bush or wild animal, they are its resource and the amount left in it, as the unit
+panel shows when you select it. Both are `null` for other players' objects. A
 villager that switches to another source of the same resource keeps its load; one that switches
 to another resource loses it unless it drops it off first.
 
@@ -311,7 +342,7 @@ Validation and execution (`stage: "validation"` or `"execution"`): `unavailable_
 `unavailable_sources`, `missing_target`, `unavailable_target`, `foreign_target`,
 `invalid_payload`, `queue_unavailable`, `module_unavailable`, `unavailable_object_type`,
 `unavailable_technology`, `population_capacity`, `unaffordable`, `already_satisfied`,
-`command_unavailable`, `queue_full`, `multiplayer`, `no_ai_script`. They mean the same as the Lua command rejections in the module log.
+`command_unavailable`, `queue_full`, `multiplayer`, `no_ai_script`, `unsupported_object`. They mean the same as the Lua command rejections in the module log.
 
 ## Error codes
 
