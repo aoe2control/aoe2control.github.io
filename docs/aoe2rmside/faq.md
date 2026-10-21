@@ -68,7 +68,7 @@ Click a question to open the answer.
     work out that result for certain, it refuses to generate the map instead of
     showing one that could be wrong, and Output says
     **This map can't be previewed with a later starting age**. Choose
-    **Dark Age** or **Standard starting age** in the preset menu to preview
+    **Dark Age** or **Standard starting age** in the configuration menu to preview
     the map.
 
 ??? question "Why is my map refused with Full tech tree or Antiquity?"
@@ -80,7 +80,7 @@ Click a question to open the answer.
 
 ??? question "Why are my human players computers in a live test?"
     A live test starts a single-player game. In it, you play the player in
-    P1 and the game makes every other player a computer, whatever the preset
+    P1 and the game makes every other player a computer, whatever the configuration
     says. While **Live test on run** is on, the players menu shows this and
     the preview generates the map with the same computer players, so the
     preview and the game agree. Turn live testing off to preview other human
@@ -293,12 +293,12 @@ advice.
     edited.
 
 ??? question "Output says a player slot has no player land."
-    The preset puts a player in a lobby slot (P1 to P8) that your script does
+    The configuration puts a player in a lobby slot (P1 to P8) that your script does
     not create land for, for example **P6 has no player land**. The map is
     still generated, as in the game, but that player starts without a land
     and gets none of the per-player objects. When it can, Output says which
     player to move, for example **Put player 2 back in slot P2**. Open
-    **Configure players** in the preset menu and choose slots your script
+    **Configure players** in the configuration menu and choose slots your script
     supports, or change the player count.
 
 ??? question "Map test: it asks me to pin a map."
@@ -406,7 +406,7 @@ advice.
     - the AoE2RMSIDE version, shown in **Help → About AoE2RMSIDE**;
     - the game version from the **Preview game version** menu, including
       `(not verified)` if shown;
-    - the seed and the preset settings (map size, players, game mode);
+    - the seed and the configuration settings (map size, players, game mode);
     - the smallest script that shows the problem. Only share scripts you are
       allowed to share;
     - the relevant lines from Output, with their **Details** (the code and

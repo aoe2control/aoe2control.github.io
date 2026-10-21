@@ -279,7 +279,13 @@ appears.
 - At the start of a line outside `{ }`, with nothing typed yet or after `<`,
   the section headers your script does not have yet come first, in the order
   the sections belong in the script. Sections the script already has come
-  last.
+  last. If you pick a header the script already has, AoE2RMSIDE asks
+  **Go to the existing … section?**: **Go to Section** removes the new header
+  and moves the cursor to the existing one. If you pick a missing header at a
+  spot that does not match the order of sections, it asks **Move … to its
+  place?**: **Move to Its Place** puts the header where it belongs. In both
+  cases **Insert Here** keeps the header at the cursor and **Cancel** gives
+  back what you typed, and one Undo returns to the text as it was before.
 - After `if` and `elseif` you get the labels a lobby can define. After
   `#include` you get the files of your open folder, one folder level at a
   time.
@@ -302,7 +308,7 @@ Editor help is built into AoE2RMSIDE and works offline.
 
 ### Inserting a snippet
 
-**Edit → Insert Snippet…**, or **Insert Snippet…** in the editor's
+**Edit → Insert Snippet…** (Ctrl+J), or **Insert Snippet…** in the editor's
 right-click menu, opens a searchable list of snippets. It works in RMS
 scripts; XS files and map tests have no snippets.
 
@@ -315,8 +321,8 @@ scripts; XS files and map tests have no snippets.
   in the editor's colors, with each placeholder showing its default value,
   and names the sections the snippet fits in.
 - **Up** and **Down** move through the list. **Enter** or a click inserts the
-  highlighted snippet, and **Escape** closes the list without inserting
-  anything.
+  highlighted snippet, and **Escape** or the **x** at the top closes the list
+  without inserting anything.
 
 The snippet goes in at the cursor, or replaces the selected text, and takes
 the indentation of its line. Press Tab to move through its placeholders. One
@@ -365,11 +371,12 @@ in English in every interface language.
 #### Your own snippets
 
 Keep code you use often as your own snippet: select it (or select nothing to
-start empty) and choose **Save as Snippet…** in the editor's right-click menu
-or the **Edit** menu. Give it a name, the section it belongs in (or **Any
+start empty) and choose **Save as Snippet…** (Ctrl+Shift+J) in the editor's
+right-click menu or the **Edit** menu. Give it a name, the section it belongs in (or **Any
 section**) and, if you like, a short description. The code can still be
 changed in the dialog, with the same highlighting, suggestions and
-descriptions as in the editor, fitted to the section you chose. Your snippets appear first under **My snippets** in
+descriptions as in the editor, fitted to the section you chose. **Save
+Snippet** keeps it; the **x** or Escape closes the dialog without saving. Your snippets appear first under **My snippets** in
 Insert Snippet…, go into their section the same way as the built-in ones, and
 are inserted as written, without placeholders. The **Edit** and **Delete** buttons
 on a snippet's row change or remove it; deleting asks first.

@@ -149,7 +149,7 @@ or a different folder, the preview goes back to the local version.
 
 ## Map settings
 
-The **preset menu** at the top of the preview holds the lobby settings the map
+The **configuration menu** at the top of the preview holds the lobby settings the map
 is generated with:
 
 - **Map size:** Tiny (120×120) up to Ludicrous (480×480). Medium is the
@@ -173,12 +173,12 @@ is generated with:
   marked **(game mode)**. The button shows how many options are on. Point at
   an option for a short explanation.
 
-![The lobby options next to the preset menu](images/lobby-options.png)
+![The lobby options next to the configuration menu](images/lobby-options.png)
 
 !!! note "Turbo Random Map"
     **Turbo Random Map** is the game's old mode and stays in the list as it
     was. For the game's turbo labels, choose **Random Map** and turn on
-    **Turbo**; when Turbo Random Map is selected, the preset menu offers
+    **Turbo**; when Turbo Random Map is selected, the configuration menu offers
     **Use Random Map + Turbo** to switch.
 
 !!! note "Regicide without kings"
@@ -199,7 +199,10 @@ a computer") and the preview uses that lobby too, so the preview and the live
 match agree. If no player sits in P1, the players menu asks you to put one
 there. Your own choice comes back when you turn live testing off.
 
-You can save combinations as named presets and switch between them.
+You can save combinations as named configurations and switch between them in
+the configuration list (the button next to the configuration menu).
+**New Configuration** adds one with a short name such as **Config** or
+**Config 1**; rename it with its pencil button.
 
 If a player sits in a slot your script gives no land, the map is still
 generated, as in the game: that player starts without a land and gets none
@@ -218,7 +221,7 @@ Open the Run options (the arrow next to the Run button) to set it:
 - The lock button next to the Seed field decides whether the seed is kept.
   While it shows an open lock (**Lock seed**), each Run picks a new seed;
   this is the default for a new setup. While it shows a closed lock and is
-  highlighted (**Locked**), the seed stays until you change it. Saved presets keep your choice. To reproduce a map later,
+  highlighted (**Locked**), the seed stays until you change it. Saved configurations keep your choice. To reproduce a map later,
   copy its seed and lock it.
 
 ## Running automatically
@@ -306,7 +309,8 @@ minimap:
   orange, stone grey, relics white, berry bushes light green, sheep and hunt
   brown, and fish light blue. Player objects, walls included, are in the
   player color.
-- Each Town Center is a castle in its player's color with a black outline.
+- Each Town Center is a small domed hall in its player's color with a black
+  outline.
 - Decorations, birds and helper objects are left out.
 
 ### Elevation
@@ -376,6 +380,9 @@ With a linked game folder, the rows use the game's own names, such as
 Each row's icon is drawn in the colors of the current look, so it matches
 what you see on the map.
 
+- Point at a row to see its full name, including the name your script uses.
+  For objects that hold food, wood, gold or stone, the tooltip also shows how
+  much they hold in total, for example **Gold: 9,600 in total**.
 - Click a row to open the script line that created it. This also works for
   lines in include files.
 - Point at the list (or at the coordinates above it) to show the **Filter**
@@ -411,7 +418,9 @@ created, and the selection list shows only those.
   section created.
 - Terrain highlights include tiles that later commands painted over, so a
   placeholder terrain that is replaced afterwards still shows where it was
-  placed. The same goes for lands and elevations.
+  placed. The same goes for lands and elevations. The selection list then
+  lists those tiles by the terrain they have now, so a land command such as
+  `create_player_lands` lists all of its tiles.
 - With an area selected on the map, the highlight stays inside that area.
 - A line that created nothing on this seed highlights nothing.
 - After you edit the script without running it again, the highlight still
@@ -421,6 +430,12 @@ When you move the cursor to other code, the old highlight fades out while the
 new one fades in. Move the pointer off the code, for example onto the tab
 row or the map, to see the whole map again. Highlighting is paused while a run
 is in progress.
+
+To use the list the code filled, move the pointer from the code straight
+across to the list, staying at the list's height. The list and the highlight
+then stay as they are, so you can point at a row to see only its tiles, or
+click it to go to its line. When the pointer leaves the list, the list goes back to showing the
+selection.
 
 ![Tiles created by the command under the cursor are highlighted](images/code-highlight.png)
 
@@ -460,7 +475,9 @@ a size you choose, use the map icon instead (see
 The gauge button in the preview shows how long the last run took. Click it to
 open a breakdown by generation step: script parsing, player setup, land,
 elevation, cliffs, terrain, connections, object placement and the final steps.
-Point at a row to see counters for that step.
+Point at a row to see counters for that step. Click a step that comes from one
+section of your script, such as land or terrain, or press Enter on it, to
+select that section's first command in the editor, also in an include file.
 
 While the preview is hidden (**Editor only**), the gauge button sits on the
 right side of the bottom panel bar and shows the run's time without a progress

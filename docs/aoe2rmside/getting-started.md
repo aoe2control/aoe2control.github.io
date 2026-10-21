@@ -239,6 +239,13 @@ When you start AoE2RMSIDE for the first time, the editor already shows a
 short starter map. It is a small, complete map that works without the game,
 and its first line points you to this documentation.
 
+A short tour then explains the window, one part at a time. Each card lights
+up one part: **Explorer**, **Editor**, **Generate a Map** (the Run button),
+**Map Preview** once your first map appears, and **Output and Problems**.
+**Got It** (or Escape) closes a card, and the next one follows when its part
+is ready; **Skip Tour** ends the tour. It shows by itself only once;
+**Help → Take the Tour** starts it again.
+
 You can edit the starter right away. As soon as you change it, it becomes a
 normal unsaved file; save it with **File → Save As…**. If you open another
 file first, the untouched starter makes room for it.
@@ -268,7 +275,7 @@ the game. See
 Things to try next:
 
 - Change a number in the script and run again.
-- Open the **preset menu** at the top of the preview and change the map size
+- Open the **configuration menu** at the top of the preview and change the map size
   or the number of players.
 - Open the Run options (the arrow next to Run) and change the **Seed**. The
   same seed with the same script, settings and game version always gives the

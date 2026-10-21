@@ -145,8 +145,8 @@ bottom-left corner of the enlarged icon change how it is drawn:
   [Look](preview.md#perspective-and-look).
 - **Minimap objects** draws the objects as small squares, like the preview's
   [Minimap objects](preview.md#minimap-objects). While it is on, the trees
-  and gold-and-stone graphics are switched off. Town Center castles are only
-  drawn when the spawn markers are hidden.
+  and gold-and-stone graphics are switched off. The Town Center marks (small
+  domed halls) are only drawn when the spawn markers are hidden.
 - The elevation button cycles through **Elevation off**, **Terrain relief**
   and **3D elevation** (the default), like the preview's
   [Elevation](preview.md#elevation). In Top-down view it skips 3D elevation.
@@ -160,7 +160,7 @@ Below the enlarged icon you can also:
   **Player squares** (the default) to **Nomad feet** to **No spawn markers**.
   The size next to it sets how large the markers are, as a share of the map
   width (with Minimap objects and no spawn markers, it sizes the Town Center
-  castles instead);
+  marks instead);
 - choose how trees, and gold and stone, are drawn (below).
 
 All choices are remembered for the next icon.
