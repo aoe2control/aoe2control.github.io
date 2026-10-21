@@ -269,7 +269,8 @@ used, the result is a note such as `3 commands not compared against the game`
 instead of `Generated`. Open the run to see these commands listed below its
 table; click one to go to the first place your script uses it. The map is
 still generated; the note only tells you where the preview may differ from
-the game. See
+the game. Commands the game ignores where they stand count as compared and
+are not listed. See
 [How AoE2RMSIDE is checked against the game](faq.md#how-aoe2rmside-is-checked-against-the-game).
 
 Things to try next:
