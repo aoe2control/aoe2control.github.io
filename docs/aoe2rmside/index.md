@@ -1,5 +1,5 @@
 ---
-description: "AoE2RMSIDE is a Windows editor for Age of Empires II: Definitive Edition random map scripts, with a built-in map preview, multi-seed map tests and mod deployment."
+description: "AoE2RMSIDE is a Windows editor for Age of Empires II: Definitive Edition random map scripts, with a built-in map preview, multi-seed map tests, a quality check and mod deployment."
 ---
 
 # AoE2RMSIDE
@@ -23,17 +23,25 @@ result.
 - **Write scripts** with error checking, lint warnings with quick fixes,
   completion, ready-made snippets, hover documentation, inlay hints and
   formatting, for RMS and for the XS scripts your maps load, and find text
-  across all your files. See [Writing scripts](writing-scripts.md).
+  across all your files. The editor warns where the game itself can crash,
+  and every preview of a map with XS lists what its XS does at game start.
+  See [Writing scripts](writing-scripts.md).
 - **Preview the map** for any seed, map size, player count, game setting and
   lobby option, in minimap colors or texture colors, beside your code or
   behind it, and copy or save the picture. See [Preview](preview.md).
 - **Test many seeds at once.** A map test generates dozens or hundreds of maps
   and checks each one for problems you describe, such as missing gold or
-  players without a land path. See [Map tests](map-tests.md).
+  players without a land path. The ready-made **quality check** compares
+  what every player gets over many seeds without a line of test code. See
+  [Map tests](map-tests.md).
 - **Put the map into the game** as a local mod, optionally with a generated
   map icon with trees, gold, stone and player starts. See
   [Deploying and live testing](deploying-and-live-testing.md).
 - **Test in the running game** (optional) through AoE2Control.
+- **Work with an AI app** such as Claude (optional). Through MCP it reads
+  and edits your scripts, generates maps, looks at pictures of them and runs
+  map tests and the quality check; its edits stay unsaved until you save
+  them. See [AI apps (MCP)](ai-apps.md).
 - **Use it in your language.** Menus, dialogs and messages are available in
   20 languages. See
   [Interface language](getting-started.md#interface-language).
@@ -53,7 +61,8 @@ If the game is installed, AoE2RMSIDE can link its folder. A linked game adds:
 
 - your own game version as the preview version;
 - the game's standard include files, if your script uses them;
-- the game's XS constants, so the editor can check your XS scripts fully;
+- the game's XS constants, so the editor can check your XS scripts fully
+  and the XS start check can run them;
 - browsing and cloning the maps installed with the game;
 - deploying your map as a local mod;
 - live testing of your map in the running game (with AoE2Control).

@@ -116,13 +116,40 @@ the editor cannot tell a misspelled constant from a real one. A note in
 Problems says so; notes are hidden until you turn them on in the Problems
 filter.
 
-The preview does not run XS. The game runs a map's XS code after the map has
-been generated, so XS never changes the terrain or elevation you see; it can
-change players, objects, and game data when the match starts. When a map
-loads XS, the run's line in Output and Problems show the note **XS effects
-are not shown**. It is information only and does not stop anything.
-
 ![An XS file with a quick fix for main(void)](images/xs-editor.png)
+
+### XS start check
+
+The game runs a map's XS code after the map has been generated, so XS never
+changes the terrain or elevation you see; it can change players, objects and
+game data when the match starts. With every preview of a map that loads XS,
+AoE2RMSIDE runs the **XS start check**: `main()` and the rules active at the
+start, once, with the game's `Constants.xs` from your linked game folder.
+
+- Output lists under the source **XS**, in the run's group, a summary such
+  as "XS start check: start_bonus.xs ran main() and 2 rules (1,284 steps)",
+  the chat lines, the changes per player (resources, technologies, units,
+  names, colors) and what the check found, such as an array index out of
+  range or a division by zero.
+- Findings with a file and line also appear in **Problems**, under their XS
+  file. The editor draws no squiggles for them.
+- The results are not compared against the game; the summary says **Not
+  compared against the game**. Random numbers come from AoE2RMSIDE's own
+  stream, seeded from the map seed, not from the game's.
+- The map does not show these changes. The run's note reads **XS changes are
+  listed in Output, not drawn on the map**.
+- Some calls need a running match or data AoE2RMSIDE does not have, such as
+  the values of units. The check stops at such a call with a note that names
+  it, for example "Stopped at xsGetUnitHitpoints: the IDE does not know
+  values of objects and units". That is a limit of the check, not a mistake
+  in your script, so it stays out of Problems.
+- Without a linked game folder, Output asks you to link it. An XS file with
+  errors is skipped, and Output says so.
+
+To turn the check off, uncheck **View → Check XS When Running a Map**. It is
+on by default, and the choice is remembered. Map tests can run the same check
+with `sample.xs_start()` (see
+[Map tests](map-tests.md#xs-scripts)).
 
 ## Includes and the game's definitions
 
@@ -199,6 +226,7 @@ what you meant. Each of these lint rules has a code:
 | RMS4009 | Not a comment in the game | `//` or `;` written as a comment, or `/*` and `*/` glued to other text. The game only skips text between `/*` and `*/` written apart, so it reads the words after `//` or `;` as code. |
 | RMS4010 | Number where a name is needed | A plain number where a command reads an object, terrain, effect, resource or attribute, for example `create_object 66`. The game only finds defined names there, so it ignores the whole command. Write the name instead, such as `GOLD`. Amounts and other values still take numbers. |
 | RMS4011 | Name may be undefined | A name your script defines with `#define` or `#const` that some random or conditional path to the line leaves undefined, for example when one `percent_chance` branch misspells it. On such a path the game ignores a command that needs the name, and counts a value written with the name as 0. |
+| RMS4012 | The game can crash here | A line on which the game itself crashes when another branch, seed or lobby setting reaches it, for example `override_map_size` making the map smaller after the player lands. See [Known game crashes](#known-game-crashes). |
 
 An unused definition (RMS4002) is not underlined: its name is shown faded,
 and Problems does not list it. After `//` or `;`, RMS4009 is a warning only
@@ -216,6 +244,28 @@ are warnings.
 Lint warnings never stop you from running, deploying or live testing a map.
 The rules stay quiet wherever the game could read the code differently from
 the editor.
+
+#### Known game crashes
+
+Some scripts make the game itself crash, while it generates the map or later
+in the match. AoE2RMSIDE knows these crashes from a reviewed list and words
+each one the same way:
+
+- When the selected settings reach such a crash, the preview refuses the map
+  with **The game crashes on this map**, the cause and the change to the
+  script that avoids it, in Output, Problems and the deployment panel.
+- When only another branch, seed or lobby setting reaches it, the editor
+  warns **The game can crash here** (RMS4012) on the line. Like the other
+  lint rules you can turn it off. Deploying such a map asks first and offers
+  **Deploy Anyway**; a live test asks first and offers **Start Anyway**.
+- The hover help of commands that can crash the game, such as
+  `override_map_size` or `override_actor_radius_if_required`, says when the
+  game crashes.
+- Map tests count the maps the game would crash on, for each cause, and list
+  seeds to try again (see [Map tests](map-tests.md#read-the-results)).
+
+The list of known crashes and their fixes is in the
+[FAQ](faq.md#known-game-crashes).
 
 ![A lint warning with its quick fixes](images/rms-lint.png)
 

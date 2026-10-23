@@ -89,6 +89,13 @@ check the same before they change anything in the game.
 If the preview does not already show the selected map, opening the dialog
 generates it. That way the IDE deploys the files the map used.
 
+If the game itself crashes on the map with the selected settings, the dialog
+says **The game crashes on this map**, with the cause and the fix, and the
+IDE does not deploy. If only another seed or other lobby settings lead to a
+[known game crash](writing-scripts.md#known-game-crashes), the dialog warns
+"With another seed or other lobby settings the game can crash on this map",
+and the deploy button reads **Deploy Anyway**.
+
 If a mod with the same name already exists, the IDE asks before replacing it
 (**Replace existing mod?**, confirmed with **Replace Mod**). The question opens
 over the deploy dialog, which stays open behind it, dimmed and blurred like
@@ -265,6 +272,11 @@ Start the game and press **Run** in AoE2RMSIDE. The IDE then:
 5. selects the map in the game;
 6. starts a Random Map game with your map, seed and settings;
 7. checks that the match started with those settings.
+
+If the game crashes on the map with the selected settings, the preview
+refuses it and no live test starts. If only another seed or other lobby
+settings lead to a known game crash, the IDE asks first (**The game can crash
+on this map**): **Start Anyway** runs the live test, and **Cancel** stops it.
 
 While this runs, a progress bar on the right side of the bottom panel bar,
 before the **Preview game version** menu, shows one word for the current step,

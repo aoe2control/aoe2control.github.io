@@ -57,10 +57,16 @@ Click a question to open the answer.
     the game. Nothing that happens after the start is shown: AI, unit
     behavior, or changes during the game.
 
-    XS code does not run in the preview. The game runs it after the map has
-    been generated, so it never changes the terrain you see, but it can change
-    players, objects, and game data when the match starts. For a map that
-    loads XS, Output shows the note **XS effects are not shown**.
+    XS code does not change the terrain you see; the game runs it after the
+    map has been generated. With every preview of a map that loads XS,
+    AoE2RMSIDE runs the XS start check: `main()` and the rules active at the
+    start, once, with the game's `Constants.xs` from your linked game folder.
+    Output lists under **XS** the chat lines, the changes per player
+    (resources, technologies, units, names, colors) and what the check found;
+    findings with a file and line also appear in Problems. The results are not
+    compared against the game, and the map does not show these changes.
+    Without a linked game folder, Output asks you to link it. See
+    [XS start check](writing-scripts.md#xs-start-check).
 
 ??? question "Why is my map refused with a later starting age?"
     With some starting ages later than the Dark Age, the game changes objects
@@ -93,8 +99,9 @@ Click a question to open the answer.
 
     The exception is code known to crash the game or whose behavior the
     preview cannot safely reproduce. AoE2RMSIDE reports an error instead.
-    **The game crashes on this script** (RMS2042) identifies a known game-crash
-    path. Open the message's **Details** for the affected code.
+    **The game crashes on this map** names a known game crash, with its cause
+    and the change that avoids it (see [Known game crashes](#known-game-crashes)).
+    Open the message's **Details** for the affected code.
 
 ??? question "Is the time shown in the preview the time the game takes?"
     No. The execution-cost numbers are measured on your computer, in
@@ -117,6 +124,35 @@ Click a question to open the answer.
     for New Versions at Startup**. AoE2RMSIDE downloads something only when
     you choose **Update** in the installed version: the new release's
     installer and its checksum list, from the AoE2RMSIDE releases on GitHub.
+
+    If you connect an AI app through MCP (off until you turn it on), that app
+    sees the scripts, maps and pictures it asks for. See
+    [Where your data goes](ai-apps.md#where-your-data-goes).
+
+## Known game crashes
+
+Some scripts make the game itself crash. AoE2RMSIDE refuses such a map with
+**The game crashes on this map**, or warns **The game can crash here** when
+only another seed or lobby setting reaches the crash (see
+[Known game crashes](writing-scripts.md#known-game-crashes)). These are the
+crashes it knows, each with the change that avoids it:
+
+| Crash | Fix |
+|---|---|
+| `override_actor_radius_if_required` on an object too small for the search | Remove `override_actor_radius_if_required` from that object. |
+| A line in a connection block has no terrain | Move the line out of the connection block, before the connection commands. |
+| A connection reaches a land outside the map | Keep `land_position` inside the map for every map size. |
+| An object is placed on a land outside the map | Keep `land_position` inside the map for every map size. |
+| `override_map_size` makes the map smaller after the player lands | Move `override_map_size` before `create_player_lands`. |
+| The map paints a terrain without movement data | Use a terrain that the game's movement data covers. |
+| A defined name runs as `cliff_type` in `<CLIFF_GENERATION>` | Remove the defined name, or write the command it was meant to be. |
+| A defined name runs as `base_terrain` or `base_layer` in `create_elevation` braces | Remove the defined name, or write the command it was meant to be. |
+| A defined name runs as `ai_info_map_type`, `effect_amount` or `effect_percent` | Remove the defined name, or write the command it was meant to be. |
+| A defined name runs as `guard_state` in `<PLAYER_SETUP>` | Remove the defined name, or write the command it was meant to be. |
+| A defined name runs as `base_terrain` or `base_layer` in `<LAND_GENERATION>` | Remove the defined name, or write the command it was meant to be. |
+| A defined name runs as `terrain_type` or `assign_to` in a land's braces | Remove the defined name, or write the command it was meant to be. |
+| A defined name runs as `terrain_to_place_on`, `layer_to_place_on` or `second_object` in an object's braces | Remove the defined name, or write the command it was meant to be. |
+| A defined name runs as `create_terrain` or `color_correction` in `<TERRAIN_GENERATION>` | Remove the defined name, or write the command it was meant to be. |
 
 ## RMS replication and compatibility boundary
 

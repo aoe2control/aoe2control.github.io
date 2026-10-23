@@ -72,8 +72,10 @@ follows the pointer. The separators work with the mouse only.
 layout. **View → Theme…** sets the app theme and the editor colors (see
 [Theme and editor colors](#theme-and-editor-colors)). The
 **View** menu also holds **Show Live Generation Stages** for the preview,
-**Show Outline Row**, **Show Inlay Hints** and **Lint Rules** for the editor,
-and **Language…** for the interface language.
+**Check XS When Running a Map** for the
+[XS start check](writing-scripts.md#xs-start-check), **Show Outline Row**,
+**Show Inlay Hints** and **Lint Rules** for the editor, **Language…** for the
+interface language, and **MCP…** for [AI apps](ai-apps.md).
 
 ## Theme and editor colors
 
@@ -172,8 +174,8 @@ link.
 
 AoE2RMSIDE only reads your game folder; it never changes the game's files.
 Graphics from your own game installation are only read locally, and the
-application never uploads or sends them anywhere; only a picture you copy or
-save yourself can contain them.
+application never uploads them anywhere; only a picture you copy or save
+yourself, or one that an AI app you allowed asks for, can contain them.
 
 ## Open your scripts
 
@@ -281,6 +283,9 @@ Things to try next:
 - Open the Run options (the arrow next to Run) and change the **Seed**. The
   same seed with the same script, settings and game version always gives the
   same map.
+- Turn on **Quality check** in the Run options: every Run is then followed by
+  a check of many seeds for fairness and playability (see
+  [Quality check](map-tests.md#quality-check)).
 
 While a run is in progress, the Run button shows a spinner. When you point at
 it, it turns into a Stop button. Click it or press F5 to stop the run.
@@ -292,5 +297,7 @@ it, it turns into a Stop button. Click it or press F5 to stop the run.
 - [Map tests](map-tests.md): check many seeds automatically.
 - [Deploying and live testing](deploying-and-live-testing.md): play your map
   in the game.
+- [AI apps (MCP)](ai-apps.md): let an AI app such as Claude work on your
+  maps with you.
 
 **Help → Documentation** in AoE2RMSIDE opens these pages.

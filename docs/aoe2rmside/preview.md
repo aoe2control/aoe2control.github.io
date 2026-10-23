@@ -202,7 +202,20 @@ there. Your own choice comes back when you turn live testing off.
 You can save combinations as named configurations and switch between them in
 the configuration list (the button next to the configuration menu).
 **New Configuration** adds one with a short name such as **Config** or
-**Config 1**; rename it with its pencil button.
+**Config 1**. Each configuration in the list has three buttons:
+
+- **Edit** (the pencil) renames it in place, with the whole name selected.
+  Enter, the check, clicking elsewhere or closing the list keeps the new
+  name; Esc keeps the old one.
+- **Duplicate** adds a copy right below it, with every setting, the seed and
+  its lock included, named like a copy in Windows Explorer: **Config (2)**,
+  then **Config (3)**. The copy is selected and its name opens for editing.
+- **Delete** removes it after you confirm.
+
+When you show a map test or quality check result that your settings cannot
+reproduce, the preview uses a temporary configuration, **Test Config**, with
+a dotted button and a **Back to** button beside it (see
+[Map tests](map-tests.md#read-the-results)).
 
 If a player sits in a slot your script gives no land, the map is still
 generated, as in the game: that player starts without a land and gets none
@@ -223,6 +236,10 @@ Open the Run options (the arrow next to the Run button) to set it:
   this is the default for a new setup. While it shows a closed lock and is
   highlighted (**Locked**), the seed stays until you change it. Saved configurations keep your choice. To reproduce a map later,
   copy its seed and lock it.
+
+The **Quality check** row below the Seed row checks your map over many seeds
+after each Run and Run on save; see
+[Quality check](map-tests.md#quality-check).
 
 ## Running automatically
 
@@ -395,7 +412,9 @@ what you see on the map.
   selection, until you press Esc in the box or click its **x**. While it
   holds text, the box stays visible.
 - The list keeps the same width and place whatever it shows, so it never
-  jumps while you select or filter.
+  jumps while you select or filter. After a large selection, its rows can
+  take a moment to fill in; until then the list keeps showing the rows it
+  had, and the selection settles on its tiles without waiting for it.
 - Helper objects are hidden by default. Use the
   **Show Helper Objects** button at the bottom of the list to include them;
   it then reads **Hide Helper Objects**.
@@ -497,6 +516,9 @@ while it has keyboard focus.
 
 - If the script has errors, the preview keeps the last good map.
 - If generation itself fails, the preview is cleared.
+- If the game itself would crash on the map with these settings, the notice
+  says **The game crashes on this map**, with the cause and the change that
+  avoids it (see [Known game crashes](writing-scripts.md#known-game-crashes)).
 
 For common messages, see
 [Compatibility, limits and troubleshooting](faq.md#common-problems).

@@ -82,6 +82,7 @@ nav:
     - Preview: aoe2rmside/preview.md
     - Map tests: aoe2rmside/map-tests.md
     - Deploying and live testing: aoe2rmside/deploying-and-live-testing.md
+    - AI apps (MCP): aoe2rmside/ai-apps.md
     - Compatibility, limits and troubleshooting: aoe2rmside/faq.md
   - Reference:
     - ai-agent-reference.md
