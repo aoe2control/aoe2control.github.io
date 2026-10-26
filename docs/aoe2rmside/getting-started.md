@@ -190,6 +190,9 @@ yourself, or one that an AI app you allowed asks for, can contain them.
   Explorer's folder tree are opened too; they are not copied into the folder.
 - **File → New File** (Ctrl+N) creates a new `.rms` file with a small starter
   map.
+- The arrow at the right end of the Explorer's top row (**Switch Folder**)
+  lists your recent folders, the same ones as **File → Open Recent**, and
+  **Open Folder…**. Choose one to open it instead of the open folder.
 
 There is no project file. The IDE works on plain folders.
 
@@ -201,6 +204,14 @@ nothing relevant is in it yet. Faded folders work like any other: open them,
 create a new script or folder in them, rename or delete them. As soon as a
 script exists inside, the folder and the folders above it show at full
 strength again.
+
+Right-click a file or folder for **Copy**, **Cut** and **Paste**, or press
+**Ctrl+C**, **Ctrl+X** and **Ctrl+V** in the Explorer. Paste on a folder or
+on the empty part of the Explorer. Cut and Paste moves the item. If the name
+is taken, the copy gets a name as in Windows File Explorer, for example
+`Map - Copy.rms`, then `Map - Copy (2).rms`. You can copy files and folders
+from Windows File Explorer and paste them into the Explorer, and the other way
+round. **F2** renames the selected item, and **Delete** deletes it.
 
 The **Search files** box in the Explorer filters the folder tree as you type.
 The tree keeps only the matching files and folders and the folders that
@@ -297,7 +308,7 @@ it, it turns into a Stop button. Click it or press F5 to stop the run.
 - [Map tests](map-tests.md): check many seeds automatically.
 - [Deploying and live testing](deploying-and-live-testing.md): play your map
   in the game.
-- [AI apps (MCP)](ai-apps.md): let an AI app such as Claude work on your
+- [AI apps (MCP)](ai-apps.md): let an AI app work on your
   maps with you.
 
 **Help → Documentation** in AoE2RMSIDE opens these pages.

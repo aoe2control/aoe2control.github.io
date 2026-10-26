@@ -1,13 +1,13 @@
 ---
-description: "Connect an AI app such as Claude to AoE2RMSIDE through MCP: it reads and edits your scripts, generates maps, looks at pictures of them, runs map tests and the quality check, and when you ask deploys maps and starts live tests."
+description: "Connect an AI app to AoE2RMSIDE through MCP: it reads and edits your scripts, generates maps, looks at pictures of them, runs map tests and the quality check, and when you ask deploys maps and starts live tests."
 ---
 
 # AI apps (MCP)
 
-AI apps on your computer, such as Claude Desktop, Claude Code or Codex, can work
-with AoE2RMSIDE through MCP, the Model Context Protocol that AI apps use to
-connect to tools. The app reads and edits the scripts in your open folder,
-checks them for errors, generates maps and looks at pictures of them, runs
+AI apps on your computer can work with AoE2RMSIDE through MCP, the Model
+Context Protocol that AI apps use to connect to tools. The app reads and
+edits the scripts in your open folder, can switch to one of your recent
+folders, checks the scripts for errors, generates maps and looks at pictures of them, runs
 map tests and the quality check and, when you ask, deploys a map or starts a
 live test. You see
 every change in the editor, and nothing is saved unless you save it.
@@ -17,9 +17,9 @@ MCP is off until you turn it on.
 ## What you need
 
 - AoE2RMSIDE running, with your maps folder open (**File → Open Folder…**).
-  The AI app works only in that folder.
-- An AI app that can use local MCP servers, such as Claude Desktop, Claude
-  Code or Codex, with its own account. AoE2RMSIDE does not include an AI app.
+  The AI app works only in the open folder and your recent folders.
+- An AI app that can use local MCP servers, with its own account.
+  AoE2RMSIDE does not include an AI app.
 
 The game and AoE2Control are only needed for what needs them without an AI
 app too: deploying needs a linked game folder, and live tests need
@@ -37,9 +37,8 @@ AoE2Control and the running game. See
    stops it, for example a setting it is not allowed to change, it tells you
    what to do.
 4. Close **Connect an AI app** with its **x**. When the app connects,
-   AoE2RMSIDE asks **Allow Claude to use AoE2RMSIDE?** (with your app's
-   name), with one line on what the app could do and which program started
-   it. Choose **Allow**.
+   AoE2RMSIDE asks whether to allow it, with your app's name, one line on
+   what the app could do and which program started it. Choose **Allow**.
 
 Some apps need a restart before they see a new connection; the app tells
 you when.
@@ -49,15 +48,15 @@ you when.
 If your AI app cannot change its own settings, press **Set up by hand**
 beside **Copy Prompt** in **Connect an AI app**:
 
-1. Choose your app in the list: **Claude Desktop**, **Claude Code**,
-   **Codex** or **Other app**.
-2. Press **Copy Setup** and add the copied text to the app:
-    - **Claude Desktop:** open **Settings > Developer > Edit Config**, add the
-      text to the configuration file, save it and restart Claude Desktop. If
-      the file already has an `mcpServers` section, add the `aoe2rmside`
-      entry to it.
-    - **Claude Code** or **Codex:** run the copied command in a terminal.
-    - **Other app:** add the copied program as a local MCP server in the app.
+1. Choose your app in the list, or **Other app** if it is not listed.
+2. Press **Copy Setup** and add the copied text to the app as the line below
+   it says:
+    - For an app with a configuration file, add the text to that file, save
+      it and restart the app. If the file already has an `mcpServers`
+      section, add the `aoe2rmside` entry to it.
+    - For an app with a command line, run the copied command in a terminal.
+    - For **Other app**, add the copied program as a local MCP server in the
+      app.
 3. In the AI app, ask for something, for example "Which scripts are in my
    AoE2RMSIDE folder?", and choose **Allow** when AoE2RMSIDE asks.
 
@@ -72,8 +71,9 @@ Start AoE2RMSIDE and ask again; you do not need to restart the AI app.
 ## Where your data goes
 
 The AI app sees the scripts, maps and pictures it asks for, and only from
-your open folder, never your game folder, your game profiles or the game's
-own maps. The app's provider handles that data under its own terms.
+your open folder and your recent folders, never your game folder, your game
+profiles, the game's own maps or mod folders. A game or mod folder in your
+recent folders is not offered to the app. The app's provider handles that data under its own terms.
 
 To disconnect every AI app, turn off **Enable MCP**.
 
@@ -93,10 +93,10 @@ others. **Remove** disconnects an app and forgets it; it asks again the next
 time it connects. **Connect an AI app…** below the list connects another
 app.
 
-While an app is connected, the right end of the Output panel's bar shows it,
-for example **Claude connected**, or **Claude is working** while a request
-runs. Click it to open **View → MCP…**. The Output panel lists every request
-of the app in one line, such as **Claude: edited maps/oasis.rms**, without
+While an app is connected, the right end of the Output panel's bar shows its
+name with **connected**, or with **is working** while a request runs. Click
+it to open **View → MCP…**. The Output panel lists every request of the app
+in one line after the app's name, such as **edited maps/oasis.rms**, without
 file contents.
 
 ## What asks you first
@@ -104,11 +104,12 @@ file contents.
 | What the app does | Does AoE2RMSIDE ask you? |
 |---|---|
 | Read, edit and create files in the open folder | No. Edits stay unsaved in the editor. |
+| Switch to one of your recent folders | No. Open tabs stay open with their unsaved changes. |
 | Save files | The app can save only when **Let AI apps save files** is on in **View → MCP…**. |
 | Check scripts, generate maps, take pictures, run map tests | No |
 | Deploy a map as a new mod, or again into a mod it deployed in this session | No. The editor shows a notice, and Output lists it. |
 | Deploy into a mod it did not deploy in this session | Yes: **Replace the mod "…"?** |
-| Start a live test | Yes, each time: **Start a live test for Claude?** with **Start Live Test**. With **Allow for this session** on, later live tests of that app start without asking until AoE2RMSIDE restarts. |
+| Start a live test | Yes, each time: **Start a live test for …?** (with the app's name) with **Start Live Test**. With **Allow for this session** on, later live tests of that app start without asking until AoE2RMSIDE restarts. |
 | Deploy or live test a map the game can crash on with other seeds or lobby settings | Yes, with the same warning as your own deploy (**Deploy Anyway**) or live test (**Start Anyway**). |
 
 The app deploys and starts live tests only when you ask it to. A live test
@@ -123,8 +124,8 @@ After you answer, tell the app to continue.
 
 - An edit opens the file in a tab in the background; the tab you work in
   stays active.
-- The tab of a file the app changed is marked. Its tooltip says, for example,
-  **Edited by Claude, not saved**, with the reason the app gave. The changed
+- The tab of a file the app changed is marked. Its tooltip says that the app
+  edited it and that it is not saved, with the reason the app gave. The changed
   lines are highlighted for a few seconds.
 - **Ctrl+Z** in the tab undoes one change of the app in one step.
 - You save as usual. With **Let AI apps save files** on, the app can save
@@ -134,9 +135,8 @@ After you answer, tell the app to continue.
 ## Maps, pictures and tests
 
 - **Maps:** when the app generates a map, it appears in the preview, and
-  Output lists the run with the app's name, for example
-  **Claude · oasis.rms**. Your Run settings stay as they are, including a
-  kept seed.
+  Output lists the run with the app's name and the script's name. Your Run
+  settings stay as they are, including a kept seed.
 - **Showing a map:** when you ask the app to show you a map, it runs as your
   own Run does. Settings it suggests are set in the Run menu, and Output says
   that they were set by the app.
@@ -172,6 +172,7 @@ What the AI app can do, in plain words:
 | Tool | What it does |
 |---|---|
 | `ide_status` | Sees the open folder, the open tabs, the Run settings, whether AoE2RMSIDE is busy, and whether deploying and live tests are available. |
+| `list_folders`, `open_folder` | Lists your recent folders and opens one of them instead of the open folder. |
 | `list_files`, `read_file` | Lists and reads the scripts in the open folder, with your unsaved text. |
 | `edit_file`, `create_file` | Changes or creates a script; the change stays unsaved in a tab. |
 | `save_file` | Saves a tab, only when **Let AI apps save files** is on. |

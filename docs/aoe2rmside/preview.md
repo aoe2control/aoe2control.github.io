@@ -400,6 +400,10 @@ what you see on the map.
 - Point at a row to see its full name, including the name your script uses.
   For objects that hold food, wood, gold or stone, the tooltip also shows how
   much they hold in total, for example **Gold: 9,600 in total**.
+  For maps of a verified game version, the tooltip's last line gives the IDs
+  the game assigns when it generates the map: **ID 574** for one object, or
+  the lowest and highest, such as **ID 574-580**, for several. This covers
+  objects, forest trees and cliffs.
 - Click a row to open the script line that created it. This also works for
   lines in include files.
 - Point at the list (or at the coordinates above it) to show the **Filter**

@@ -38,7 +38,7 @@ result.
   map icon with trees, gold, stone and player starts. See
   [Deploying and live testing](deploying-and-live-testing.md).
 - **Test in the running game** (optional) through AoE2Control.
-- **Work with an AI app** such as Claude (optional). Through MCP it reads
+- **Work with an AI app** (optional). Through MCP it reads
   and edits your scripts, generates maps, looks at pictures of them and runs
   map tests and the quality check; its edits stay unsaved until you save
   them. See [AI apps (MCP)](ai-apps.md).

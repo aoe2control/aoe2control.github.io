@@ -722,7 +722,8 @@ per player), it is shown once with a count such as `×2`.
   configuration **Test Config**. Its button above the map has a dotted
   outline, and it is neither stored nor listed. **Back to** with your
   configuration's name, beside it, returns to your own configuration as it
-  was, with its seed and lock; choosing a configuration from the list ends
+  was, with its seed and lock, and brings back the map you had before the
+  replay; choosing a configuration from the list ends
   it too. A finding made with the Run menu's own settings changes only the
   seed.
 - **Click the line number** at the right of a check's header to go to that
