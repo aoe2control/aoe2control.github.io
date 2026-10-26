@@ -83,7 +83,7 @@ No session. Payload `{}`. Returns:
 | Field | Content |
 |---|---|
 | `player_id` | The pipe's player. |
-| `state` | `waiting_for_match`, `ready`, `multiplayer_refused`. |
+| `state` | `waiting_for_match` (also while a match loads), `ready`, `multiplayer_refused`. |
 | `session_open` | `true` while a session is alive. |
 | `information_policy` | `player_view`, or `omniscient` while **Modules See Everything** is on. |
 | `last_result` | `null`, or the result of the last match that ended while the bridge was on: `world` (the `world` of that match's observations), `winner` (the id of the player the game names as the winner, `null` when it names none) and `won` (`true` when `winner` is the bridge's player). It stays until another match ends. |
