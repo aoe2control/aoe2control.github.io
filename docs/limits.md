@@ -69,7 +69,7 @@ With **Tournament Mode** on:
 
 ## Multithreading
 
-With **Multithreading** on, each module runs on its own thread and reads a copy of the game state taken once per frame. Game commands are queued and carried out on the game's thread.
+With **Multithreading** on, each module runs on its own thread and reads a copy of the game state taken just before each of its callbacks. Game commands are queued and carried out on the game's thread.
 
 - `Render()` is not called.
 - These functions do nothing and return `nil`, `false` or an empty value, and CONTROL logs `Multithreading blocked ...` once per function and module load: `DispatchStartGame`, `DispatchRestartGame`, `DispatchResignGame`, `DispatchQuitGame`, `DispatchLoadGame`, `RefreshRandomMapSources`, `SetGamePaused`, `SetReplaySpeed`, `SetGameSpeedMultiplier`, `IPC.WaitForMessage`, `GetScreenSize`, `IsOnScreen`, `IsWorldPosOnScreen`, `WorldToScreen`, `WorldToMinimap`, `GetZoom`, `GetCameraPosition`.
@@ -77,7 +77,7 @@ With **Multithreading** on, each module runs on its own thread and reads a copy 
 
 ### Game-state copy
 
-With **Multithreading** on, and while the [Agent Bridge](agent-bridge.md) is on for any player, modules read a copy of the game state taken once per frame instead of the live game. These functions then behave differently:
+With **Multithreading** on, and while the [Agent Bridge](agent-bridge.md) is on for any player, modules read a copy of the game state instead of the live game. CONTROL takes the copy just before a callback runs, and every frame while the module has a `Render()` function. These functions then behave differently:
 
 - `GetFact`, `Player:GetFact`, `Object:GetAttribute` and `Object:GetObjectData` return `nil` for values the copy does not hold.
 - `GetObjectTypeData` returns `nil` for every field except `ObjectData.TRAIN_SITE`.
