@@ -77,7 +77,7 @@ Rules:
 - The top-level code runs when the module is loaded (selected, CONTROL started with it assigned, or reloaded). Top-level `require` calls run then too.
 - Most game functions need a running match. Outside one (for example in `Load()` in the main menu) they log `Game API function called before the game started` and return `nil` or a default value.
 - **Time limit:** a callback, including top-level code, that runs longer than 1 second is stopped with the error `callback ran longer than the 1000 ms limit`. Time inside a single CONTROL function call is not interrupted. The game waits for callbacks that run on its thread, so keep `Update()` and `Render()` short.
-- **Errors:** a Lua error in top-level code, `Load()`, `Update()` or `Render()` is shown in the slot's section of the CONTROL menu and logged. After an error in `Update()` or `Render()`, CONTROL stops calling that function until the module is reloaded.
+- **Errors:** a Lua error in top-level code, `Load()`, `Update()` or `Render()` is shown in the slot's section of the CONTROL menu and logged. After an error in `Update()` or `Render()`, CONTROL stops calling that function until the next match or a reload. `pcall` catches the time-limit error, but the next 10,000 Lua instructions raise it again, so return right after catching it.
 - **Commands outside Update():** game commands belong in `Update()`. From another callback they still run and log a warning once per module load; with **Tournament Mode** on they are refused. During a replay they are refused.
 - **Drawing:** `Render*` functions raise an error outside `Render()`.
 
@@ -114,7 +114,7 @@ Rules:
 With **Multithreading** on, and while the Agent Bridge is on for any player, every module reads a copy of the game state taken once per frame instead of the live game. Tournament Mode does not do this.
 
 - `GetFact`, `Player:GetFact`, `Object:GetObjectData` return `nil` for values the copy does not hold.
-- `GetObjectTypeData` returns `nil` for every field except `ObjectData.TRAIN_SITE`.
+- `GetObjectTypeData` returns `nil` for every field except `ObjectData.TRAIN_SITE` and `ObjectData.CLASS`.
 - `GetObjectTypeAttribute` and `Object:GetAttribute` return `nil` except for `RADIUS_X`, `RADIUS_Y` (and `HITPOINTS` for objects) and these combat values, with the owner's upgrades: `SHOWN_ATTACK`, `SHOWN_MELEE_ARMOR`, `WEAPON_RANGE`, `MINIMUM_WEAPON_RANGE`, `SPEED_OF_ATTACK`, `HIT_CHANCE`, `SPEED`, `LINE_OF_SIGHT`, and `WEAPON` and `ARMOR` per class (`nil` for a class the type has no value for). Types: those the assigned player has, has queued or can make now. Objects: the player's own, and other players' objects it can see.
 - `CheckPlacement()`, `CanPlaceObject()` and `MapTile:IsBuildable()` return `nil`.
 - `GetObjectsInArea` compares the object's exact position, not its tile.
@@ -294,7 +294,7 @@ A cost list is an array of `{ resourceId = ResourceType, amount = number }`.
 
 **Keeping references.** An `Object`, `Player` or `MapTile` is valid during the callback that returned it. Keep ids or positions across callbacks and look objects up again.
 
-**GetObjectStates(objects)** takes an array of `Object` values and returns a table of arrays `id`, `unitType`, `playerId`, `x`, `y`, `hitpoints`, `targetId`, `alive`; index `i` of every array is the same object. `playerId` is `-1` without an owner; `targetId` is `-1` without a visible target. `nil` entries, objects that no longer exist and objects the module cannot see are skipped, so match results by `id`. A value that is not an `Object` raises an error.
+**GetObjectStates(objects)** takes an array of `Object` values and returns a table of arrays `id`, `unitType`, `class`, `playerId`, `x`, `y`, `hitpoints`, `targetId`, `alive`; index `i` of every array is the same object. `playerId` is `-1` without an owner; `targetId` is `-1` without a visible target. `nil` entries, objects that no longer exist and objects the module cannot see are skipped, so match results by `id`. A value that is not an `Object` raises an error.
 
 **GetObjectChanges()** compares the assigned player's objects (as `GetAssignedPlayer():GetPlayerObjects()` returns them) with the previous call from this module instance. `created`, `destroyed` and `damaged` (lower hitpoints) are integer id arrays sorted by id. The first call after a load reports every object as created. When the player cannot be read, it returns empty lists and keeps the previous state.
 

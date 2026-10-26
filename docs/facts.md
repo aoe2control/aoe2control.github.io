@@ -211,8 +211,9 @@ An `Object`, `Player` or `MapTile` is valid during the callback that returned it
 
 ### Object states
 
-`GetObjectStates(objects)` takes an array of `Object` values, for example the result of `GetObjectsByClass`. It returns a table of arrays: `id`, `unitType`, `playerId`, `x`, `y`, `hitpoints`, `targetId` and `alive`. Index `i` of every array describes the same object.
+`GetObjectStates(objects)` takes an array of `Object` values, for example the result of `GetObjectsByClass`. It returns a table of arrays: `id`, `unitType`, `class`, `playerId`, `x`, `y`, `hitpoints`, `targetId` and `alive`. Index `i` of every array describes the same object.
 
+- `class` is the value `Object:GetClass()` returns, a `UnitClass`. Read it as `states.class[i]`.
 - `playerId` is `-1` for an object without an owner. `targetId` is `-1` when the object has no target, or its target is not visible.
 - `nil` entries, objects that no longer exist and objects the module cannot see are left out, so the arrays can be shorter than the input. Use the `id` array to match results to objects.
 - A value that is not an `Object` raises an error.

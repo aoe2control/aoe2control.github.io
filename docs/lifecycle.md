@@ -79,7 +79,7 @@ The entry file's top-level code runs when the module is loaded: when you select 
 ## Errors
 
 - A Lua error in the top-level code or any callback is shown in the player's section of the CONTROL menu and written to the log.
-- After an error in `Update()` or `Render()`, CONTROL stops calling that function until the module is reloaded.
+- After an error in `Update()` or `Render()`, CONTROL stops calling that function for the rest of the match. It runs again when the next match starts, or after a reload. Until then the error stays in the CONTROL menu.
 - A callback, including the top-level code, that runs longer than 1 second is stopped with an error. See [Limits](limits.md#callback-time-limit).
 
 ## Commands outside Update

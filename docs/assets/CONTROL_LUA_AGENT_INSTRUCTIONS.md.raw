@@ -17,7 +17,7 @@ Rules for coding agents that write CONTROL (AoE2Control) Lua modules. Look up ev
 8. Give game commands (`TrainUnit`, `UnitsMove`, `ResearchTechnology` and the rest) only in `Update()`. With **Sequential Actions** on (the default), only the first command per `Update()` runs.
 9. Call `Render*` draw functions only inside `Render()`. Anywhere else they raise an error. Keep expensive work out of `Render()`; it runs every frame.
 10. A callback, including the file's top-level code, is stopped with an error after 1 second. Never write loops that wait for game state; `IPC.WaitForMessage` waits at most 500 ms.
-11. After an error in `Update()` or `Render()`, CONTROL stops calling it until the module is reloaded. Guard code paths that can fail.
+11. After an error in `Update()` or `Render()`, CONTROL stops calling it until the next match or a reload. Guard code paths that can fail, and spread long work over several updates.
 
 ## Nil checks and stale objects
 

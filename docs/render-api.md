@@ -6,7 +6,7 @@ description: "Reference for the AoE2Control Render API, including screen-space, 
 
 The Render API draws overlays on the game screen, in the game world and on the minimap.
 
-- Call the draw functions (`Render*`) only from your module's `Render()` callback. Anywhere else they raise an error, for example `RenderLine can only be called from Render() (called during Update).` If `Render()` raises an error, CONTROL stops calling it until the module is reloaded.
+- Call the draw functions (`Render*`) only from your module's `Render()` callback. Anywhere else they raise an error, for example `RenderLine can only be called from Render() (called during Update).` If `Render()` raises an error, CONTROL stops calling it until the next match or a reload.
 - The query functions (`GetScreenSize`, `IsOnScreen`, `WorldToScreen`, `GetZoom` and the others without `Render` in the name) work in any callback.
 - The Render API does not work while **Multithreading** or **Tournament Mode** is enabled. The query functions return zero values (`false` for `IsOnScreen` and `IsWorldPosOnScreen`). With Multithreading, CONTROL does not call `Render()`; with Tournament Mode, `Render()` runs but the draw functions draw nothing.
 - Colors are `Color(r, g, b, a)` values with components from 0 to 255; see [Color](types.md#color).

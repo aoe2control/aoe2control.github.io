@@ -8,6 +8,56 @@ A callback, including the entry file's top-level code, may run for at most 1 sec
 
 While a callback runs on the game's thread, the game waits for it. Keep `Update()` and `Render()` short.
 
+When `Update()` or `Render()` ends with an error, this one included, CONTROL stops calling it for the rest of the match. It runs again when the next match starts, or after a reload.
+
+### Spreading work over updates
+
+Handle part of a long list in each `Update()` and continue where the previous call stopped. `GetClockMs()` measures how long the current call has run. Keep ids, not `Object` values, between calls (see [Keeping references](facts.md#keeping-references)).
+
+```lua
+local ids = {}
+local nextIndex = 1
+
+local function HandleObject(object)
+    -- your per-object work
+end
+
+function Update()
+    if nextIndex > #ids then
+        ids = GetObjectStates(GetAssignedPlayer():GetPlayerObjects()).id
+        nextIndex = 1
+    end
+    local started = GetClockMs()
+    while nextIndex <= #ids and GetClockMs() - started < 100 do
+        local object = GetObjectById(ids[nextIndex])
+        if object then
+            HandleObject(object)
+        end
+        nextIndex = nextIndex + 1
+    end
+end
+```
+
+### Catching the time-limit error
+
+`pcall` catches the time-limit error like any other Lua error, so the callback is not stopped. The time is still used up: CONTROL checks it every 10,000 Lua instructions and raises the error again at the next check. After a caught time-limit error, return from the callback in a few statements.
+
+```lua
+local lastError = nil
+
+local function PlanArmy()
+    -- your long-running work
+end
+
+function Update()
+    local ok, err = pcall(PlanArmy)
+    if not ok then
+        lastError = err -- for example, plan less in the next Update
+        return
+    end
+end
+```
+
 ## Module Depth
 
 - **Module discovery:** entry files in `modules\` and up to three folders below it. See [Module System](module-system.md#discovery-rules).
@@ -80,7 +130,7 @@ With **Multithreading** on, each module runs on its own thread and reads a copy 
 With **Multithreading** on, and while the [Agent Bridge](agent-bridge.md) is on for any player, modules read a copy of the game state instead of the live game. CONTROL takes the copy just before a callback runs, and every frame while the module has a `Render()` function. These functions then behave differently:
 
 - `GetFact`, `Player:GetFact`, `Object:GetAttribute` and `Object:GetObjectData` return `nil` for values the copy does not hold.
-- `GetObjectTypeData` returns `nil` for every field except `ObjectData.TRAIN_SITE`.
+- `GetObjectTypeData` returns `nil` for every field except `ObjectData.TRAIN_SITE` and `ObjectData.CLASS`.
 - `GetObjectTypeAttribute` and `Object:GetAttribute` return `nil` for every attribute except `RADIUS_X`, `RADIUS_Y` and the [combat values](#combat-values-in-the-copy). `Object:GetAttribute` also returns `HITPOINTS`.
 - `CheckPlacement()`, `CanPlaceObject()` and `MapTile:IsBuildable()` return `nil`.
 - `GetMapTile` returns `nil` for a tile the assigned player has not explored, unless **Modules See
